@@ -1,21 +1,28 @@
 import { CSEStockData } from '@/types';
+import axios from 'axios';
 
 // CSE symbols to track
+// Add or remove stock symbols here as needed
 export const CSE_SYMBOLS = [
-  'JKH.N0000',
-  'COMB.N0000',
-  'HNB.N0000',
-  'DIAL.N0000',
-  'SAMP.N0000',
-  'LFIN.N0000',
-  'NTB.N0000',
-  'CINS.N0000',
-  'BIL.N0000',
-  'VONE.N0000'
+  'JKH',
+  'COMB',
+  'HNB',
+  'DIAL',
+  'SAMP',
+  'LFIN',
+  'NTB',
+  'CINS',
+  'BIL',
+  'VONE',
+  'LOLC'
 ];
 
 // Throttle delay between API calls (in milliseconds)
+// This prevents being blocked by the API server
 const THROTTLE_DELAY = 2000; // 2 seconds between requests
+
+// CSE API endpoint
+const CSE_API_URL = 'https://www.cse.lk/api/companyInfoSummery';
 
 /**
  * Sleep function for throttling
@@ -24,35 +31,59 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Fetch stock data from CSE (Colombo Stock Exchange)
- * Note: This is a placeholder. In production, you would use the actual CSE API
- * or a financial data provider like Alpha Vantage, Yahoo Finance, etc.
+ * Uses the official CSE API endpoint
  */
 export async function fetchCSEStockData(symbol: string): Promise<CSEStockData | null> {
   try {
-    // Placeholder for CSE API call
-    // In production, replace this with actual API endpoint
-    // Example: const response = await axios.get(`https://api.cse.lk/stock/${symbol}`);
-    
     console.log(`Fetching data for ${symbol}...`);
     
-    // Simulated data for demonstration
-    // Replace this with actual API call in production
-    const mockData: CSEStockData = {
+    // Make request to CSE API with symbol in request body
+    const response = await axios.post(CSE_API_URL, {
+      symbol: symbol
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      timeout: 10000 // 10 second timeout
+    });
+    
+    // Extract data from API response
+    const apiData = response.data;
+    
+    // Parse price information from the response
+    const currentPrice = parseFloat(apiData.priceInfo?.currentPrice || '0');
+    const previousClose = parseFloat(apiData.priceInfo?.previousClose || '0');
+    const change = parseFloat(apiData.priceInfo?.change || '0');
+    const percentageChange = parseFloat(apiData.priceInfo?.percentageChange || '0');
+    const open = parseFloat(apiData.priceInfo?.open || '0');
+    const high = parseFloat(apiData.priceInfo?.high || '0');
+    const low = parseFloat(apiData.priceInfo?.low || '0');
+    const volume = parseInt(apiData.shareVolume || '0', 10);
+    
+    // Convert to our CSEStockData format
+    const stockData: CSEStockData = {
       symbol,
       date: new Date().toISOString().split('T')[0],
-      price: Math.random() * 100 + 50,
-      change: (Math.random() - 0.5) * 5,
-      changePercent: (Math.random() - 0.5) * 10,
-      volume: Math.floor(Math.random() * 1000000),
-      high: Math.random() * 100 + 60,
-      low: Math.random() * 100 + 40,
-      open: Math.random() * 100 + 50,
-      close: Math.random() * 100 + 50,
+      price: currentPrice,
+      change: change,
+      changePercent: percentageChange,
+      volume: volume,
+      high: high,
+      low: low,
+      open: open,
+      close: previousClose,
     };
     
-    return mockData;
+    return stockData;
   } catch (error) {
-    console.error(`Error fetching data for ${symbol}:`, error);
+    if (axios.isAxiosError(error)) {
+      console.error(`Error fetching data for ${symbol}:`, error.message);
+      if (error.response) {
+        console.error(`Response status: ${error.response.status}`);
+      }
+    } else {
+      console.error(`Error fetching data for ${symbol}:`, error);
+    }
     return null;
   }
 }
