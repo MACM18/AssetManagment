@@ -1,0 +1,27 @@
+{
+  "symbol": "LOLC",
+  "companyName": "LOLC Holdings PLC",
+  "sector": "Diversified Financials",
+  "shareVolume": "12345678",
+  "turnover": "123456789.50",
+  "trades": "1234",
+  "priceInfo": {
+    "currentPrice": "285.00",
+    "previousClose": "280.00",
+    "change": "5.00",
+    "percentageChange": "1.79",
+    "open": "282.00",
+    "high": "287.50",
+    "low": "280.00",
+    "lastTradedTime": "2025-10-17T14:30:00"
+  },
+  "yearlyStats": {
+    "fiftyTwoWeekHigh": "320.00",
+    "fiftyTwoWeekLow": "245.00"
+  },
+  "marketInfo": {
+    "marketCap": "123456789000",
+    "eps": "12.50",
+    "pe": "22.80"
+  }
+}
