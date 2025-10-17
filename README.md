@@ -156,10 +156,22 @@ The system now uses the official CSE API endpoint:
 
 **Response Format**: See `lolc_beta_info.json` for an example API response structure.
 
+## Deployment
+
+The application is configured for automated deployment to Firebase Hosting via GitHub Actions.
+
+### Quick Start
+
+1. Set up Firebase project and configure `.firebaserc` with your project ID
+2. Add GitHub secrets: `FIREBASE_SERVICE_ACCOUNT` and `FIREBASE_PROJECT_ID`
+3. Push to `main` branch - deployment happens automatically
+
+For detailed deployment setup and troubleshooting, see [FIREBASE_DEPLOYMENT.md](./FIREBASE_DEPLOYMENT.md).
+
 ## Scripts
 
 - `npm run dev` - Start development server
-- `npm run build` - Build for production
+- `npm run build` - Build for production (creates static export in `out/`)
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run collect-data` - Manually run data collection
