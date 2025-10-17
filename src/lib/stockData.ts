@@ -29,10 +29,20 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
   try {
     console.log('Fetching trade summary for all stocks...');
     
-    // Make request to CSE API - no body required for tradeSummary endpoint
-    const response = await axios.post(CSE_API_URL, {}, {
+    // Make request to CSE API - using explicit axios.request config
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: CSE_API_URL,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Empty body for tradeSummary endpoint
+      data: {},
       timeout: 30000 // 30 second timeout for all data
-    });
+    } as const;
+
+    const response = await axios.request(config as any);
     
     // Extract data from API response - response.data.tradeSummary contains the array
     const apiDataArray = Array.isArray(response.data?.tradeSummary) 
