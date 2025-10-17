@@ -3,7 +3,7 @@ import { fetchMultipleStocks, saveStockDataLocally, CSE_SYMBOLS } from '../src/l
 
 async function main() {
   console.log('Starting daily stock data collection...');
-  console.log(`Collecting data for ${CSE_SYMBOLS.length} symbols with throttling...`);
+  console.log(`Collecting data for ${CSE_SYMBOLS.length} symbols using bulk endpoint...`);
   
   const date = new Date().toISOString().split('T')[0];
   

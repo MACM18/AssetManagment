@@ -1,0 +1,56 @@
+[
+  {
+    "symbol": "JKH",
+    "companyName": "John Keells Holdings PLC",
+    "sector": "Diversified Financials",
+    "shareVolume": "881394",
+    "turnover": "92156789.50",
+    "trades": "1234",
+    "priceInfo": {
+      "currentPrice": "104.62",
+      "previousClose": "102.34",
+      "change": "2.28",
+      "percentageChange": "2.23",
+      "open": "102.50",
+      "high": "105.00",
+      "low": "101.80",
+      "lastTradedTime": "2025-10-17T14:30:00"
+    },
+    "yearlyStats": {
+      "fiftyTwoWeekHigh": "110.00",
+      "fiftyTwoWeekLow": "85.00"
+    },
+    "marketInfo": {
+      "marketCap": "150000000000",
+      "eps": "8.50",
+      "pe": "12.31"
+    }
+  },
+  {
+    "symbol": "COMB",
+    "companyName": "Commercial Bank of Ceylon PLC",
+    "sector": "Banking",
+    "shareVolume": "428381",
+    "turnover": "64234567.80",
+    "trades": "987",
+    "priceInfo": {
+      "currentPrice": "149.94",
+      "previousClose": "149.64",
+      "change": "0.30",
+      "percentageChange": "0.20",
+      "open": "149.50",
+      "high": "150.20",
+      "low": "148.90",
+      "lastTradedTime": "2025-10-17T14:30:00"
+    },
+    "yearlyStats": {
+      "fiftyTwoWeekHigh": "160.00",
+      "fiftyTwoWeekLow": "135.00"
+    },
+    "marketInfo": {
+      "marketCap": "120000000000",
+      "eps": "10.25",
+      "pe": "14.63"
+    }
+  }
+]
