@@ -1,0 +1,47 @@
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
+import { getAuth, Auth } from 'firebase/auth';
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+let app: FirebaseApp | undefined;
+let dbInstance: Firestore | undefined;
+let storageInstance: FirebaseStorage | undefined;
+let authInstance: Auth | undefined;
+
+// Only initialize Firebase if we have valid configuration
+const hasValidConfig = firebaseConfig.apiKey && 
+                       firebaseConfig.authDomain && 
+                       firebaseConfig.projectId;
+
+if (hasValidConfig && typeof window !== 'undefined') {
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+    dbInstance = getFirestore(app);
+    storageInstance = getStorage(app);
+    authInstance = getAuth(app);
+  } else {
+    app = getApps()[0];
+    dbInstance = getFirestore(app);
+    storageInstance = getStorage(app);
+    authInstance = getAuth(app);
+  }
+}
+
+// Create placeholder/mock implementations for when Firebase is not configured
+const mockDb = {} as Firestore;
+const mockStorage = {} as FirebaseStorage;
+const mockAuth = {} as Auth;
+
+export const db = dbInstance || mockDb;
+export const storage = storageInstance || mockStorage;
+export const auth = authInstance || mockAuth;
+export { app };
