@@ -34,8 +34,12 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
       timeout: 30000 // 30 second timeout for all data
     });
     
-    // Extract data from API response - expecting an array
-    const apiDataArray = Array.isArray(response.data) ? response.data : [];
+    // Extract data from API response - response.data.tradeSummary contains the array
+    const apiDataArray = Array.isArray(response.data?.tradeSummary) 
+      ? response.data.tradeSummary 
+      : Array.isArray(response.data) 
+        ? response.data 
+        : [];
     
     if (!apiDataArray.length) {
       console.warn('No trade summary data returned from API');
