@@ -32,6 +32,10 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          
+          git fetch origin data-sync || git checkout -b data-sync
+          git checkout data-sync
+          
           git add data/
           git diff --staged --quiet || git commit -m "chore: daily stock data collection $(date +'%Y-%m-%d')"
-          git push
+          git push origin data-sync
