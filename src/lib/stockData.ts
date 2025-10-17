@@ -31,9 +31,6 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
     
     // Make request to CSE API - no body required for tradeSummary endpoint
     const response = await axios.post(CSE_API_URL, {}, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
       timeout: 30000 // 30 second timeout for all data
     });
     
