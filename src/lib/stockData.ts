@@ -19,7 +19,7 @@ export const CSE_SYMBOLS = [
 
 // Throttle delay between API calls (in milliseconds)
 // This prevents being blocked by the API server
-const THROTTLE_DELAY = 2000; // 2 seconds between requests
+const THROTTLE_DELAY = 10000; // 10 seconds between requests
 
 // CSE API endpoint
 const CSE_API_URL = 'https://www.cse.lk/api/companyInfoSummery';
