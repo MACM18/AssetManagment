@@ -5,11 +5,6 @@ on:
     # Run every day at 9:00 AM UTC (3:00 PM Sri Lanka Time)
     - cron: '0 9 * * *'
   workflow_dispatch: # Allow manual trigger
-    inputs:
-      target_Branch:
-        description: 'Branch to run on'
-        required: true
-        default: 'data-sync'
 
 jobs:
   collect-data:
@@ -37,10 +32,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
-          git fetch origin data-sync || git checkout -b data-sync
-          git checkout data-sync
-          
           git add data/
           git diff --staged --quiet || git commit -m "chore: daily stock data collection $(date +'%Y-%m-%d')"
-          git push origin data-sync
+          git push
