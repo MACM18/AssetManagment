@@ -78,8 +78,9 @@ Runs every day at 9:00 AM UTC (3:00 PM Sri Lanka Time) to fetch CSE stock data.
 - **Workflow**: `.github/workflows/daily-data-collection.yml`
 - **Script**: `scripts/collectStockData.ts`
 - **Features**:
-  - Fetches data for multiple CSE stock symbols
-  - Implements throttling (2 seconds between requests) to avoid API rejection
+  - Fetches data for all CSE stocks in a single bulk request
+  - Filters to include only tracked symbols
+  - Much faster: completes in ~5 seconds (vs. 110+ seconds with old approach)
   - Saves data to `data/` directory
   - Commits data back to repository
 
@@ -137,24 +138,26 @@ export const CSE_SYMBOLS = [
 
 ## API Integration
 
-The system now uses the official CSE API endpoint:
+The system now uses the official CSE API endpoint with improved efficiency:
 
-**Endpoint**: `https://www.cse.lk/api/companyInfoSummery`
+**Endpoint**: `https://www.cse.lk/api/tradeSummary`
 
 **Request Format**:
 ```json
-{
-  "symbol": "LOLC"
-}
+{}
 ```
+(Empty POST request body)
+
+**Response**: Array of all stocks' trade summary data for the day
 
 **Features**:
-- Makes POST requests with stock symbol in request body
-- Processes one stock at a time
-- Implements 2-second throttling between requests to prevent being blocked
+- Makes a single POST request to get all stocks at once
+- No throttling required between stocks (bulk fetch)
+- Dramatically faster: ~5 seconds instead of 110+ seconds
 - Parses response data including price, volume, and trading statistics
+- Filters results to only include tracked symbols
 
-**Response Format**: See `lolc_beta_info.json` for an example API response structure.
+**Response Format**: See `trade_summary_example.json` for an example API response structure.
 
 ## Scripts
 
