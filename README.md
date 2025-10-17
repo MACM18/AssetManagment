@@ -117,24 +117,44 @@ The tracker supports four types of investments:
 
 The following CSE symbols are tracked by default (configurable in `src/lib/stockData.ts`):
 
-- JKH.N0000 (John Keells Holdings)
-- COMB.N0000 (Commercial Bank)
-- HNB.N0000 (Hatton National Bank)
-- DIAL.N0000 (Dialog Axiata)
-- SAMP.N0000 (Sampath Bank)
-- LFIN.N0000 (LB Finance)
-- NTB.N0000 (Nations Trust Bank)
-- CINS.N0000 (Ceylinco Insurance)
-- BIL.N0000 (Bukit Darah)
-- VONE.N0000 (Vallibel One)
+**To add or remove stock symbols**, edit the `CSE_SYMBOLS` array in `src/lib/stockData.ts`:
+
+```typescript
+export const CSE_SYMBOLS = [
+  'JKH',    // John Keells Holdings
+  'COMB',   // Commercial Bank
+  'HNB',    // Hatton National Bank
+  'DIAL',   // Dialog Axiata
+  'SAMP',   // Sampath Bank
+  'LFIN',   // LB Finance
+  'NTB',    // Nations Trust Bank
+  'CINS',   // Ceylinco Insurance
+  'BIL',    // Bukit Darah
+  'VONE',   // Vallibel One
+  'LOLC'    // LOLC Holdings
+];
+```
 
 ## API Integration
 
-**Note**: The current implementation uses mock data for demonstration. To use real CSE data:
+The system now uses the official CSE API endpoint:
 
-1. Obtain API access from a financial data provider (e.g., CSE official API, Alpha Vantage, Yahoo Finance)
-2. Update the `fetchCSEStockData` function in `src/lib/stockData.ts`
-3. Add API credentials to your environment variables
+**Endpoint**: `https://www.cse.lk/api/companyInfoSummery`
+
+**Request Format**:
+```json
+{
+  "symbol": "LOLC"
+}
+```
+
+**Features**:
+- Makes POST requests with stock symbol in request body
+- Processes one stock at a time
+- Implements 2-second throttling between requests to prevent being blocked
+- Parses response data including price, volume, and trading statistics
+
+**Response Format**: See `lolc_beta_info.json` for an example API response structure.
 
 ## Scripts
 

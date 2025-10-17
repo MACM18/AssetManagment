@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "collect-data": "tsx scripts/collectStockData.ts",
-    "monthly-export": "tsx scripts/monthlyExport.ts"
+    "monthly-export": "tsx scripts/monthlyExport.ts",
+    "test-stock-data": "tsx scripts/testStockData.ts"
   },
   "keywords": [],
   "author": "",
