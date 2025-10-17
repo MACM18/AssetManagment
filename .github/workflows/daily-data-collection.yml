@@ -5,6 +5,11 @@ on:
     # Run every day at 9:00 AM UTC (3:00 PM Sri Lanka Time)
     - cron: '0 9 * * *'
   workflow_dispatch: # Allow manual trigger
+    inputs:
+      target_Branch:
+        description: 'Branch to run on'
+        required: true
+        default: 'data-sync'
 
 jobs:
   collect-data:
