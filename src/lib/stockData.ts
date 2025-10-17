@@ -45,9 +45,9 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
 
     const response = await axios.request(config);
     
-    // Extract data from API response - response.data.tradeSummary contains the array
-    const apiDataArray = Array.isArray(response.data?.tradeSummary) 
-      ? response.data.tradeSummary 
+    // Extract data from API response - response.data.reqTradeSummery contains the array
+    const apiDataArray = Array.isArray(response.data?.reqTradeSummery) 
+      ? response.data.reqTradeSummery 
       : Array.isArray(response.data) 
         ? response.data 
         : [];
@@ -66,20 +66,23 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
     for (const apiData of apiDataArray) {
       try {
         // Only process stocks that are in our tracking list
-        const symbol = apiData.symbol;
+        // Symbol format from API is like "JKH.N0000", so we need to extract the base symbol
+        const fullSymbol = apiData.symbol || '';
+        const symbol = fullSymbol.split('.')[0]; // Extract "JKH" from "JKH.N0000"
+        
         if (!CSE_SYMBOLS.includes(symbol)) {
           continue;
         }
         
-        // Parse price information from the response
-        const currentPrice = parseFloat(apiData.priceInfo?.currentPrice || '0');
-        const previousClose = parseFloat(apiData.priceInfo?.previousClose || '0');
-        const change = parseFloat(apiData.priceInfo?.change || '0');
-        const percentageChange = parseFloat(apiData.priceInfo?.percentageChange || '0');
-        const open = parseFloat(apiData.priceInfo?.open || '0');
-        const high = parseFloat(apiData.priceInfo?.high || '0');
-        const low = parseFloat(apiData.priceInfo?.low || '0');
-        const volume = parseInt(apiData.shareVolume || '0', 10);
+        // Parse price information from the response (fields are at root level)
+        const currentPrice = parseFloat(apiData.price || 0);
+        const previousClose = parseFloat(apiData.previousClose || 0);
+        const change = parseFloat(apiData.change || 0);
+        const percentageChange = parseFloat(apiData.percentageChange || 0);
+        const open = parseFloat(apiData.open || 0);
+        const high = parseFloat(apiData.high || 0);
+        const low = parseFloat(apiData.low || 0);
+        const volume = parseInt(apiData.sharevolume || 0, 10);
         
         // Convert to our CSEStockData format
         const stockData: CSEStockData = {
