@@ -1,5 +1,6 @@
 import { CSEStockData } from '@/types';
 import axios from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 // CSE symbols to track
 // Add or remove stock symbols here as needed
@@ -30,7 +31,7 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
     console.log('Fetching trade summary for all stocks...');
     
     // Make request to CSE API - using explicit axios.request config
-    const config = {
+    const config: AxiosRequestConfig = {
       method: 'post',
       maxBodyLength: Infinity,
       url: CSE_API_URL,
@@ -40,9 +41,9 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
       // Empty body for tradeSummary endpoint
       data: {},
       timeout: 30000 // 30 second timeout for all data
-    } as const;
+    };
 
-    const response = await axios.request(config as any);
+    const response = await axios.request(config);
     
     // Extract data from API response - response.data.tradeSummary contains the array
     const apiDataArray = Array.isArray(response.data?.tradeSummary) 
