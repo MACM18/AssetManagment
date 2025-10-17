@@ -37,9 +37,9 @@ if (hasValidConfig && typeof window !== 'undefined') {
 }
 
 // Create placeholder/mock implementations for when Firebase is not configured
-const mockDb = {} as any;
-const mockStorage = {} as any;
-const mockAuth = {} as any;
+const mockDb = {} as Firestore;
+const mockStorage = {} as FirebaseStorage;
+const mockAuth = {} as Auth;
 
 export const db = dbInstance || mockDb;
 export const storage = storageInstance || mockStorage;

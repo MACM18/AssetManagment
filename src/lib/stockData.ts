@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { CSEStockData } from '@/types';
 
 // CSE symbols to track
@@ -87,7 +86,9 @@ export async function fetchMultipleStocks(symbols: string[]): Promise<CSEStockDa
 export function saveStockDataLocally(data: CSEStockData[], date: string): void {
   // Check if running in Node.js environment
   if (typeof window === 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fs = require('fs');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const path = require('path');
     
     const dataDir = path.join(process.cwd(), 'data');

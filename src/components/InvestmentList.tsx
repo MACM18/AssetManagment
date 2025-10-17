@@ -5,7 +5,7 @@ import { Investment } from '@/types';
 interface InvestmentListProps {
   investments: Investment[];
   onDelete: (id: string) => void;
-  onUpdate: (id: string, updates: Partial<Investment>) => void;
+  onUpdate?: (id: string, updates: Partial<Investment>) => void;
 }
 
 export default function InvestmentList({ investments, onDelete, onUpdate }: InvestmentListProps) {
