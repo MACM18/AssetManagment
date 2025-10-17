@@ -17,96 +17,134 @@ export const CSE_SYMBOLS = [
   'LOLC'
 ];
 
-// Throttle delay between API calls (in milliseconds)
-// This prevents being blocked by the API server
-const THROTTLE_DELAY = 10000; // 10 seconds between requests
-
-// CSE API endpoint
-const CSE_API_URL = 'https://www.cse.lk/api/companyInfoSummery';
+// CSE API endpoint - updated to use tradeSummary endpoint
+// This endpoint returns all trade summary data in a single request
+const CSE_API_URL = 'https://www.cse.lk/api/tradeSummary';
 
 /**
- * Sleep function for throttling
+ * Fetch all stock data from CSE (Colombo Stock Exchange) in a single request
+ * Uses the new tradeSummary endpoint which returns all stocks at once
  */
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
+  try {
+    console.log('Fetching trade summary for all stocks...');
+    
+    // Make request to CSE API - no body required for tradeSummary endpoint
+    const response = await axios.post(CSE_API_URL, {}, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000 // 30 second timeout for all data
+    });
+    
+    // Extract data from API response - expecting an array
+    const apiDataArray = Array.isArray(response.data) ? response.data : [];
+    
+    if (!apiDataArray.length) {
+      console.warn('No trade summary data returned from API');
+      return [];
+    }
+    
+    console.log(`Received data for ${apiDataArray.length} stocks`);
+    
+    // Convert each stock to our CSEStockData format
+    const results: CSEStockData[] = [];
+    const date = new Date().toISOString().split('T')[0];
+    
+    for (const apiData of apiDataArray) {
+      try {
+        // Only process stocks that are in our tracking list
+        const symbol = apiData.symbol;
+        if (!CSE_SYMBOLS.includes(symbol)) {
+          continue;
+        }
+        
+        // Parse price information from the response
+        const currentPrice = parseFloat(apiData.priceInfo?.currentPrice || '0');
+        const previousClose = parseFloat(apiData.priceInfo?.previousClose || '0');
+        const change = parseFloat(apiData.priceInfo?.change || '0');
+        const percentageChange = parseFloat(apiData.priceInfo?.percentageChange || '0');
+        const open = parseFloat(apiData.priceInfo?.open || '0');
+        const high = parseFloat(apiData.priceInfo?.high || '0');
+        const low = parseFloat(apiData.priceInfo?.low || '0');
+        const volume = parseInt(apiData.shareVolume || '0', 10);
+        
+        // Convert to our CSEStockData format
+        const stockData: CSEStockData = {
+          symbol,
+          date,
+          price: currentPrice,
+          change: change,
+          changePercent: percentageChange,
+          volume: volume,
+          high: high,
+          low: low,
+          open: open,
+          close: previousClose,
+        };
+        
+        results.push(stockData);
+        console.log(`✓ Processed ${symbol}: ${currentPrice}`);
+      } catch (itemError) {
+        console.error(`Error parsing data for stock:`, itemError);
+        // Continue processing other stocks
+      }
+    }
+    
+    return results;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error fetching trade summary:', error.message);
+      if (error.response) {
+        console.error(`Response status: ${error.response.status}`);
+        console.error(`Response data:`, error.response.data);
+      }
+    } else {
+      console.error('Error fetching trade summary:', error);
+    }
+    return [];
+  }
+}
 
 /**
- * Fetch stock data from CSE (Colombo Stock Exchange)
- * Uses the official CSE API endpoint
+ * Fetch stock data for a single symbol from CSE
+ * This function is kept for backward compatibility but now uses the bulk endpoint
  */
 export async function fetchCSEStockData(symbol: string): Promise<CSEStockData | null> {
   try {
     console.log(`Fetching data for ${symbol}...`);
     
-    // Make request to CSE API with symbol in request body
-    const response = await axios.post(CSE_API_URL, {
-      symbol: symbol
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      timeout: 10000 // 10 second timeout
-    });
+    // Use the bulk fetch and filter for the specific symbol
+    const allStocks = await fetchAllCSEStockData();
+    const stockData = allStocks.find(stock => stock.symbol === symbol);
     
-    // Extract data from API response
-    const apiData = response.data;
-    
-    // Parse price information from the response
-    const currentPrice = parseFloat(apiData.priceInfo?.currentPrice || '0');
-    const previousClose = parseFloat(apiData.priceInfo?.previousClose || '0');
-    const change = parseFloat(apiData.priceInfo?.change || '0');
-    const percentageChange = parseFloat(apiData.priceInfo?.percentageChange || '0');
-    const open = parseFloat(apiData.priceInfo?.open || '0');
-    const high = parseFloat(apiData.priceInfo?.high || '0');
-    const low = parseFloat(apiData.priceInfo?.low || '0');
-    const volume = parseInt(apiData.shareVolume || '0', 10);
-    
-    // Convert to our CSEStockData format
-    const stockData: CSEStockData = {
-      symbol,
-      date: new Date().toISOString().split('T')[0],
-      price: currentPrice,
-      change: change,
-      changePercent: percentageChange,
-      volume: volume,
-      high: high,
-      low: low,
-      open: open,
-      close: previousClose,
-    };
-    
-    return stockData;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(`Error fetching data for ${symbol}:`, error.message);
-      if (error.response) {
-        console.error(`Response status: ${error.response.status}`);
-      }
+    if (stockData) {
+      console.log(`✓ Found ${symbol}: ${stockData.price}`);
+      return stockData;
     } else {
-      console.error(`Error fetching data for ${symbol}:`, error);
+      console.warn(`Stock ${symbol} not found in trade summary`);
+      return null;
     }
+  } catch (error) {
+    console.error(`Error fetching data for ${symbol}:`, error);
     return null;
   }
 }
 
 /**
- * Fetch data for multiple symbols with throttling
+ * Fetch data for multiple symbols
+ * Now uses the bulk tradeSummary endpoint for efficiency (single request)
  */
 export async function fetchMultipleStocks(symbols: string[]): Promise<CSEStockData[]> {
-  const results: CSEStockData[] = [];
+  console.log(`Fetching data for ${symbols.length} symbols using bulk endpoint...`);
   
-  for (let i = 0; i < symbols.length; i++) {
-    const symbol = symbols[i];
-    const data = await fetchCSEStockData(symbol);
-    
-    if (data) {
-      results.push(data);
-    }
-    
-    // Throttle between requests (except for the last one)
-    if (i < symbols.length - 1) {
-      await sleep(THROTTLE_DELAY);
-    }
-  }
+  // Use the new bulk fetch - no need for throttling anymore!
+  const allStocks = await fetchAllCSEStockData();
+  
+  // Filter to only include the requested symbols
+  const results = allStocks.filter(stock => symbols.includes(stock.symbol));
+  
+  console.log(`Successfully fetched ${results.length} out of ${symbols.length} requested stocks`);
   
   return results;
 }
