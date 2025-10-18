@@ -27,6 +27,7 @@ jobs:
         run: npm run collect-data
         env:
           NODE_ENV: production
+          SAVE_TO_FIRESTORE: 'true'  # Enable Firestore saving
       
       - name: Commit and push data
         run: |

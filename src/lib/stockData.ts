@@ -1,17 +1,22 @@
 import { CSEStockData } from '@/types';
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
-// Optional server-side Firestore admin client
-let adminDb: any;
+import type { firestore as adminFirestore } from 'firebase-admin';
+
+// Optional server-side Firestore admin client (typed)
+let adminDb: adminFirestore.Firestore | null = null;
+let adminSdk: typeof import('firebase-admin') | null = null;
 try {
   // Only require the admin module at runtime when available (server-side)
   // This keeps the frontend bundle small and avoids requiring firebase-admin in browser builds
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const adminModule = require('./firestoreAdmin');
-  adminDb = adminModule?.adminDb;
+  adminDb = adminModule?.adminDb as adminFirestore.Firestore | undefined || null;
+  adminSdk = adminModule?.admin || null;
 } catch (e) {
   // Not running in server environment or firestoreAdmin not configured
   adminDb = null;
+  adminSdk = null;
 }
 
 // CSE symbols to track
@@ -227,31 +232,39 @@ export async function saveStockDataToFirestore(data: CSEStockData[], date: strin
     return;
   }
 
-  try {
-    const batch = adminDb.batch();
-    const collectionRef = adminDb.collection('stock_prices');
+    try {
+      if (!adminDb) {
+        console.warn('Firestore admin DB not available at runtime - skipping write');
+        return;
+      }
 
-    for (const item of data) {
-      const docRef = collectionRef.doc();
-      const doc = {
-        symbol: item.symbol,
-        date: item.date || date,
-        price: item.price ?? null,
-        open: item.open ?? null,
-        high: item.high ?? null,
-        low: item.low ?? null,
-        close: item.close ?? null,
-        change: item.change ?? null,
-        changePercent: item.changePercent ?? null,
-        volume: item.volume ?? null,
-        createdAt: adminDb.FieldValue ? adminDb.FieldValue.serverTimestamp() : new Date(),
-      };
-      batch.set(docRef, doc);
+      const batch = adminDb.batch();
+      const collectionRef = adminDb.collection('stock_prices');
+
+      for (const item of data) {
+        // Use deterministic doc ID to avoid duplicate entries for the same symbol+date
+        const docId = `${item.symbol}_${item.date || date}`;
+        const docRef = collectionRef.doc(docId);
+        const doc: Record<string, unknown> = {
+          symbol: item.symbol,
+          date: item.date || date,
+          price: item.price ?? null,
+          open: item.open ?? null,
+          high: item.high ?? null,
+          low: item.low ?? null,
+          close: item.close ?? null,
+          change: item.change ?? null,
+          changePercent: item.changePercent ?? null,
+          volume: item.volume ?? null,
+          // Prefer Firestore server timestamp when admin SDK is available
+          createdAt: adminSdk?.firestore.FieldValue ? adminSdk.firestore.FieldValue.serverTimestamp() : new Date(),
+        };
+        batch.set(docRef, doc, { merge: true });
+      }
+
+      await batch.commit();
+      console.log(`Saved ${data.length} stock records to Firestore (stock_prices)`);
+    } catch (err) {
+      console.error('Error saving stock data to Firestore:', err);
     }
-
-    await batch.commit();
-    console.log(`Saved ${data.length} stock records to Firestore (stock_prices)`);
-  } catch (err) {
-    console.error('Error saving stock data to Firestore:', err);
-  }
 }
