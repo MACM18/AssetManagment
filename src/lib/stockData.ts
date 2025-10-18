@@ -7,15 +7,22 @@ import type { AxiosRequestConfig } from 'axios';
 export const CSE_SYMBOLS = [
   'JKH',
   'COMB',
-  'HNB',
   'DIAL',
   'SAMP',
-  'LFIN',
   'NTB',
-  'CINS',
-  'BIL',
-  'VONE',
-  'LOLC'
+  'SERV',
+  'ACL',
+  'LIOC',
+  'LALU',
+  'AINS',
+  'RICH',
+  'SINS',
+  'ODEL',
+  'DIST',
+  'GHLL',
+  'AMSL',
+  'TILE',
+  'SLTL',
 ];
 
 // CSE API endpoint - updated to use tradeSummary endpoint
