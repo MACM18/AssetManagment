@@ -28,6 +28,8 @@ jobs:
         env:
           NODE_ENV: production
           SAVE_TO_FIRESTORE: 'true'  # Enable Firestore saving
+          FIREBASE_SERVICE_ACCOUNT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          FIREBASE_PROJECT_ID: '${{ secrets.FIREBASE_PROJECT_ID }}'
       
       - name: Commit and push data
         run: |
