@@ -80,10 +80,11 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
           continue;
         }
 
+        const companyName = apiData.name || apiData.companyName || apiData.CompanyName || '';
         // Extract price fields from various possible keys used in the API
         const currentPriceRaw = apiData.price ?? apiData.closingPrice ?? apiData.priceInfo?.currentPrice ?? apiData.lastPrice ?? 0;
         const previousCloseRaw = apiData.previousClose ?? apiData.closingPrice ?? apiData.priceInfo?.previousClose ?? 0;
-  const changeRaw = apiData.change ?? (currentPriceRaw - previousCloseRaw);
+        const changeRaw = apiData.change ?? (currentPriceRaw - previousCloseRaw);
         const percentageChangeRaw = apiData.percentageChange ?? apiData.percentageChanged ?? apiData.percentage ?? 0;
         const openRaw = apiData.open ?? apiData.priceInfo?.open ?? 0;
         const highRaw = apiData.high ?? apiData.priceInfo?.high ?? 0;
@@ -104,6 +105,7 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
         const stockData: CSEStockData = {
           symbol: normalizedSymbol,
           rawSymbol: String(rawSymbol),
+          companyName,
           date,
           price: currentPrice,
           change: change,

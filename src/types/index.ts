@@ -12,6 +12,7 @@ export interface Investment {
 
 export interface StockData {
   symbol: string;
+  companyName: string;
   date: string;
   price: number;
   volume?: number;
@@ -24,6 +25,7 @@ export interface StockData {
 export interface CSEStockData {
   symbol: string;
   rawSymbol?: string;
+  companyName: string;
   date: string;
   price: number;
   change?: number;

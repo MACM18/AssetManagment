@@ -56,51 +56,53 @@ export async function saveStockDataToFirestore(data: CSEStockData[], date: strin
 
     console.log(`saveStockDataToFirestore called — records=${data ? data.length : 0}, date=${date}`);
 
-    // Always write a metadata document so we can confirm the function executed
-    try {
-      await collectionRef.doc('_last_run').set({
-        date,
-        count: data ? data.length : 0,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
-      console.log('Wrote metadata _last_run to Firestore');
-    } catch (metaErr) {
-      console.error('Error writing metadata to Firestore:', metaErr);
-    }
+        // Write a single document per date containing all stock records for ML
+        try {
+          const dateDocId = date;
+          const byDateCollection = adminDb.collection('stock_prices_by_date');
 
-    if (!data || data.length === 0) {
-      console.log('No stock records to save; metadata written. Exiting.');
-      return;
-    }
+          const stocksArray = (data || []).map(item => {
+            const idSymbol = (item as any).rawSymbol || item.symbol;
+            return {
+              symbol: idSymbol,
+              normalizedSymbol: item.symbol,
+              companyName: item.companyName,
+              date: item.date || date,
+              price: item.price ?? null,
+              open: item.open ?? null,
+              high: item.high ?? null,
+              low: item.low ?? null,
+              close: item.close ?? null,
+              change: item.change ?? null,
+              changePercent: item.changePercent ?? null,
+              volume: item.volume ?? null,
+            };
+          });
 
-    const batch = adminDb.batch();
+          const payload: Record<string, unknown> = {
+            date,
+            count: stocksArray.length,
+            stocks: stocksArray,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          };
 
-    for (const item of data) {
-      // Prefer using the raw symbol from the API response when available
-      const idSymbol = (item as any).rawSymbol || item.symbol;
-      const docId = `${idSymbol}_${item.date || date}`;
-      const docRef = collectionRef.doc(docId);
+          await byDateCollection.doc(dateDocId).set(payload, { merge: true });
+          console.log(`Saved ${stocksArray.length} stock records to Firestore (stock_prices_by_date/${dateDocId})`);
 
-      const doc: Record<string, unknown> = {
-        symbol: idSymbol,
-        rawSymbol: (item as any).rawSymbol || null,
-        date: item.date || date,
-        price: item.price ?? null,
-        open: item.open ?? null,
-        high: item.high ?? null,
-        low: item.low ?? null,
-        close: item.close ?? null,
-        change: item.change ?? null,
-        changePercent: item.changePercent ?? null,
-        volume: item.volume ?? null,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      };
-
-      batch.set(docRef, doc, { merge: true });
-    }
-
-    await batch.commit();
-    console.log(`Saved ${data.length} stock records to Firestore (stock_prices)`);
+          // Also write last-run metadata for quick check (optional)
+          try {
+            await collectionRef.doc('_last_run').set({
+              date,
+              count: stocksArray.length,
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true });
+          } catch (metaErr) {
+            console.warn('Could not write _last_run metadata to stock_prices collection:', metaErr);
+          }
+        } catch (writeErr) {
+          console.error('Error writing date-wise stock data to Firestore:', writeErr);
+          throw writeErr;
+        }
   } catch (err) {
     console.error('Error saving stock data to Firestore:', err);
     throw err;
