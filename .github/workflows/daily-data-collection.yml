@@ -31,10 +31,22 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
           FIREBASE_PROJECT_ID: '${{ secrets.FIREBASE_PROJECT_ID }}'
       
-      - name: Commit and push data
+      - name: Commit and push data to data-sync branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/
-          git diff --staged --quiet || git commit -m "chore: daily stock data collection $(date +'%Y-%m-%d')"
-          git push
+          # Ensure we have the branch list and remote info
+          git fetch origin
+          # Create or switch to data-sync branch
+          if git rev-parse --verify origin/data-sync >/dev/null 2>&1; then
+            git checkout data-sync
+            git reset --hard origin/data-sync
+          else
+            git checkout -b data-sync
+          fi
+          # Force add generated JSON files (they may be in .gitignore)
+          git add -f data/cse-data-*.json || true
+          git commit -m "chore: daily stock data collection $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push --set-upstream origin data-sync --force
