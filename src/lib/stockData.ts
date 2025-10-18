@@ -1,6 +1,18 @@
 import { CSEStockData } from '@/types';
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
+// Optional server-side Firestore admin client
+let adminDb: any;
+try {
+  // Only require the admin module at runtime when available (server-side)
+  // This keeps the frontend bundle small and avoids requiring firebase-admin in browser builds
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const adminModule = require('./firestoreAdmin');
+  adminDb = adminModule?.adminDb;
+} catch (e) {
+  // Not running in server environment or firestoreAdmin not configured
+  adminDb = null;
+}
 
 // CSE symbols to track
 // Add or remove stock symbols here as needed
@@ -44,13 +56,19 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
     };
 
     const response = await axios.request(config);
-    
-    // Extract data from API response - response.data.reqTradeSummery contains the array
-    const apiDataArray = Array.isArray(response.data?.reqTradeSummery) 
-      ? response.data.reqTradeSummery 
-      : Array.isArray(response.data) 
-        ? response.data 
-        : [];
+
+    // Extract data array from API response - support multiple possible keys used by the CSE API
+    // known shapes: { tradeSummary: [...] } or { reqTradeSummery: [...] } or raw array
+    const dataObj = response.data || {};
+    const apiDataArray = Array.isArray(dataObj.tradeSummary)
+      ? dataObj.tradeSummary
+      : Array.isArray(dataObj.reqTradeSummery)
+        ? dataObj.reqTradeSummery
+        : Array.isArray(dataObj.reqTradeSummary)
+          ? dataObj.reqTradeSummary
+          : Array.isArray(dataObj)
+            ? dataObj
+            : [];
     
     if (!apiDataArray.length) {
       console.warn('No trade summary data returned from API');
@@ -65,28 +83,37 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
     
     for (const apiData of apiDataArray) {
       try {
-        // Only process stocks that are in our tracking list
-        // Symbol format from API is like "JKH.N0000", so we need to extract the base symbol
-        const fullSymbol = apiData.symbol || '';
-        const symbol = fullSymbol.split('.')[0]; // Extract "JKH" from "JKH.N0000"
-        
-        if (!CSE_SYMBOLS.includes(symbol)) {
+        // Normalize symbol: API sometimes returns 'JKH.N0000' - strip suffix after '.' to match our CSE_SYMBOLS
+        const rawSymbol = apiData.symbol || apiData.Symbol || apiData.symbolCode || '';
+        const normalizedSymbol = String(rawSymbol).split('.')[0].toUpperCase();
+
+        // Only process stocks that are in our tracking list (compare normalized symbols)
+        if (!CSE_SYMBOLS.includes(normalizedSymbol)) {
           continue;
         }
-        
-        // Parse price information from the response (fields are at root level)
-        const currentPrice = parseFloat(apiData.price || 0);
-        const previousClose = parseFloat(apiData.previousClose || 0);
-        const change = parseFloat(apiData.change || 0);
-        const percentageChange = parseFloat(apiData.percentageChange || 0);
-        const open = parseFloat(apiData.open || 0);
-        const high = parseFloat(apiData.high || 0);
-        const low = parseFloat(apiData.low || 0);
-        const volume = parseInt(apiData.sharevolume || 0, 10);
-        
+
+        // Extract price fields from various possible keys used in the API
+        const currentPriceRaw = apiData.price ?? apiData.closingPrice ?? apiData.priceInfo?.currentPrice ?? apiData.lastPrice ?? 0;
+        const previousCloseRaw = apiData.previousClose ?? apiData.closingPrice ?? apiData.priceInfo?.previousClose ?? 0;
+  const changeRaw = apiData.change ?? (currentPriceRaw - previousCloseRaw);
+        const percentageChangeRaw = apiData.percentageChange ?? apiData.percentageChanged ?? apiData.percentage ?? 0;
+        const openRaw = apiData.open ?? apiData.priceInfo?.open ?? 0;
+        const highRaw = apiData.high ?? apiData.priceInfo?.high ?? 0;
+        const lowRaw = apiData.low ?? apiData.priceInfo?.low ?? 0;
+        const volumeRaw = apiData.sharevolume ?? apiData.shareVolume ?? apiData.shareVolumeCount ?? apiData.tradevolume ?? 0;
+
+        const currentPrice = Number(currentPriceRaw) || 0;
+        const previousClose = Number(previousCloseRaw) || 0;
+        const change = Number(changeRaw) || 0;
+        const percentageChange = Number(percentageChangeRaw) || 0;
+        const open = Number(openRaw) || 0;
+        const high = Number(highRaw) || 0;
+        const low = Number(lowRaw) || 0;
+        const volume = parseInt(String(volumeRaw || '0'), 10) || 0;
+
         // Convert to our CSEStockData format
         const stockData: CSEStockData = {
-          symbol,
+          symbol: normalizedSymbol,
           date,
           price: currentPrice,
           change: change,
@@ -98,8 +125,8 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
           close: previousClose,
         };
         
-        results.push(stockData);
-        console.log(`✓ Processed ${symbol}: ${currentPrice}`);
+  results.push(stockData);
+  console.log(`✓ Processed ${normalizedSymbol}: ${currentPrice}`);
       } catch (itemError) {
         console.error(`Error parsing data for stock:`, itemError);
         // Continue processing other stocks
@@ -185,5 +212,46 @@ export function saveStockDataLocally(data: CSEStockData[], date: string): void {
     console.log(`Data saved to ${filename}`);
   } else {
     console.warn('saveStockDataLocally can only be called on the server side');
+  }
+}
+
+/**
+ * Save stock data to Firestore (server-side only)
+ * Documents will be created under collection: `stock_prices` with auto-ids
+ * Each document shape (good for CSV export / ML training):
+ * { symbol, date, price, open, high, low, close, change, changePercent, volume, createdAt }
+ */
+export async function saveStockDataToFirestore(data: CSEStockData[], date: string): Promise<void> {
+  if (!adminDb) {
+    console.warn('Firestore admin DB not initialized - skipping save to Firestore');
+    return;
+  }
+
+  try {
+    const batch = adminDb.batch();
+    const collectionRef = adminDb.collection('stock_prices');
+
+    for (const item of data) {
+      const docRef = collectionRef.doc();
+      const doc = {
+        symbol: item.symbol,
+        date: item.date || date,
+        price: item.price ?? null,
+        open: item.open ?? null,
+        high: item.high ?? null,
+        low: item.low ?? null,
+        close: item.close ?? null,
+        change: item.change ?? null,
+        changePercent: item.changePercent ?? null,
+        volume: item.volume ?? null,
+        createdAt: adminDb.FieldValue ? adminDb.FieldValue.serverTimestamp() : new Date(),
+      };
+      batch.set(docRef, doc);
+    }
+
+    await batch.commit();
+    console.log(`Saved ${data.length} stock records to Firestore (stock_prices)`);
+  } catch (err) {
+    console.error('Error saving stock data to Firestore:', err);
   }
 }
