@@ -23,6 +23,7 @@ export interface StockData {
 
 export interface CSEStockData {
   symbol: string;
+  rawSymbol?: string;
   date: string;
   price: number;
   change?: number;

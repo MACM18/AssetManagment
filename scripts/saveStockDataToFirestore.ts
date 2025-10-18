@@ -48,35 +48,61 @@ async function initAdmin() {
 }
 
 export async function saveStockDataToFirestore(data: CSEStockData[], date: string): Promise<void> {
-  if (!data || data.length === 0) return;
+  try {
+    const admin = await initAdmin();
+    const adminDb: adminFirestore.Firestore = admin.firestore();
 
-  const admin = await initAdmin();
-  const adminDb: adminFirestore.Firestore = admin.firestore();
+    const collectionRef = adminDb.collection('stock_prices');
 
-  const batch = adminDb.batch();
-  const collectionRef = adminDb.collection('stock_prices');
+    console.log(`saveStockDataToFirestore called — records=${data ? data.length : 0}, date=${date}`);
 
-  for (const item of data) {
-    const docId = `${item.symbol}_${item.date || date}`;
-    const docRef = collectionRef.doc(docId);
+    // Always write a metadata document so we can confirm the function executed
+    try {
+      await collectionRef.doc('_last_run').set({
+        date,
+        count: data ? data.length : 0,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+      console.log('Wrote metadata _last_run to Firestore');
+    } catch (metaErr) {
+      console.error('Error writing metadata to Firestore:', metaErr);
+    }
 
-    const doc: Record<string, unknown> = {
-      symbol: item.symbol,
-      date: item.date || date,
-      price: item.price ?? null,
-      open: item.open ?? null,
-      high: item.high ?? null,
-      low: item.low ?? null,
-      close: item.close ?? null,
-      change: item.change ?? null,
-      changePercent: item.changePercent ?? null,
-      volume: item.volume ?? null,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    };
+    if (!data || data.length === 0) {
+      console.log('No stock records to save; metadata written. Exiting.');
+      return;
+    }
 
-    batch.set(docRef, doc, { merge: true });
+    const batch = adminDb.batch();
+
+    for (const item of data) {
+      // Prefer using the raw symbol from the API response when available
+      const idSymbol = (item as any).rawSymbol || item.symbol;
+      const docId = `${idSymbol}_${item.date || date}`;
+      const docRef = collectionRef.doc(docId);
+
+      const doc: Record<string, unknown> = {
+        symbol: idSymbol,
+        rawSymbol: (item as any).rawSymbol || null,
+        date: item.date || date,
+        price: item.price ?? null,
+        open: item.open ?? null,
+        high: item.high ?? null,
+        low: item.low ?? null,
+        close: item.close ?? null,
+        change: item.change ?? null,
+        changePercent: item.changePercent ?? null,
+        volume: item.volume ?? null,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+
+      batch.set(docRef, doc, { merge: true });
+    }
+
+    await batch.commit();
+    console.log(`Saved ${data.length} stock records to Firestore (stock_prices)`);
+  } catch (err) {
+    console.error('Error saving stock data to Firestore:', err);
+    throw err;
   }
-
-  await batch.commit();
-  console.log(`Saved ${data.length} stock records to Firestore (stock_prices)`);
 }

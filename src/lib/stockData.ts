@@ -99,9 +99,11 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
         const low = Number(lowRaw) || 0;
         const volume = parseInt(String(volumeRaw || '0'), 10) || 0;
 
-        // Convert to our CSEStockData format
+        // Convert to our CSEStockData format. Preserve the raw symbol returned
+        // by the API in `rawSymbol` and keep `symbol` normalized for internal lookup.
         const stockData: CSEStockData = {
-          symbol: rawSymbol,
+          symbol: normalizedSymbol,
+          rawSymbol: String(rawSymbol),
           date,
           price: currentPrice,
           change: change,
@@ -195,8 +197,11 @@ export function saveStockDataLocally(data: CSEStockData[], date: string): void {
       fs.mkdirSync(dataDir, { recursive: true });
     }
     
-    const filename = path.join(dataDir, `cse-data-${date}.json`);
-    fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+  // When saving locally, include rawSymbol in output and prefer rawSymbol in filename
+  const safeDate = date;
+  const filename = path.join(dataDir, `cse-data-${safeDate}.json`);
+  // Include rawSymbol on each record (it was added to the CSEStockData type)
+  fs.writeFileSync(filename, JSON.stringify(data, null, 2));
     console.log(`Data saved to ${filename}`);
   } else {
     console.warn('saveStockDataLocally can only be called on the server side');
