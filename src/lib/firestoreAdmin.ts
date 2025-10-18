@@ -1,18 +1,20 @@
-import admin from 'firebase-admin';
+// Lazily initialize firebase-admin to avoid including it in client bundles.
+// Callers should `require('./firestoreAdmin')` at runtime (server only).
 
-// Initialize firebase-admin for server-side Firestore access.
-// Supports two modes:
-// - If FIREBASE_SERVICE_ACCOUNT env var is set (JSON string), it will use that
-// - Otherwise, it falls back to Application Default Credentials (GOOGLE_APPLICATION_CREDENTIALS)
+let adminDb: any = undefined;
+let adminSdk: any = undefined;
 
 function initAdmin() {
-  if (admin.apps.length) return;
+  if (adminSdk && adminSdk.apps && adminSdk.apps.length) return;
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  adminSdk = require('firebase-admin');
 
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
+      adminSdk.initializeApp({
+        credential: adminSdk.credential.cert(serviceAccount),
       });
       console.log('firebase-admin initialized from FIREBASE_SERVICE_ACCOUNT');
     } catch (e) {
@@ -20,13 +22,20 @@ function initAdmin() {
       throw e;
     }
   } else {
-    // This will work if GOOGLE_APPLICATION_CREDENTIALS env var points to a service account JSON file
-    admin.initializeApp();
+    // Will use Application Default Credentials if available in environment
+    adminSdk.initializeApp();
     console.log('firebase-admin initialized using Application Default Credentials');
   }
+
+  adminDb = adminSdk.firestore();
 }
 
-initAdmin();
+try {
+  initAdmin();
+} catch (e) {
+  // If initialization fails at require time (e.g., in a client build), don't crash.
+  // Caller should handle absence of adminDb.
+  // console.warn('firebase-admin init failed (possibly in client build):', e);
+}
 
-export const adminDb = admin.firestore();
-export { admin };
+export { adminDb, adminSdk };
