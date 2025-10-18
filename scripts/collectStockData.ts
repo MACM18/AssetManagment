@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { fetchMultipleStocks, saveStockDataLocally, saveStockDataToFirestore, CSE_SYMBOLS } from '../src/lib/stockData';
+import { fetchMultipleStocks, saveStockDataLocally, CSE_SYMBOLS } from '../src/lib/stockData';
+import { saveStockDataToFirestore } from './saveStockDataToFirestore';
 
 async function main() {
   console.log('Starting daily stock data collection...');

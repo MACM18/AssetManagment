@@ -1,7 +1,6 @@
 import { CSEStockData } from '@/types';
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
-import type { firestore as adminFirestore } from 'firebase-admin';
 
 // CSE symbols to track
 // Add or remove stock symbols here as needed
@@ -210,52 +209,4 @@ export function saveStockDataLocally(data: CSEStockData[], date: string): void {
  * Each document shape (good for CSV export / ML training):
  * { symbol, date, price, open, high, low, close, change, changePercent, volume, createdAt }
  */
-export async function saveStockDataToFirestore(data: CSEStockData[], date: string): Promise<void> {
-  // Only attempt to load admin modules on the server at runtime
-  if (typeof window !== 'undefined') {
-    console.warn('saveStockDataToFirestore should only be run on the server; skipping in browser');
-    return;
-  }
-
-  // Dynamically require the firestore admin initializer (server-only)
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const adminModule = require('./firestoreAdmin');
-    const adminSdkLocal = adminModule?.admin;
-    const adminDbLocal: adminFirestore.Firestore | undefined = adminModule?.adminDb;
-
-    if (!adminDbLocal) {
-      console.warn('Firestore admin DB not initialized - skipping save to Firestore');
-      return;
-    }
-
-    const batch = adminDbLocal.batch();
-    const collectionRef = adminDbLocal.collection('stock_prices');
-
-    for (const item of data) {
-      // Deterministic doc ID to avoid duplicate entries for the same symbol+date
-      const docId = `${item.symbol}_${item.date || date}`;
-      const docRef = collectionRef.doc(docId);
-      const doc: Record<string, unknown> = {
-        symbol: item.symbol,
-        date: item.date || date,
-        price: item.price ?? null,
-        open: item.open ?? null,
-        high: item.high ?? null,
-        low: item.low ?? null,
-        close: item.close ?? null,
-        change: item.change ?? null,
-        changePercent: item.changePercent ?? null,
-        volume: item.volume ?? null,
-        // Prefer Firestore server timestamp when admin SDK is available
-        createdAt: adminSdkLocal?.firestore?.FieldValue ? adminSdkLocal.firestore.FieldValue.serverTimestamp() : new Date(),
-      };
-      batch.set(docRef, doc, { merge: true });
-    }
-
-    await batch.commit();
-    console.log(`Saved ${data.length} stock records to Firestore (stock_prices)`);
-  } catch (err) {
-    console.error('Error saving stock data to Firestore:', err);
-  }
-}
+// Firestore-saving moved to server-only script to avoid client bundling (see scripts/saveStockDataToFirestore.ts)

@@ -14,6 +14,11 @@ const nextConfig = {
         tls: false,
         fs: false,
         child_process: false,
+        http2: false,
+      });
+      // Map `node:`-prefixed imports (e.g. `node:events`) to their browser-safe polyfills where appropriate.
+      config.resolve.alias = Object.assign({}, config.resolve.alias, {
+        'node:events': require.resolve('events'),
       });
     }
     return config;
