@@ -38,71 +38,84 @@ async function main() {
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
   const monthStr = `${year}-${String(month).padStart(2, '0')}`;
-  
+
   console.log(`Exporting data for ${monthStr}...`);
-  
+
   try {
-    // Read all data files from the current month
-    const dataDir = path.join(process.cwd(), 'data');
-    
-    if (!fs.existsSync(dataDir)) {
-      console.error('Data directory not found');
-      process.exit(1);
-    }
-    
-    const files = fs.readdirSync(dataDir)
-      .filter(file => file.startsWith('cse-data-') && file.endsWith('.json'))
-      .filter(file => file.includes(monthStr));
-    
-    console.log(`Found ${files.length} data files for ${monthStr}`);
-    
-    // Aggregate all data
-    const aggregatedData: any[] = [];
-    
-    for (const file of files) {
-      const filePath = path.join(dataDir, file);
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      const data = JSON.parse(fileContent);
-      aggregatedData.push(...data);
-    }
-    
-    console.log(`Aggregated ${aggregatedData.length} data points`);
-    
-    // Create monthly report
-    const report = {
-      month: monthStr,
-      year,
-      dataPoints: aggregatedData.length,
-      data: aggregatedData,
-      createdAt: new Date().toISOString(),
-    };
-    
-    // Save to Firebase Storage
-    const bucket = storage.bucket();
-    const fileName = `monthly-exports/${monthStr}.json`;
-    const file = bucket.file(fileName);
-    
-    await file.save(JSON.stringify(report, null, 2), {
-      contentType: 'application/json',
-      metadata: {
-        metadata: {
-          month: monthStr,
-          year: year.toString(),
-        }
+    // Query Firestore for date-wise documents in stock_prices_by_date for this month
+    const startDate = `${monthStr}-01`;
+    const nextMonth = new Date(year, month); // month is 1-based above; this gives first day of next month
+    const nextMonthStr = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
+
+    console.log(`Querying stock_prices_by_date for dates >= ${startDate} and < ${nextMonthStr}`);
+
+    const collectionRef = db.collection('stock_prices_by_date');
+    const snapshot = await collectionRef
+      .where('date', '>=', startDate)
+      .where('date', '<', nextMonthStr)
+      .orderBy('date')
+      .get();
+
+    console.log(`Found ${snapshot.size} date documents for ${monthStr}`);
+
+    const rows: string[] = [];
+    // CSV header — choose fields useful for ML: date,symbol,normalizedSymbol,price,open,high,low,close,change,changePercent,volume
+    const header = ['date','symbol','normalizedSymbol','price','open','high','low','close','change','changePercent','volume'];
+    rows.push(header.join(','));
+
+    let totalCount = 0;
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const stocks = Array.isArray(d.stocks) ? d.stocks : [];
+      for (const s of stocks) {
+        const dateVal = s.date || d.date || '';
+        const symbol = (s.rawSymbol || s.symbol || '').toString().replace(/,/g, '');
+        const normalized = (s.normalizedSymbol || s.symbol || '').toString().replace(/,/g, '');
+        const price = s.price ?? '';
+        const open = s.open ?? '';
+        const high = s.high ?? '';
+        const low = s.low ?? '';
+        const close = s.close ?? '';
+        const change = s.change ?? '';
+        const changePercent = s.changePercent ?? '';
+        const volume = s.volume ?? '';
+
+        const row = [dateVal, symbol, normalized, price, open, high, low, close, change, changePercent, volume]
+          .map(v => (v === null || v === undefined) ? '' : String(v))
+          .join(',');
+        rows.push(row);
+        totalCount++;
       }
     });
-    
-    console.log(`Uploaded report to Firebase Storage: ${fileName}`);
-    
-    // Also save metadata to Firestore
+
+    console.log(`Aggregated ${totalCount} stock rows for CSV`);
+
+    // Ensure export directory exists
+    const exportDir = path.join(process.cwd(), 'data', 'exports', monthStr);
+    if (!fs.existsSync(exportDir)) fs.mkdirSync(exportDir, { recursive: true });
+
+    const csvFilename = `stock_prices_${monthStr}.csv`;
+    const csvPath = path.join(exportDir, csvFilename);
+    fs.writeFileSync(csvPath, rows.join('\n'));
+    console.log(`Wrote CSV to ${csvPath}`);
+
+    // Upload to Firebase Storage under folder monthly-exports/<month>/
+    const bucket = storage.bucket();
+    const remotePath = `monthly-exports/${monthStr}/${csvFilename}`;
+    const file = bucket.file(remotePath);
+    await file.save(fs.readFileSync(csvPath), { contentType: 'text/csv' });
+    console.log(`Uploaded CSV to Firebase Storage: ${remotePath}`);
+
+    // Save metadata to Firestore monthly-reports collection
     await db.collection('monthly-reports').doc(monthStr).set({
       month: monthStr,
       year,
-      dataPoints: aggregatedData.length,
+      dataPoints: totalCount,
+      storagePath: remotePath,
       createdAt: new Date().toISOString(),
-      storageUrl: fileName,
     });
-    
+
     console.log('Monthly export completed successfully!');
   } catch (error) {
     console.error('Error during monthly export:', error);
