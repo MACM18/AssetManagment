@@ -101,7 +101,7 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
 
         // Convert to our CSEStockData format
         const stockData: CSEStockData = {
-          symbol: normalizedSymbol,
+          symbol: rawSymbol,
           date,
           price: currentPrice,
           change: change,

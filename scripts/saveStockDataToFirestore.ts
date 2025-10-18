@@ -11,22 +11,36 @@ async function initAdmin() {
 
   if (!admin._initialized) {
     const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
-
     if (serviceAccountJson) {
       try {
         const serviceAccount = JSON.parse(serviceAccountJson);
+
+        // Attempt to read project_id from service account JSON
+        const projectId = serviceAccount.project_id || process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT;
+
+        if (!projectId) {
+          throw new Error('Project ID not found in FIREBASE_SERVICE_ACCOUNT JSON or environment');
+        }
+
         admin.initializeApp({
           credential: admin.credential.cert(serviceAccount),
+          projectId,
         });
         admin._initialized = true;
+        console.log('firebase-admin initialized from FIREBASE_SERVICE_ACCOUNT');
       } catch (e) {
-        console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT:', e);
+        console.error('Failed to parse or initialize Firebase admin from FIREBASE_SERVICE_ACCOUNT:', e);
         throw e;
       }
     } else {
-      // let admin try application default credentials
-      admin.initializeApp();
+      // Try application default credentials; ensure project id is available via env
+      const projectId = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || process.env.FIREBASE_PROJECT;
+      if (!projectId) {
+        console.warn('No FIREBASE_SERVICE_ACCOUNT provided and no project id found in GCLOUD_PROJECT/GOOGLE_CLOUD_PROJECT/FIREBASE_PROJECT env vars. Application Default Credentials may still work if running in GCP environment.');
+      }
+      admin.initializeApp({ projectId: projectId || undefined });
       admin._initialized = true;
+      console.log('firebase-admin initialized using Application Default Credentials');
     }
   }
 
