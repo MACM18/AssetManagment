@@ -1,5 +1,12 @@
 # Stock Data Fetching Update - Implementation Summary
 
+## Recent Fix (October 2025)
+**Issue**: The data collection workflow was returning 0 stocks due to incorrect API response parsing.
+
+**Root Cause**: The CSE API returns the data wrapped in a `tradeSummary` property (`{ tradeSummary: [...] }`), but the code was expecting a direct array.
+
+**Solution**: Updated the response parsing logic in `fetchAllCSEStockData()` to correctly extract data from `response.data.tradeSummary` while maintaining backward compatibility with direct array format.
+
 ## Overview
 This update implements an improved CSE (Colombo Stock Exchange) API integration for stock data fetching, using the new bulk tradeSummary endpoint for much better performance.
 
@@ -15,7 +22,8 @@ This update implements an improved CSE (Colombo Stock Exchange) API integration 
 - **Endpoint**: `https://www.cse.lk/api/tradeSummary`
 - **Method**: POST
 - **Request Format**: Empty body `{}`
-- **Response**: Array of all stocks' trade summary data
+- **Response**: Object containing `tradeSummary` array: `{ tradeSummary: [...] }`
+  - Note: The implementation also supports direct array format for backward compatibility
 
 ## Changes Made
 
@@ -25,8 +33,9 @@ This update implements an improved CSE (Colombo Stock Exchange) API integration 
 1. **`fetchAllCSEStockData()`** - Main bulk fetch function
    - Makes single POST request to tradeSummary endpoint
    - Returns array of all stocks
+   - Parses response from `{ tradeSummary: [...] }` format
    - Filters to only include tracked symbols
-   - Parses all data in one go
+   - Handles both wrapped and direct array formats for robustness
 
 2. **`fetchMultipleStocks(symbols)`** - Updated for bulk fetch
    - Now uses `fetchAllCSEStockData()` internally

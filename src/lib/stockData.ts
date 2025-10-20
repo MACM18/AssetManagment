@@ -1,20 +1,28 @@
 import { CSEStockData } from '@/types';
 import axios from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 // CSE symbols to track
 // Add or remove stock symbols here as needed
 export const CSE_SYMBOLS = [
   'JKH',
   'COMB',
-  'HNB',
   'DIAL',
   'SAMP',
-  'LFIN',
   'NTB',
-  'CINS',
-  'BIL',
-  'VONE',
-  'LOLC'
+  'SERV',
+  'ACL',
+  'LIOC',
+  'LALU',
+  'AINS',
+  'RICH',
+  'SINS',
+  'ODEL',
+  'DIST',
+  'GHLL',
+  'AMSL',
+  'TILE',
+  'SLTL',
 ];
 
 // CSE API endpoint - updated to use tradeSummary endpoint
@@ -29,13 +37,33 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
   try {
     console.log('Fetching trade summary for all stocks...');
     
-    // Make request to CSE API - no body required for tradeSummary endpoint
-    const response = await axios.post(CSE_API_URL, {}, {
+    // Make request to CSE API - using explicit axios.request config
+    const config: AxiosRequestConfig = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: CSE_API_URL,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Empty body for tradeSummary endpoint
+      data: {},
       timeout: 30000 // 30 second timeout for all data
-    });
-    
-    // Extract data from API response - expecting an array
-    const apiDataArray = Array.isArray(response.data) ? response.data : [];
+    };
+
+    const response = await axios.request(config);
+
+    // Extract data array from API response - support multiple possible keys used by the CSE API
+    // known shapes: { tradeSummary: [...] } or { reqTradeSummery: [...] } or raw array
+    const dataObj = response.data || {};
+    const apiDataArray = Array.isArray(dataObj.tradeSummary)
+      ? dataObj.tradeSummary
+      : Array.isArray(dataObj.reqTradeSummery)
+        ? dataObj.reqTradeSummery
+        : Array.isArray(dataObj.reqTradeSummary)
+          ? dataObj.reqTradeSummary
+          : Array.isArray(dataObj)
+            ? dataObj
+            : [];
     
     if (!apiDataArray.length) {
       console.warn('No trade summary data returned from API');
@@ -50,25 +78,41 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
     
     for (const apiData of apiDataArray) {
       try {
-        // Only process stocks that are in our tracking list
-        const symbol = apiData.symbol;
-        if (!CSE_SYMBOLS.includes(symbol)) {
+        // Normalize symbol: API sometimes returns 'JKH.N0000' - strip suffix after '.' to match our CSE_SYMBOLS
+        const rawSymbol = apiData.symbol || apiData.Symbol || apiData.symbolCode || '';
+        const normalizedSymbol = String(rawSymbol).split('.')[0].toUpperCase();
+
+        // Only process stocks that are in our tracking list (compare normalized symbols)
+        if (!CSE_SYMBOLS.includes(normalizedSymbol)) {
           continue;
         }
-        
-        // Parse price information from the response
-        const currentPrice = parseFloat(apiData.priceInfo?.currentPrice || '0');
-        const previousClose = parseFloat(apiData.priceInfo?.previousClose || '0');
-        const change = parseFloat(apiData.priceInfo?.change || '0');
-        const percentageChange = parseFloat(apiData.priceInfo?.percentageChange || '0');
-        const open = parseFloat(apiData.priceInfo?.open || '0');
-        const high = parseFloat(apiData.priceInfo?.high || '0');
-        const low = parseFloat(apiData.priceInfo?.low || '0');
-        const volume = parseInt(apiData.shareVolume || '0', 10);
-        
-        // Convert to our CSEStockData format
+
+        const companyName = apiData.name || apiData.companyName || apiData.CompanyName || '';
+        // Extract price fields from various possible keys used in the API
+        const currentPriceRaw = apiData.price ?? apiData.closingPrice ?? apiData.priceInfo?.currentPrice ?? apiData.lastPrice ?? 0;
+        const previousCloseRaw = apiData.previousClose ?? apiData.closingPrice ?? apiData.priceInfo?.previousClose ?? 0;
+        const changeRaw = apiData.change ?? (currentPriceRaw - previousCloseRaw);
+        const percentageChangeRaw = apiData.percentageChange ?? apiData.percentageChanged ?? apiData.percentage ?? 0;
+        const openRaw = apiData.open ?? apiData.priceInfo?.open ?? 0;
+        const highRaw = apiData.high ?? apiData.priceInfo?.high ?? 0;
+        const lowRaw = apiData.low ?? apiData.priceInfo?.low ?? 0;
+        const volumeRaw = apiData.sharevolume ?? apiData.shareVolume ?? apiData.shareVolumeCount ?? apiData.tradevolume ?? 0;
+
+        const currentPrice = Number(currentPriceRaw) || 0;
+        const previousClose = Number(previousCloseRaw) || 0;
+        const change = Number(changeRaw) || 0;
+        const percentageChange = Number(percentageChangeRaw) || 0;
+        const open = Number(openRaw) || 0;
+        const high = Number(highRaw) || 0;
+        const low = Number(lowRaw) || 0;
+        const volume = parseInt(String(volumeRaw || '0'), 10) || 0;
+
+        // Convert to our CSEStockData format. Preserve the raw symbol returned
+        // by the API in `rawSymbol` and keep `symbol` normalized for internal lookup.
         const stockData: CSEStockData = {
-          symbol,
+          symbol: normalizedSymbol,
+          rawSymbol: String(rawSymbol),
+          companyName,
           date,
           price: currentPrice,
           change: change,
@@ -80,8 +124,8 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
           close: previousClose,
         };
         
-        results.push(stockData);
-        console.log(`✓ Processed ${symbol}: ${currentPrice}`);
+  results.push(stockData);
+  console.log(`✓ Processed ${normalizedSymbol}: ${currentPrice}`);
       } catch (itemError) {
         console.error(`Error parsing data for stock:`, itemError);
         // Continue processing other stocks
@@ -162,10 +206,21 @@ export function saveStockDataLocally(data: CSEStockData[], date: string): void {
       fs.mkdirSync(dataDir, { recursive: true });
     }
     
-    const filename = path.join(dataDir, `cse-data-${date}.json`);
-    fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+  // When saving locally, include rawSymbol in output and prefer rawSymbol in filename
+  const safeDate = date;
+  const filename = path.join(dataDir, `cse-data-${safeDate}.json`);
+  // Include rawSymbol on each record (it was added to the CSEStockData type)
+  fs.writeFileSync(filename, JSON.stringify(data, null, 2));
     console.log(`Data saved to ${filename}`);
   } else {
     console.warn('saveStockDataLocally can only be called on the server side');
   }
 }
+
+/**
+ * Save stock data to Firestore (server-side only)
+ * Documents will be created under collection: `stock_prices` with auto-ids
+ * Each document shape (good for CSV export / ML training):
+ * { symbol, date, price, open, high, low, close, change, changePercent, volume, createdAt }
+ */
+// Firestore-saving moved to server-only script to avoid client bundling (see scripts/saveStockDataToFirestore.ts)
