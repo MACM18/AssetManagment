@@ -1,6 +1,6 @@
 export interface Investment {
   id: string;
-  type: 'stock' | 'mutual-fund' | 'fd' | 'other';
+  type: "stock" | "mutual-fund" | "fd" | "other";
   name: string;
   symbol?: string;
   amount: number;
@@ -45,3 +45,38 @@ export interface MonthlyReport {
   stocksData: StockData[];
   createdAt: string;
 }
+
+// Trading Platform Types
+export interface MarketSummary {
+  totalVolume: number;
+  totalTrades: number;
+  advancers: number;
+  decliners: number;
+  unchanged: number;
+  marketCap?: number;
+}
+
+export interface StockQuote extends CSEStockData {
+  id?: string;
+  timestamp?: string;
+  prevClose?: number;
+}
+
+export interface ChartDataPoint {
+  date: string;
+  timestamp: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export interface WatchlistItem {
+  symbol: string;
+  companyName: string;
+  addedAt: string;
+}
+
+export type TimeFrame = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
+export type ChartType = "line" | "candlestick" | "area";

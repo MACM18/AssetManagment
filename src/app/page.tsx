@@ -1,149 +1,207 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Investment } from '@/types';
-import InvestmentForm from '@/components/InvestmentForm';
-import InvestmentList from '@/components/InvestmentList';
-import StockPriceTracker from '@/components/StockPriceTracker';
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useState, useEffect } from "react";
+import { StockQuote, ChartDataPoint, MarketSummary } from "@/types";
+import MarketOverview from "@/components/MarketOverview";
+import StockChart from "@/components/StockChart";
+import WatchList from "@/components/WatchList";
+import MarketDepth from "@/components/MarketDepth";
+import {
+  fetchLatestStockPrices,
+  fetchStockHistory,
+  calculateMarketSummary,
+  generateMockChartData,
+  getLastDataSource,
+} from "@/lib/tradingData";
+import { FIREBASE_AVAILABLE } from "@/lib/firebase";
+import { TrendingUp, RefreshCw } from "lucide-react";
 
 export default function Home() {
-  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [stocks, setStocks] = useState<StockQuote[]>([]);
+  const [selectedSymbol, setSelectedSymbol] = useState<string>("JKH");
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [marketSummary, setMarketSummary] = useState<MarketSummary>({
+    totalVolume: 0,
+    totalTrades: 0,
+    advancers: 0,
+    decliners: 0,
+    unchanged: 0,
+  });
   const [loading, setLoading] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-  useEffect(() => {
-    loadInvestments();
-  }, []);
-
-  const loadInvestments = async () => {
+  const loadMarketData = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'investments'));
-      const investmentsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Investment));
-      setInvestments(investmentsData);
+      const stockData = await fetchLatestStockPrices();
+
+      if (stockData.length > 0) {
+        setStocks(stockData);
+        const summary = calculateMarketSummary(stockData);
+        setMarketSummary(summary);
+        setLastUpdate(new Date());
+
+        // Set default selected symbol if not set
+        if (!selectedSymbol && stockData.length > 0) {
+          setSelectedSymbol(stockData[0].symbol);
+        }
+      } else {
+        console.warn("No stock data available");
+      }
     } catch (error) {
-      console.error('Error loading investments:', error);
-      // If Firebase is not configured, use empty array
-      setInvestments([]);
+      console.error("Error loading market data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddInvestment = async (investment: Omit<Investment, 'id'>) => {
+  const loadStockChart = async (symbol: string) => {
     try {
-      const docRef = await addDoc(collection(db, 'investments'), investment);
-      setInvestments([...investments, { id: docRef.id, ...investment }]);
+      const history = await fetchStockHistory(symbol, 90);
+
+      if (history.length > 0) {
+        setChartData(history);
+      } else {
+        // Fallback to mock data if no historical data
+        const selectedStock = stocks.find((s) => s.symbol === symbol);
+        if (selectedStock) {
+          const mockData = generateMockChartData(selectedStock.price, 90);
+          setChartData(mockData);
+        }
+      }
     } catch (error) {
-      console.error('Error adding investment:', error);
-      alert('Failed to add investment. Please check Firebase configuration.');
+      console.error(`Error loading chart data for ${symbol}:`, error);
     }
   };
 
-  const handleDeleteInvestment = async (id: string) => {
-    try {
-      await deleteDoc(doc(db, 'investments', id));
-      setInvestments(investments.filter(inv => inv.id !== id));
-    } catch (error) {
-      console.error('Error deleting investment:', error);
-      alert('Failed to delete investment.');
+  useEffect(() => {
+    loadMarketData();
+    // Refresh data every 5 minutes
+    const interval = setInterval(() => {
+      loadMarketData();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (selectedSymbol) {
+      loadStockChart(selectedSymbol);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSymbol]);
+
+  const handleRefresh = () => {
+    setLoading(true);
+    loadMarketData();
   };
 
-  const handleUpdateInvestment = async (id: string, updates: Partial<Investment>) => {
-    try {
-      await updateDoc(doc(db, 'investments', id), updates);
-      setInvestments(investments.map(inv => 
-        inv.id === id ? { ...inv, ...updates } : inv
-      ));
-    } catch (error) {
-      console.error('Error updating investment:', error);
-      alert('Failed to update investment.');
-    }
-  };
-
-  if (loading) {
+  if (loading && stocks.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4'></div>
+          <p className='text-xl text-gray-700'>Loading Market Data...</p>
+        </div>
       </div>
     );
   }
 
-  const totalInvested = investments.reduce((sum, inv) => sum + inv.amount, 0);
-  const totalValue = investments.reduce((sum, inv) => sum + (inv.currentValue || inv.amount), 0);
-  const totalReturn = totalValue - totalInvested;
-  const returnPercentage = totalInvested > 0 ? (totalReturn / totalInvested * 100).toFixed(2) : '0.00';
+  const selectedStock = stocks.find((s) => s.symbol === selectedSymbol);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Investment Tracker</h1>
-          
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 truncate">Total Invested</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                  Rs. {totalInvested.toLocaleString()}
-                </dd>
-              </div>
+    <main className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100'>
+      <div className='max-w-[1920px] mx-auto p-6'>
+        {/* Header */}
+        <div className='flex justify-between items-center mb-6'>
+          <div className='flex items-center space-x-4'>
+            <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-3'>
+              <TrendingUp className='w-8 h-8 text-white' />
             </div>
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 truncate">Current Value</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                  Rs. {totalValue.toLocaleString()}
-                </dd>
-              </div>
-            </div>
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 truncate">Total Return</dt>
-                <dd className={`mt-1 text-3xl font-semibold ${totalReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  Rs. {totalReturn.toLocaleString()}
-                </dd>
-              </div>
-            </div>
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 truncate">Return %</dt>
-                <dd className={`mt-1 text-3xl font-semibold ${parseFloat(returnPercentage) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {returnPercentage}%
-                </dd>
-              </div>
+            <div>
+              <h1 className='text-4xl font-bold text-gray-900'>
+                CSE Trading Platform
+              </h1>
+              <p className='text-gray-600 mt-1'>
+                Colombo Stock Exchange - Real-time Market Data
+              </p>
             </div>
           </div>
-
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Add Investment Form */}
-            <div className="bg-white shadow rounded-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Add Investment</h2>
-              <InvestmentForm onSubmit={handleAddInvestment} />
+          <div className='flex items-center space-x-4'>
+            <div className='text-right'>
+              <p className='text-sm text-gray-600'>Last Updated</p>
+              <p className='text-sm font-semibold text-gray-900'>
+                {lastUpdate.toLocaleTimeString()}
+              </p>
             </div>
 
-            {/* Stock Price Tracker */}
-            <div className="bg-white shadow rounded-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">CSE Stock Tracker</h2>
-              <StockPriceTracker />
+            {/* Data source badge */}
+            <div className='flex items-center space-x-2'>
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  FIREBASE_AVAILABLE
+                    ? "bg-green-100 text-green-800"
+                    : "bg-yellow-100 text-yellow-800"
+                }`}
+              >
+                {FIREBASE_AVAILABLE ? "Firestore" : "No Firestore"}
+              </span>
+              <span className='text-sm text-gray-500'>
+                Source: {getLastDataSource()}
+              </span>
             </div>
+
+            <button
+              onClick={handleRefresh}
+              disabled={loading}
+              className='flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors shadow-lg'
+            >
+              <RefreshCw
+                className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+              />
+              <span>Refresh</span>
+            </button>
           </div>
+        </div>
 
-          {/* Investment List */}
-          <div className="mt-8 bg-white shadow rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Investments</h2>
-            <InvestmentList 
-              investments={investments}
-              onDelete={handleDeleteInvestment}
-              onUpdate={handleUpdateInvestment}
+        {/* Market Overview */}
+        <div className='mb-6'>
+          <MarketOverview stocks={stocks} marketSummary={marketSummary} />
+        </div>
+
+        {/* Main Trading Interface */}
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+          {/* Left Column - Watchlist */}
+          <div className='lg:col-span-1'>
+            <WatchList
+              stocks={stocks}
+              onSelectStock={setSelectedSymbol}
+              selectedSymbol={selectedSymbol}
             />
           </div>
+
+          {/* Center Column - Chart */}
+          <div className='lg:col-span-2 space-y-6'>
+            {selectedStock && (
+              <>
+                <StockChart
+                  data={chartData}
+                  symbol={selectedStock.symbol}
+                  currentPrice={selectedStock.price}
+                  change={selectedStock.change || 0}
+                  changePercent={selectedStock.changePercent || 0}
+                />
+                <MarketDepth stock={selectedStock} />
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className='mt-8 text-center text-sm text-gray-600'>
+          <p>Data provided by Colombo Stock Exchange (CSE)</p>
+          <p className='mt-1'>
+            Market data may be delayed. For informational purposes only.
+          </p>
         </div>
       </div>
     </main>

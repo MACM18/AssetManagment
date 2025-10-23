@@ -1,7 +1,7 @@
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
-import { getStorage, FirebaseStorage } from 'firebase/storage';
-import { getAuth, Auth } from 'firebase/auth';
+import { initializeApp, getApps, FirebaseApp } from "firebase/app";
+import { getFirestore, Firestore } from "firebase/firestore";
+import { getStorage, FirebaseStorage } from "firebase/storage";
+import { getAuth, Auth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -18,11 +18,12 @@ let storageInstance: FirebaseStorage | undefined;
 let authInstance: Auth | undefined;
 
 // Only initialize Firebase if we have valid configuration
-const hasValidConfig = firebaseConfig.apiKey && 
-                       firebaseConfig.authDomain && 
-                       firebaseConfig.projectId;
+const hasValidConfig =
+  firebaseConfig.apiKey &&
+  firebaseConfig.authDomain &&
+  firebaseConfig.projectId;
 
-if (hasValidConfig && typeof window !== 'undefined') {
+if (hasValidConfig && typeof window !== "undefined") {
   if (!getApps().length) {
     app = initializeApp(firebaseConfig);
     dbInstance = getFirestore(app);
@@ -45,3 +46,6 @@ export const db = dbInstance || mockDb;
 export const storage = storageInstance || mockStorage;
 export const auth = authInstance || mockAuth;
 export { app };
+
+// Indicates whether Firebase was initialized successfully at runtime
+export const FIREBASE_AVAILABLE = Boolean(dbInstance && app);

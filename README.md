@@ -1,42 +1,110 @@
-# Investment Tracker + ML Pipeline
+# CSE Trading Platform - Investment Tracker + ML Pipeline
 
-A modular investment tracking and forecasting system built with Next.js, Firebase, and GitHub Actions.
+A professional trading platform for the Colombo Stock Exchange (CSE) with real-time analytics, advanced charting, and automated data collection workflows.
 
-## Features
+## 🚀 Features
 
-- 📊 **Next.js Dashboard**: Track investments across stocks (Colombo Stock Exchange), mutual funds, FDs, and other assets
-- 📈 **Stock Price Tracking**: Monitor CSE stock prices in real-time
-- 🤖 **Automated Data Collection**: Daily GitHub Actions workflow to fetch stock data with throttling
-- 📦 **Monthly Exports**: Automated monthly aggregation and storage in Firebase
-- 🔥 **Firebase Integration**: Firestore for data storage, Firebase Storage for exports
+### 📊 Trading Platform UI
+
+- **Market Overview**: Real-time market summary with advancers, decliners, and volume stats
+- **Advanced Charts**: Line, Area, and Candlestick charts with multiple timeframes (1D to 1Y)
+- **Watchlist**: Customizable stock watchlist with search and filtering
+- **Market Depth**: Order book visualization with bid/ask levels
+- **Real-time Updates**: Auto-refresh every 5 minutes
+
+### 🤖 Automated Data Collection
+
+- **Daily Collection**: GitHub Actions workflow fetches CSE data daily at 9 AM UTC
+- **Bulk API Requests**: Single request fetches all stocks (~5 seconds)
+- **Firestore Storage**: All data stored in Firebase Firestore for fast querying
+- **Monthly Exports**: Automated monthly aggregation and archival
+
+### 📈 Analytics & Visualization
+
+- **Top Movers**: Track top gainers, losers, and most active stocks
+- **Price Charts**: Interactive charts with OHLCV data and volume analysis
+- **Historical Data**: View price history across multiple timeframes
+- **Technical Analysis**: Foundation ready for indicators (RSI, MACD, etc.)
+
+## 📦 Technology Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS 4
+- **Charts**: Recharts
+- **Database**: Firebase Firestore
+- **Icons**: Lucide React
+- **API**: CSE TradeSummary API
+- **Automation**: GitHub Actions
 
 ## Project Structure
 
 ```
 AssetManagment/
 ├── src/
-│   ├── app/                    # Next.js App Router pages
+│   ├── app/                    # Next.js App Router
 │   │   ├── layout.tsx          # Root layout
-│   │   ├── page.tsx            # Home page with dashboard
+│   │   ├── page.tsx            # Trading platform main page
 │   │   └── globals.css         # Global styles
 │   ├── components/             # React components
-│   │   ├── InvestmentForm.tsx  # Form to add investments
-│   │   ├── InvestmentList.tsx  # List of investments
-│   │   └── StockPriceTracker.tsx # CSE stock price tracker
+│   │   ├── MarketOverview.tsx  # Market summary & top movers
+│   │   ├── StockChart.tsx      # Advanced charting component
+│   │   ├── WatchList.tsx       # Stock watchlist
+│   │   ├── MarketDepth.tsx     # Order book visualization
+│   │   ├── InvestmentForm.tsx  # (Legacy - for future use)
+│   │   └── InvestmentList.tsx  # (Legacy - for future use)
 │   ├── lib/                    # Utility libraries
-│   │   ├── firebase.ts         # Firebase configuration
-│   │   └── stockData.ts        # Stock data fetching utilities
-│   └── types/                  # TypeScript type definitions
+│   │   ├── firebase.ts         # Firebase client config
+│   │   ├── firestoreAdmin.ts   # Firebase admin SDK
+│   │   ├── stockData.ts        # CSE API integration
+│   │   └── tradingData.ts      # Firestore data queries
+│   └── types/                  # TypeScript definitions
 │       └── index.ts
 ├── scripts/                    # Automation scripts
-│   ├── collectStockData.ts     # Daily data collection script
-│   └── monthlyExport.ts        # Monthly export script
+│   ├── collectStockData.ts     # Daily data collection
+│   ├── saveStockDataToFirestore.ts  # Save to Firestore
+│   └── monthlyExport.ts        # Monthly export
 ├── .github/
-│   └── workflows/              # GitHub Actions workflows
+│   └── workflows/              # GitHub Actions
 │       ├── daily-data-collection.yml
 │       └── monthly-export.yml
 └── data/                       # Local data storage (gitignored)
 ```
+
+## 🎨 UI Components
+
+### Market Overview
+
+Displays market-wide statistics and highlights top movers.
+
+- Market summary cards (Volume, Advancers, Decliners, Trades)
+- Top 5 Gainers, Losers, and Most Active stocks
+- Color-coded indicators and gradients
+
+### Stock Chart
+
+Advanced charting with multiple visualization options.
+
+- **Chart Types**: Line, Area, Candlestick
+- **Timeframes**: 1D, 1W, 1M, 3M, 6M, 1Y, ALL
+- Interactive tooltips with OHLCV data
+- Integrated volume chart
+
+### Watch List
+
+Customizable stock monitoring interface.
+
+- Search and filter stocks
+- Add/remove from watchlist
+- Real-time price updates
+- Quick stock selection
+
+### Market Depth
+
+Visual representation of market liquidity.
+
+- Bid/Ask order book
+- Visual volume bars
+- Trading statistics (High, Low, Volume)
 
 ## Setup
 
@@ -67,7 +135,47 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
+Open [http://localhost:3000](http://localhost:3000) to view the trading platform.
+
+## 📊 Data Collection & Storage
+
+### Firestore Collections
+
+#### `stock_prices`
+
+Stores daily stock price data with the following structure:
+
+```typescript
+{
+  symbol: string; // e.g., "JKH"
+  companyName: string;
+  date: string; // YYYY-MM-DD
+  price: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  createdAt: string; // ISO timestamp
+}
+```
+
+### Data Collection Workflow
+
+1. **Collect Data**: Fetch from CSE API
+
+```bash
+npm run collect-data
+```
+
+2. **Save to Firestore**: Automatically saves during collection
+3. **Monthly Export**: Aggregate and archive
+
+```bash
+npm run monthly-export
+```
 
 ## GitHub Actions Workflows
 
@@ -85,6 +193,7 @@ Runs every day at 9:00 AM UTC (3:00 PM Sri Lanka Time) to fetch CSE stock data.
   - Commits data back to repository
 
 **Manual trigger:**
+
 ```bash
 npm run collect-data
 ```
@@ -101,97 +210,49 @@ Runs on the first day of each month to aggregate collected data and upload to Fi
   - Saves metadata to Firestore
 
 **Manual trigger:**
+
 ```bash
 npm run monthly-export
 ```
 
-## Investment Types
+## 🚀 Future Enhancements
 
-The tracker supports four types of investments:
+### Planned Features
 
-1. **Stocks (CSE)**: Colombo Stock Exchange stocks with symbol tracking
-2. **Mutual Funds**: Mutual fund investments with quantity tracking
-3. **Fixed Deposits (FD)**: Bank fixed deposits
-4. **Other**: Any other type of investment
+- Real-time WebSocket updates
+- Technical indicators (RSI, MACD, Bollinger Bands)
+- Portfolio tracking and management (reintegrate legacy components)
+- Price alerts and notifications
+- Export to CSV/Excel
+- Dark mode support
+- News integration
+- ML-based price predictions
 
-## CSE Stock Symbols
+### Legacy Investment Management
 
-The following CSE symbols are tracked by default (configurable in `src/lib/stockData.ts`):
+The original investment tracking features are preserved for future integration:
 
-**To add or remove stock symbols**, edit the `CSE_SYMBOLS` array in `src/lib/stockData.ts`:
+- `InvestmentForm.tsx` - Add investments
+- `InvestmentList.tsx` - Manage portfolio
+- Portfolio analytics and returns calculation
 
-```typescript
-export const CSE_SYMBOLS = [
-  'JKH',    // John Keells Holdings
-  'COMB',   // Commercial Bank
-  'HNB',    // Hatton National Bank
-  'DIAL',   // Dialog Axiata
-  'SAMP',   // Sampath Bank
-  'LFIN',   // LB Finance
-  'NTB',    // Nations Trust Bank
-  'CINS',   // Ceylinco Insurance
-  'BIL',    // Bukit Darah
-  'VONE',   // Vallibel One
-  'LOLC'    // LOLC Holdings
-];
-```
+See [TRADING_PLATFORM.md](./TRADING_PLATFORM.md) for detailed documentation.
 
-## API Integration
-
-The system now uses the official CSE API endpoint with improved efficiency:
-
-**Endpoint**: `https://www.cse.lk/api/tradeSummary`
-
-**Request Format**:
-```json
-{}
-```
-(Empty POST request body)
-
-**Response**: Array of all stocks' trade summary data for the day
-
-**Features**:
-- Makes a single POST request to get all stocks at once
-- No throttling required between stocks (bulk fetch)
-- Dramatically faster: ~5 seconds instead of 110+ seconds
-- Parses response data including price, volume, and trading statistics
-- Filters results to only include tracked symbols
-
-**Response Format**: See `trade_summary_example.json` for an example API response structure.
-
-## Deployment
-
-The application is configured for automated deployment to Firebase Hosting via GitHub Actions.
-
-### Quick Start
-
-1. Set up Firebase project and configure `.firebaserc` with your project ID
-2. Add GitHub secrets: `FIREBASE_SERVICE_ACCOUNT` and `FIREBASE_PROJECT_ID`
-3. Push to `main` branch - deployment happens automatically
-
-For detailed deployment setup and troubleshooting, see [FIREBASE_DEPLOYMENT.md](./FIREBASE_DEPLOYMENT.md).
-
-## Scripts
+## 📝 Scripts
 
 - `npm run dev` - Start development server
-- `npm run build` - Build for production (creates static export in `out/`)
+- `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run collect-data` - Manually run data collection
-- `npm run monthly-export` - Manually run monthly export
+- `npm run collect-data` - Fetch stock data from CSE
+- `npm run monthly-export` - Generate monthly report
 
-## Data Storage
+## 📚 Documentation
 
-### Local Storage
-- Daily stock data is saved to `data/cse-data-YYYY-MM-DD.json`
-- The `data/` directory is gitignored by default (except when committed by GitHub Actions)
-
-### Firebase Firestore
-- Investments: `investments` collection
-- Monthly reports metadata: `monthly-reports` collection
-
-### Firebase Storage
-- Monthly aggregated data: `monthly-exports/YYYY-MM.json`
+- [TRADING_PLATFORM.md](./TRADING_PLATFORM.md) - Complete trading platform guide
+- [FIREBASE_DEPLOYMENT.md](./FIREBASE_DEPLOYMENT.md) - Deployment setup
+- [GITHUB_ACTIONS_SETUP.md](./GITHUB_ACTIONS_SETUP.md) - CI/CD configuration
+- [STOCK_DATA_UPDATE.md](./STOCK_DATA_UPDATE.md) - Data collection details
 
 ## Contributing
 
