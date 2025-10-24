@@ -80,3 +80,33 @@ export interface WatchlistItem {
 
 export type TimeFrame = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
 export type ChartType = "line" | "candlestick" | "area";
+
+// Firestore document structure for stock_prices_by_date collection
+export interface FirestoreStockPricesByDate {
+  date: string;
+  count: number;
+  stocks: FirestoreStockData[];
+  updatedAt: FirebaseTimestamp | string;
+}
+
+export interface FirestoreStockData {
+  symbol: string;
+  normalizedSymbol?: string;
+  companyName: string;
+  date: string;
+  price: number | null;
+  open: number | null;
+  high: number | null;
+  low: number | null;
+  close: number | null;
+  change: number | null;
+  changePercent: number | null;
+  volume: number | null;
+}
+
+// Firebase Timestamp type (can be Firestore Timestamp or ISO string)
+export interface FirebaseTimestamp {
+  toDate?: () => Date;
+  seconds?: number;
+  nanoseconds?: number;
+}

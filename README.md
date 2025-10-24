@@ -116,18 +116,40 @@ npm install
 
 ### 2. Configure Firebase
 
+#### Frontend Configuration (Required for Web App)
+
 1. Create a Firebase project at [https://console.firebase.google.com](https://console.firebase.google.com)
-2. Enable Firestore Database and Firebase Storage
-3. Copy `.env.example` to `.env.local` and fill in your Firebase configuration:
+2. Enable **Firestore Database** in Firebase Console
+3. Get your Web App configuration:
+   - Go to Project Settings (gear icon) → Your apps
+   - Select or add a Web App
+   - Copy the Firebase SDK configuration values
+4. Copy `.env.example` to `.env.local` and fill in your Firebase web app config:
 
 ```bash
 cp .env.example .env.local
 ```
 
-4. For GitHub Actions, add the following secrets to your repository:
-   - `FIREBASE_SERVICE_ACCOUNT`: Your Firebase service account JSON
+Edit `.env.local` with your Firebase web app credentials:
+```
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+#### GitHub Actions Configuration (Required for Data Collection)
+
+For automated data collection workflows, add the following secrets to your GitHub repository:
+   - `FIREBASE_SERVICE_ACCOUNT`: Your Firebase service account JSON (from Firebase Console → Project Settings → Service Accounts)
    - `FIREBASE_PROJECT_ID`: Your Firebase project ID
-   - `FIREBASE_STORAGE_BUCKET`: Your Firebase storage bucket name
+   - `FIREBASE_STORAGE_BUCKET`: Your Firebase storage bucket name (e.g., `your_project.appspot.com`)
+
+**Note**: The frontend and workflows use different authentication methods:
+- Frontend: Web app credentials (NEXT_PUBLIC_* variables)
+- Workflows: Service account credentials (GitHub Secrets)
 
 ### 3. Run Development Server
 
@@ -141,24 +163,45 @@ Open [http://localhost:3000](http://localhost:3000) to view the trading platform
 
 ### Firestore Collections
 
-#### `stock_prices`
+The application uses two Firestore collections:
 
-Stores daily stock price data with the following structure:
+#### `stock_prices_by_date` (Primary Collection)
+
+Each document represents one trading date and contains all stock data for that date:
 
 ```typescript
 {
-  symbol: string; // e.g., "JKH"
-  companyName: string;
-  date: string; // YYYY-MM-DD
-  price: number;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  change: number;
-  changePercent: number;
-  volume: number;
-  createdAt: string; // ISO timestamp
+  date: string;              // YYYY-MM-DD (document ID)
+  count: number;             // Number of stocks
+  stocks: [                  // Array of all stocks for this date
+    {
+      symbol: string;        // Original symbol (e.g., "JKH.N0000")
+      normalizedSymbol: string; // Cleaned symbol (e.g., "JKH")
+      companyName: string;
+      date: string;          // YYYY-MM-DD
+      price: number;
+      open: number;
+      high: number;
+      low: number;
+      close: number;
+      change: number;
+      changePercent: number;
+      volume: number;
+    }
+  ],
+  updatedAt: timestamp;      // Server timestamp
+}
+```
+
+#### `stock_prices/_last_run` (Metadata)
+
+Stores metadata about the last data collection run:
+
+```typescript
+{
+  date: string;              // Last collection date
+  count: number;             // Number of stocks collected
+  updatedAt: timestamp;      // Last update time
 }
 ```
 
