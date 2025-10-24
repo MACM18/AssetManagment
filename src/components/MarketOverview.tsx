@@ -42,11 +42,11 @@ export default function MarketOverview({
     <div className='space-y-6 animate-slide-up'>
       {/* Mock Data Warning Banner */}
       {isMockData && (
-        <div className='bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-500 rounded-lg p-4 shadow-md hover-lift'>
+        <div className='bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-l-4 border-amber-500 rounded-lg p-4 shadow-md hover-lift'>
           <div className='flex items-start'>
-            <AlertCircle className='w-6 h-6 text-amber-600 mr-3 flex-shrink-0 mt-0.5' />
+            <AlertCircle className='w-6 h-6 text-amber-600 dark:text-amber-400 mr-3 flex-shrink-0 mt-0.5' />
             <div>
-              <h3 className='text-amber-900 font-semibold text-sm'>
+              <h3 className='text-amber-900 dark:text-amber-100 font-semibold text-sm'>
                 Demo Mode - Sample Data
               </h3>
               <p className='text-amber-800 text-sm mt-1'>
@@ -150,13 +150,13 @@ export default function MarketOverview({
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900'>{stock.symbol}</p>
+                    <p className='font-bold text-gray-900 dark:text-gray-100'>{stock.symbol}</p>
                     <p className='text-xs text-gray-500 truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
                   <div className='text-right'>
-                    <p className='font-semibold text-gray-900'>
+                    <p className='font-semibold text-gray-900 dark:text-gray-100'>
                       Rs.{" "}
                       {typeof stock.price === "number"
                         ? stock.price.toFixed(2)
@@ -194,13 +194,13 @@ export default function MarketOverview({
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900'>{stock.symbol}</p>
+                    <p className='font-bold text-gray-900 dark:text-gray-100'>{stock.symbol}</p>
                     <p className='text-xs text-gray-500 truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
                   <div className='text-right'>
-                    <p className='font-semibold text-gray-900'>
+                    <p className='font-semibold text-gray-900 dark:text-gray-100'>
                       Rs.{" "}
                       {typeof stock.price === "number"
                         ? stock.price.toFixed(2)
@@ -238,13 +238,13 @@ export default function MarketOverview({
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900'>{stock.symbol}</p>
+                    <p className='font-bold text-gray-900 dark:text-gray-100'>{stock.symbol}</p>
                     <p className='text-xs text-gray-500 truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
                   <div className='text-right'>
-                    <p className='font-semibold text-gray-900'>
+                    <p className='font-semibold text-gray-900 dark:text-gray-100'>
                       Rs.{" "}
                       {typeof stock.price === "number"
                         ? stock.price.toFixed(2)

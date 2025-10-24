@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PortfolioProvider } from "@/contexts/PortfolioContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export const metadata: Metadata = {
   title: "stock.macm.dev - CSE Stock Market Tracker",
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className='font-sans'>
-        <AuthProvider>
-          <PortfolioProvider>{children}</PortfolioProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <PortfolioProvider>{children}</PortfolioProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -30,11 +30,11 @@ export default function PerformanceChart() {
 
   if (!summary || summary.holdings.length === 0) {
     return (
-      <div className='bg-white rounded-lg shadow-lg p-6 border border-gray-200'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
         <h3 className='text-lg font-bold text-gray-900 mb-4'>
           Performance by Stock
         </h3>
-        <div className='text-center py-8 text-gray-500'>
+        <div className='text-center py-8 text-gray-500 dark:text-gray-400'>
           <p>No data to display</p>
           <p className='text-sm mt-1'>Add holdings to see performance</p>
         </div>
@@ -43,7 +43,7 @@ export default function PerformanceChart() {
   }
 
   return (
-    <div className='bg-white rounded-lg shadow-lg p-6 border border-gray-200'>
+    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
       <h3 className='text-lg font-bold text-gray-900 mb-4'>
         Performance by Stock
       </h3>

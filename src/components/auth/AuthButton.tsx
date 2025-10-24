@@ -22,7 +22,7 @@ export default function AuthButton() {
   if (loading) {
     return (
       <div className='flex items-center gap-2'>
-        <div className='w-8 h-8 rounded-full bg-gray-200 animate-pulse'></div>
+        <div className='w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse'></div>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function AuthButton() {
         </div>
         <button
           onClick={handleSignOut}
-          className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50'
+          className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900'
         >
           Sign Out
         </button>

@@ -30,7 +30,7 @@ export default function PortfolioInsights() {
     (profitableHoldings / summary.holdings.length) * 100;
 
   return (
-    <div className='bg-white rounded-lg shadow-lg p-6 border border-gray-200'>
+    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
       <h3 className='text-lg font-bold text-gray-900 mb-4'>
         Portfolio Insights
       </h3>
@@ -47,7 +47,7 @@ export default function PortfolioInsights() {
                 <p className='text-sm font-medium text-green-900'>
                   Best Performer
                 </p>
-                <p className='text-lg font-bold text-green-700'>
+                <p className='text-lg font-bold text-green-700 dark:text-green-400'>
                   {bestPerformer.symbol}
                 </p>
                 <p className='text-xs text-green-600 mt-1'>
@@ -56,7 +56,7 @@ export default function PortfolioInsights() {
               </div>
             </div>
             <div className='text-right'>
-              <div className='flex items-center gap-1 text-green-700'>
+              <div className='flex items-center gap-1 text-green-700 dark:text-green-400'>
                 <TrendingUp className='w-4 h-4' />
                 <span className='text-lg font-bold'>
                   +{bestPerformer.gainLossPercent.toFixed(2)}%
@@ -71,7 +71,7 @@ export default function PortfolioInsights() {
 
         {/* Worst Performer */}
         {worstPerformer.gainLossPercent < 0 && (
-          <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+          <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4'>
             <div className='flex items-start justify-between'>
               <div className='flex items-start gap-3'>
                 <div className='p-2 bg-red-100 rounded-full'>
@@ -81,7 +81,7 @@ export default function PortfolioInsights() {
                   <p className='text-sm font-medium text-red-900'>
                     Needs Attention
                   </p>
-                  <p className='text-lg font-bold text-red-700'>
+                  <p className='text-lg font-bold text-red-700 dark:text-red-400'>
                     {worstPerformer.symbol}
                   </p>
                   <p className='text-xs text-red-600 mt-1'>
@@ -90,7 +90,7 @@ export default function PortfolioInsights() {
                 </div>
               </div>
               <div className='text-right'>
-                <div className='flex items-center gap-1 text-red-700'>
+                <div className='flex items-center gap-1 text-red-700 dark:text-red-400'>
                   <TrendingDown className='w-4 h-4' />
                   <span className='text-lg font-bold'>
                     {worstPerformer.gainLossPercent.toFixed(2)}%
@@ -115,7 +115,7 @@ export default function PortfolioInsights() {
             </div>
             <p
               className={`text-2xl font-bold ${
-                avgGainLoss >= 0 ? "text-green-700" : "text-red-700"
+                avgGainLoss >= 0 ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"
               }`}
             >
               {avgGainLoss >= 0 ? "+" : ""}
@@ -142,13 +142,13 @@ export default function PortfolioInsights() {
         {/* Diversification Score */}
         <div className='bg-gray-50 border border-gray-200 rounded-lg p-4'>
           <div className='flex items-center justify-between mb-2'>
-            <p className='text-sm font-medium text-gray-700'>Diversification</p>
-            <p className='text-sm font-bold text-gray-900'>
+            <p className='text-sm font-medium text-gray-700 dark:text-gray-300'>Diversification</p>
+            <p className='text-sm font-bold text-gray-900 dark:text-gray-100'>
               {summary.holdings.length} stock
               {summary.holdings.length !== 1 ? "s" : ""}
             </p>
           </div>
-          <div className='w-full bg-gray-200 rounded-full h-2'>
+          <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2'>
             <div
               className='bg-blue-600 h-2 rounded-full transition-all'
               style={{

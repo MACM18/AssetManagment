@@ -114,31 +114,31 @@ export default function StockChart({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className='bg-white p-4 rounded-lg shadow-lg border border-gray-200'>
+        <div className='bg-white p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'>
           <p className='text-sm text-gray-600 mb-2'>
             {format(new Date(data.date), "MMM dd, yyyy")}
           </p>
           <div className='space-y-1'>
             <p className='text-sm'>
-              <span className='text-gray-600'>Open: </span>
+              <span className='text-gray-600 dark:text-gray-400'>Open: </span>
               <span className='font-semibold'>Rs. {data.open?.toFixed(2)}</span>
             </p>
             <p className='text-sm'>
-              <span className='text-gray-600'>High: </span>
+              <span className='text-gray-600 dark:text-gray-400'>High: </span>
               <span className='font-semibold'>Rs. {data.high?.toFixed(2)}</span>
             </p>
             <p className='text-sm'>
-              <span className='text-gray-600'>Low: </span>
+              <span className='text-gray-600 dark:text-gray-400'>Low: </span>
               <span className='font-semibold'>Rs. {data.low?.toFixed(2)}</span>
             </p>
             <p className='text-sm'>
-              <span className='text-gray-600'>Close: </span>
+              <span className='text-gray-600 dark:text-gray-400'>Close: </span>
               <span className='font-semibold'>
                 Rs. {data.close?.toFixed(2)}
               </span>
             </p>
             <p className='text-sm'>
-              <span className='text-gray-600'>Volume: </span>
+              <span className='text-gray-600 dark:text-gray-400'>Volume: </span>
               <span className='font-semibold'>
                 {(data.volume / 1000).toFixed(0)}K
               </span>
@@ -151,13 +151,13 @@ export default function StockChart({
   };
 
   return (
-    <div className='bg-white rounded-lg shadow-lg p-6'>
+    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6'>
       {/* Header */}
       <div className='flex justify-between items-start mb-6'>
         <div>
-          <h2 className='text-2xl font-bold text-gray-900'>{symbol}</h2>
+          <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>{symbol}</h2>
           <div className='flex items-center mt-2 space-x-4'>
-            <p className='text-3xl font-bold text-gray-900'>
+            <p className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
               Rs.{" "}
               {typeof currentPrice === "number"
                 ? currentPrice.toFixed(2)
@@ -194,7 +194,7 @@ export default function StockChart({
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 chartType === ct.type
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 hover:bg-gray-200"
               }`}
             >
               {ct.label}
@@ -270,7 +270,7 @@ export default function StockChart({
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className='bg-white p-2 rounded shadow-lg border border-gray-200'>
+                    <div className='bg-white p-2 rounded shadow-lg border border-gray-200 dark:border-gray-700'>
                       <p className='text-sm'>
                         Volume:{" "}
                         {((payload[0].value as number) / 1000).toFixed(0)}K
@@ -295,7 +295,7 @@ export default function StockChart({
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               timeFrame === tf
                 ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 hover:bg-gray-200"
             }`}
           >
             {tf}

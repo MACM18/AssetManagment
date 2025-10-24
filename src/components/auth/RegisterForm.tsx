@@ -72,11 +72,11 @@ export default function RegisterForm({
   };
 
   return (
-    <div className='w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg'>
-      <h2 className='text-2xl font-bold mb-6 text-gray-900'>Create Account</h2>
+    <div className='w-full max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg'>
+      <h2 className='text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100'>Create Account</h2>
 
       {error && (
-        <div className='mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm'>
+        <div className='mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-400 text-sm'>
           {error}
         </div>
       )}
@@ -95,7 +95,7 @@ export default function RegisterForm({
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             required
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500'
             placeholder='John Doe'
           />
         </div>
@@ -113,7 +113,7 @@ export default function RegisterForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500'
             placeholder='you@example.com'
           />
         </div>
@@ -131,7 +131,7 @@ export default function RegisterForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500'
             placeholder='••••••••'
           />
         </div>
@@ -149,7 +149,7 @@ export default function RegisterForm({
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500'
             placeholder='••••••••'
           />
         </div>
@@ -166,10 +166,10 @@ export default function RegisterForm({
       <div className='mt-4'>
         <div className='relative'>
           <div className='absolute inset-0 flex items-center'>
-            <div className='w-full border-t border-gray-300'></div>
+            <div className='w-full border-t border-gray-300 dark:border-gray-600'></div>
           </div>
           <div className='relative flex justify-center text-sm'>
-            <span className='px-2 bg-white text-gray-500'>
+            <span className='px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400'>
               Or continue with
             </span>
           </div>
@@ -178,7 +178,7 @@ export default function RegisterForm({
         <button
           onClick={handleGoogleSignUp}
           disabled={loading}
-          className='mt-4 w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium'
+          className='mt-4 w-full flex items-center justify-center gap-2 bg-white border border-gray-300 dark:border-gray-600 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium'
         >
           <svg className='w-5 h-5' viewBox='0 0 24 24'>
             <path
@@ -202,7 +202,7 @@ export default function RegisterForm({
         </button>
       </div>
 
-      <p className='mt-6 text-center text-sm text-gray-600'>
+      <p className='mt-6 text-center text-sm text-gray-600 dark:text-gray-400'>
         Already have an account?{" "}
         <button
           onClick={onSwitchToLogin}

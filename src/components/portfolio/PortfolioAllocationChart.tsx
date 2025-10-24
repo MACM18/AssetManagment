@@ -37,11 +37,11 @@ export default function PortfolioAllocationChart() {
 
   if (!summary || summary.holdings.length === 0) {
     return (
-      <div className='bg-white rounded-lg shadow-lg p-6 border border-gray-200'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
         <h3 className='text-lg font-bold text-gray-900 mb-4'>
           Portfolio Allocation
         </h3>
-        <div className='text-center py-8 text-gray-500'>
+        <div className='text-center py-8 text-gray-500 dark:text-gray-400'>
           <p>No data to display</p>
           <p className='text-sm mt-1'>Add holdings to see allocation</p>
         </div>
@@ -50,7 +50,7 @@ export default function PortfolioAllocationChart() {
   }
 
   return (
-    <div className='bg-white rounded-lg shadow-lg p-6 border border-gray-200'>
+    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
       <h3 className='text-lg font-bold text-gray-900 mb-4'>
         Portfolio Allocation
       </h3>
@@ -98,10 +98,10 @@ export default function PortfolioAllocationChart() {
                   className='w-3 h-3 rounded-full'
                   style={{ backgroundColor: COLORS[index % COLORS.length] }}
                 />
-                <span className='font-medium text-gray-900'>{item.name}</span>
+                <span className='font-medium text-gray-900 dark:text-gray-100'>{item.name}</span>
               </div>
               <div className='flex items-center gap-4'>
-                <span className='text-gray-600'>
+                <span className='text-gray-600 dark:text-gray-400'>
                   LKR{" "}
                   {item.value.toLocaleString("en-LK", {
                     minimumFractionDigits: 2,

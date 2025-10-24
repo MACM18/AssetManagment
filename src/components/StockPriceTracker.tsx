@@ -54,7 +54,7 @@ export default function StockPriceTracker() {
           id="symbol"
           value={selectedSymbol}
           onChange={(e) => setSelectedSymbol(e.target.value)}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
         >
           {CSE_SYMBOLS.map(symbol => (
             <option key={symbol} value={symbol}>
@@ -94,7 +94,7 @@ export default function StockPriceTracker() {
           {stockPrices.map(stock => (
             <div
               key={stock.symbol}
-              className="flex justify-between items-center p-2 hover:bg-gray-50 rounded cursor-pointer"
+              className="flex justify-between items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer"
               onClick={() => setSelectedSymbol(stock.symbol)}
             >
               <span className="text-sm font-medium text-gray-900">{stock.symbol}</span>

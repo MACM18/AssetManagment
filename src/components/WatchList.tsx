@@ -74,7 +74,7 @@ export default function WatchList({
       <div className='flex justify-between items-center mb-4'>
         <h2 className='text-xl font-bold gradient-text'>Watchlist</h2>
         <div className='flex items-center gap-2'>
-          <span className='text-sm text-gray-500'>
+          <span className='text-sm text-gray-500 dark:text-gray-400'>
             {filteredStocks.length} stocks
           </span>
           {isMockData && (
@@ -108,7 +108,7 @@ export default function WatchList({
         {filteredStocks.length === 0 ? (
           <div className='text-center py-12'>
             <AlertCircle className='w-12 h-12 mx-auto text-gray-300 mb-3' />
-            <p className='text-gray-500'>No stocks in watchlist</p>
+            <p className='text-gray-500 dark:text-gray-400'>No stocks in watchlist</p>
             <p className='text-sm text-gray-400 mt-1'>
               Click the star icon to add stocks
             </p>
@@ -140,7 +140,7 @@ export default function WatchList({
                       >
                         <Star className='w-4 h-4 fill-current' />
                       </button>
-                      <h3 className='font-bold text-gray-900'>
+                      <h3 className='font-bold text-gray-900 dark:text-gray-100'>
                         {stock.symbol}
                       </h3>
                       {isSelected && (
@@ -155,7 +155,7 @@ export default function WatchList({
                   </div>
 
                   <div className='text-right'>
-                    <p className='text-lg font-bold text-gray-900'>
+                    <p className='text-lg font-bold text-gray-900 dark:text-gray-100'>
                       Rs.{" "}
                       {typeof stock.price === "number"
                         ? stock.price.toFixed(2)
@@ -182,7 +182,7 @@ export default function WatchList({
                 <div className='mt-3 pt-3 border-t border-gray-200 grid grid-cols-4 gap-2 text-xs'>
                   <div>
                     <p className='text-gray-500 mb-1'>Open</p>
-                    <p className='font-semibold text-gray-900'>
+                    <p className='font-semibold text-gray-900 dark:text-gray-100'>
                       {stock.open?.toFixed(2) || "N/A"}
                     </p>
                   </div>

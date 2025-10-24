@@ -55,7 +55,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
           id="type"
           value={formData.type}
           onChange={(e) => setFormData({ ...formData, type: e.target.value as Investment['type'] })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
         >
           <option value="stock">Stock (CSE)</option>
           <option value="mutual-fund">Mutual Fund</option>
@@ -74,7 +74,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
           required
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
           placeholder="e.g., John Keells Holdings"
         />
       </div>
@@ -89,7 +89,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
             id="symbol"
             value={formData.symbol}
             onChange={(e) => setFormData({ ...formData, symbol: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
             placeholder="e.g., JKH.N0000"
           />
         </div>
@@ -108,7 +108,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
             min="0"
             value={formData.amount}
             onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
             placeholder="0.00"
           />
         </div>
@@ -125,7 +125,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
               min="0"
               value={formData.quantity}
               onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
               placeholder="0"
             />
           </div>
@@ -142,7 +142,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
           required
           value={formData.purchaseDate}
           onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
         />
       </div>
 
@@ -155,7 +155,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
           rows={3}
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
           placeholder="Additional notes..."
         />
       </div>

@@ -50,13 +50,13 @@ export default function StockDetailModal({
   }, [holding]);
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <div className='bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto'>
+    <div className='fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 p-4'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto'>
         {/* Header */}
         <div className='sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-start'>
           <div>
             <div className='flex items-center gap-3'>
-              <h2 className='text-2xl font-bold text-gray-900'>
+              <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
                 {holding.symbol}
               </h2>
               <span
@@ -142,7 +142,7 @@ export default function StockDetailModal({
               <p className='text-xs font-medium text-gray-800 uppercase mb-1'>
                 Quantity
               </p>
-              <p className='text-xl font-bold text-gray-900'>
+              <p className='text-xl font-bold text-gray-900 dark:text-gray-100'>
                 {holding.quantity.toLocaleString()}
               </p>
               <p className='text-xs text-gray-600 mt-1'>shares</p>
@@ -193,8 +193,8 @@ export default function StockDetailModal({
             </h3>
             <div className='space-y-3'>
               <div className='flex justify-between items-center'>
-                <span className='text-sm text-gray-600'>Total Invested</span>
-                <span className='text-sm font-semibold text-gray-900'>
+                <span className='text-sm text-gray-600 dark:text-gray-400'>Total Invested</span>
+                <span className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                   LKR{" "}
                   {holding.invested.toLocaleString("en-LK", {
                     minimumFractionDigits: 2,
@@ -203,8 +203,8 @@ export default function StockDetailModal({
                 </span>
               </div>
               <div className='flex justify-between items-center'>
-                <span className='text-sm text-gray-600'>Current Value</span>
-                <span className='text-sm font-semibold text-gray-900'>
+                <span className='text-sm text-gray-600 dark:text-gray-400'>Current Value</span>
+                <span className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                   LKR{" "}
                   {holding.currentValue.toLocaleString("en-LK", {
                     minimumFractionDigits: 2,
@@ -212,8 +212,8 @@ export default function StockDetailModal({
                   })}
                 </span>
               </div>
-              <div className='flex justify-between items-center pt-3 border-t border-gray-300'>
-                <span className='text-sm font-bold text-gray-700'>
+              <div className='flex justify-between items-center pt-3 border-t border-gray-300 dark:border-gray-600'>
+                <span className='text-sm font-bold text-gray-700 dark:text-gray-300'>
                   Total Return
                 </span>
                 <div className='text-right'>
@@ -229,7 +229,7 @@ export default function StockDetailModal({
                       maximumFractionDigits: 2,
                     })}
                   </span>
-                  <p className='text-xs text-gray-600'>
+                  <p className='text-xs text-gray-600 dark:text-gray-400'>
                     {isGain ? "+" : ""}
                     {holding.gainLossPercent.toFixed(2)}%
                   </p>
@@ -280,7 +280,7 @@ export default function StockDetailModal({
                   <h3 className='text-sm font-bold text-gray-900 mb-2'>
                     Notes
                   </h3>
-                  <p className='text-sm text-gray-700'>{holding.notes}</p>
+                  <p className='text-sm text-gray-700 dark:text-gray-300'>{holding.notes}</p>
                 </div>
               )}
             </div>

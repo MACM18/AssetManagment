@@ -33,11 +33,11 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
 
   if (loading) {
     return (
-      <div className='bg-white rounded-lg shadow-lg p-6 border border-gray-200'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
         <h2 className='text-xl font-bold text-gray-900 mb-4'>My Holdings</h2>
         <div className='animate-pulse space-y-3'>
           {[1, 2, 3].map((i) => (
-            <div key={i} className='h-24 bg-gray-200 rounded'></div>
+            <div key={i} className='h-24 bg-gray-200 dark:bg-gray-700 rounded'></div>
           ))}
         </div>
       </div>
@@ -46,9 +46,9 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
 
   if (!summary || summary.holdings.length === 0) {
     return (
-      <div className='bg-white rounded-lg shadow-lg p-6 border border-gray-200'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
         <h2 className='text-xl font-bold text-gray-900 mb-4'>My Holdings</h2>
-        <div className='text-center py-8 text-gray-500'>
+        <div className='text-center py-8 text-gray-500 dark:text-gray-400'>
           <p>No holdings to display</p>
           <p className='text-sm mt-1'>Add your first stock to get started</p>
         </div>
@@ -84,9 +84,9 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
   };
 
   return (
-    <div className='bg-white rounded-lg shadow-lg border border-gray-200'>
+    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'>
       <div className='p-6 border-b border-gray-200'>
-        <h2 className='text-xl font-bold text-gray-900'>My Holdings</h2>
+        <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100'>My Holdings</h2>
       </div>
 
       <div className='divide-y divide-gray-200'>
@@ -100,12 +100,12 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
           return (
             <div
               key={holding.id}
-              className='p-6 hover:bg-gray-50 transition-colors'
+              className='p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
             >
               <div className='flex justify-between items-start mb-3'>
                 <div className='flex-1'>
                   <div className='flex items-center gap-2'>
-                    <h3 className='text-lg font-bold text-gray-900'>
+                    <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100'>
                       {holding.symbol}
                     </h3>
                     <span
@@ -153,7 +153,7 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                     <Hash className='w-3 h-3' />
                     <span>Shares</span>
                   </div>
-                  <p className='text-sm font-semibold text-gray-900'>
+                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                     {holding.quantity.toLocaleString()}
                   </p>
                 </div>
@@ -164,7 +164,7 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                     <Calendar className='w-3 h-3' />
                     <span>Avg. Buy</span>
                   </div>
-                  <p className='text-sm font-semibold text-gray-900'>
+                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                     LKR {holding.purchasePrice.toFixed(2)}
                   </p>
                 </div>
@@ -175,7 +175,7 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                     <TrendingUp className='w-3 h-3' />
                     <span>Current</span>
                   </div>
-                  <p className='text-sm font-semibold text-gray-900'>
+                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                     LKR {holding.currentPrice.toFixed(2)}
                   </p>
                 </div>
@@ -207,8 +207,8 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
               {/* Investment Summary */}
               <div className='flex justify-between items-center pt-3 border-t border-gray-100'>
                 <div>
-                  <p className='text-xs text-gray-500'>Invested</p>
-                  <p className='text-sm font-semibold text-gray-900'>
+                  <p className='text-xs text-gray-500 dark:text-gray-400'>Invested</p>
+                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                     LKR{" "}
                     {holding.invested.toLocaleString("en-LK", {
                       minimumFractionDigits: 2,
@@ -217,8 +217,8 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                   </p>
                 </div>
                 <div className='text-right'>
-                  <p className='text-xs text-gray-500'>Current Value</p>
-                  <p className='text-sm font-semibold text-gray-900'>
+                  <p className='text-xs text-gray-500 dark:text-gray-400'>Current Value</p>
+                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                     LKR{" "}
                     {holding.currentValue.toLocaleString("en-LK", {
                       minimumFractionDigits: 2,
@@ -231,7 +231,7 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
               {holding.notes && (
                 <div className='mt-3 pt-3 border-t border-gray-100'>
                   <p className='text-xs text-gray-500 mb-1'>Notes</p>
-                  <p className='text-sm text-gray-700'>{holding.notes}</p>
+                  <p className='text-sm text-gray-700 dark:text-gray-300'>{holding.notes}</p>
                 </div>
               )}
             </div>

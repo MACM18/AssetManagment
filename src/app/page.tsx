@@ -127,10 +127,12 @@ export default function Home() {
 
   if (loading && stocks.length === 0) {
     return (
-      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100'>
+      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4'></div>
-          <p className='text-xl text-gray-700'>Loading Market Data...</p>
+          <p className='text-xl text-gray-700 dark:text-gray-300'>
+            Loading Market Data...
+          </p>
         </div>
       </div>
     );
@@ -139,24 +141,26 @@ export default function Home() {
   const selectedStock = stocks.find((s) => s.symbol === selectedSymbol);
 
   return (
-    <main className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100'>
+    <main className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800'>
       <Navigation />
 
       <div className='max-w-[1920px] mx-auto p-6'>
         {/* Header */}
         <div className='flex justify-between items-center mb-6'>
           <div>
-            <h1 className='text-3xl font-bold text-gray-900'>
+            <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
               Market Overview
             </h1>
-            <p className='text-gray-600 mt-1'>
+            <p className='text-gray-600 dark:text-gray-400 mt-1'>
               Colombo Stock Exchange - Real-time Market Data
             </p>
           </div>
           <div className='flex items-center space-x-4'>
             <div className='text-right'>
-              <p className='text-sm text-gray-600'>Last Updated</p>
-              <p className='text-sm font-semibold text-gray-900'>
+              <p className='text-sm text-gray-600 dark:text-gray-400'>
+                Last Updated
+              </p>
+              <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                 {lastUpdate.toLocaleTimeString()}
               </p>
             </div>
@@ -166,13 +170,13 @@ export default function Home() {
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   FIREBASE_AVAILABLE
-                    ? "bg-green-100 text-green-800"
-                    : "bg-yellow-100 text-yellow-800"
+                    ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                    : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
                 }`}
               >
                 {FIREBASE_AVAILABLE ? "Firestore" : "No Firestore"}
               </span>
-              <span className='text-sm text-gray-500'>
+              <span className='text-sm text-gray-500 dark:text-gray-400'>
                 Source: {getLastDataSource()}
               </span>
             </div>
@@ -224,8 +228,10 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <div className='mt-8 text-center text-sm text-gray-600 border-t pt-6'>
-          <p className='font-semibold text-gray-700'>stock.macm.dev</p>
+        <div className='mt-8 text-center text-sm text-gray-600 dark:text-gray-400 border-t dark:border-gray-700 pt-6'>
+          <p className='font-semibold text-gray-700 dark:text-gray-300'>
+            stock.macm.dev
+          </p>
           <p className='mt-2'>Data provided by Colombo Stock Exchange (CSE)</p>
           <p className='mt-1'>
             Market data may be delayed. This platform is for informational

@@ -22,9 +22,9 @@ export default function InvestmentList({
       case "fd":
         return "bg-yellow-100 text-yellow-800";
       case "other":
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800";
     }
   };
 
@@ -60,10 +60,10 @@ export default function InvestmentList({
             d='M12 6v6m0 0v6m0-6h6m-6 0H6'
           />
         </svg>
-        <h3 className='mt-2 text-sm font-medium text-gray-900'>
+        <h3 className='mt-2 text-sm font-medium text-gray-900 dark:text-gray-100'>
           No investments
         </h3>
-        <p className='mt-1 text-sm text-gray-500'>
+        <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
           Get started by adding a new investment.
         </p>
       </div>
@@ -73,7 +73,7 @@ export default function InvestmentList({
   return (
     <div className='overflow-x-auto'>
       <table className='min-w-full divide-y divide-gray-200'>
-        <thead className='bg-gray-50'>
+        <thead className='bg-gray-50 dark:bg-gray-900'>
           <tr>
             <th
               scope='col'
@@ -123,11 +123,11 @@ export default function InvestmentList({
           {investments.map((investment) => (
             <tr key={investment.id}>
               <td className='px-6 py-4 whitespace-nowrap'>
-                <div className='text-sm font-medium text-gray-900'>
+                <div className='text-sm font-medium text-gray-900 dark:text-gray-100'>
                   {investment.name}
                 </div>
                 {investment.notes && (
-                  <div className='text-sm text-gray-500'>
+                  <div className='text-sm text-gray-500 dark:text-gray-400'>
                     {investment.notes}
                   </div>
                 )}
@@ -141,16 +141,16 @@ export default function InvestmentList({
                   {getTypeLabel(investment.type)}
                 </span>
               </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
                 {investment.symbol || "-"}
               </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100'>
                 Rs. {investment.amount.toLocaleString()}
               </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
                 {investment.quantity || "-"}
               </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
                 {new Date(investment.purchaseDate).toLocaleDateString()}
               </td>
               <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>

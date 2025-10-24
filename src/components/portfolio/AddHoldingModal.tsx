@@ -82,10 +82,10 @@ export default function AddHoldingModal({
   };
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <div className='bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto'>
+    <div className='fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 p-4'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto'>
         <div className='sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center'>
-          <h2 className='text-2xl font-bold text-gray-900'>
+          <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
             Add Stock Holding
           </h2>
           <button
@@ -98,7 +98,7 @@ export default function AddHoldingModal({
 
         <form onSubmit={handleSubmit} className='p-6 space-y-4'>
           {error && (
-            <div className='p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm'>
+            <div className='p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-400 text-sm'>
               {error}
             </div>
           )}
@@ -116,7 +116,7 @@ export default function AddHoldingModal({
               value={symbol}
               onChange={(e) => setSymbol(e.target.value)}
               required
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             >
               <option value=''>Select a stock</option>
               {stocks.map((stock) => (
@@ -143,7 +143,7 @@ export default function AddHoldingModal({
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               required
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='100'
             />
           </div>
@@ -164,11 +164,11 @@ export default function AddHoldingModal({
               value={purchasePrice}
               onChange={(e) => setPurchasePrice(e.target.value)}
               required
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='1250.00'
             />
             {selectedStock && (
-              <p className='mt-1 text-sm text-gray-500'>
+              <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
                 Current price: LKR {selectedStock.price.toFixed(2)}
               </p>
             )}
@@ -189,7 +189,7 @@ export default function AddHoldingModal({
               onChange={(e) => setPurchaseDate(e.target.value)}
               required
               max={new Date().toISOString().split("T")[0]}
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
           </div>
 
@@ -206,7 +206,7 @@ export default function AddHoldingModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='Add any notes about this investment...'
             />
           </div>
@@ -219,17 +219,17 @@ export default function AddHoldingModal({
               </p>
               <div className='space-y-1 text-sm'>
                 <div className='flex justify-between'>
-                  <span className='text-gray-600'>Total Shares:</span>
+                  <span className='text-gray-600 dark:text-gray-400'>Total Shares:</span>
                   <span className='font-medium'>{quantity}</span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-gray-600'>Price per Share:</span>
+                  <span className='text-gray-600 dark:text-gray-400'>Price per Share:</span>
                   <span className='font-medium'>
                     LKR {parseFloat(purchasePrice).toFixed(2)}
                   </span>
                 </div>
                 <div className='flex justify-between border-t border-blue-300 pt-1 mt-1'>
-                  <span className='font-medium text-gray-700'>
+                  <span className='font-medium text-gray-700 dark:text-gray-300'>
                     Total Investment:
                   </span>
                   <span className='font-bold text-blue-700'>
@@ -248,7 +248,7 @@ export default function AddHoldingModal({
             <button
               type='button'
               onClick={onClose}
-              className='flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-medium'
+              className='flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 font-medium'
             >
               Cancel
             </button>
