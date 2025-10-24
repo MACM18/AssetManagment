@@ -20,6 +20,12 @@ export default function MarketOverview({
   marketSummary,
 }: MarketOverviewProps) {
   const dataSource = getLastDataSource();
+  console.debug(
+    "MarketOverview: dataSource=",
+    dataSource,
+    "stocks.length=",
+    stocks.length
+  );
   const isMockData = dataSource === "mock" || stocks.length === 0;
 
   // Get top gainers and losers
@@ -151,7 +157,10 @@ export default function MarketOverview({
                   </div>
                   <div className='text-right'>
                     <p className='font-semibold text-gray-900'>
-                      Rs. {stock.price.toFixed(2)}
+                      Rs.{" "}
+                      {typeof stock.price === "number"
+                        ? stock.price.toFixed(2)
+                        : "N/A"}
                     </p>
                     <p className='text-sm font-bold text-green-600 flex items-center justify-end'>
                       <TrendingUp className='w-3 h-3 mr-1' />+
@@ -192,7 +201,10 @@ export default function MarketOverview({
                   </div>
                   <div className='text-right'>
                     <p className='font-semibold text-gray-900'>
-                      Rs. {stock.price.toFixed(2)}
+                      Rs.{" "}
+                      {typeof stock.price === "number"
+                        ? stock.price.toFixed(2)
+                        : "N/A"}
                     </p>
                     <p className='text-sm font-bold text-red-600 flex items-center justify-end'>
                       <TrendingDown className='w-3 h-3 mr-1' />
@@ -233,7 +245,10 @@ export default function MarketOverview({
                   </div>
                   <div className='text-right'>
                     <p className='font-semibold text-gray-900'>
-                      Rs. {stock.price.toFixed(2)}
+                      Rs.{" "}
+                      {typeof stock.price === "number"
+                        ? stock.price.toFixed(2)
+                        : "N/A"}
                     </p>
                     <div className='flex items-center justify-end gap-1'>
                       <Activity className='w-3 h-3 text-blue-600' />

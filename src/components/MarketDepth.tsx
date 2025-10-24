@@ -8,9 +8,10 @@ interface MarketDepthProps {
 }
 
 export default function MarketDepth({ stock }: MarketDepthProps) {
+  console.debug("MarketDepth: stock=", stock);
   // Generate mock order book data (in production, this would come from real market data)
   const generateOrderBook = () => {
-    const basePrice = stock.price;
+    const basePrice = typeof stock.price === "number" ? stock.price : 0;
     const bids = [];
     const asks = [];
 
@@ -54,7 +55,10 @@ export default function MarketDepth({ stock }: MarketDepthProps) {
             <div>
               <p className='text-sm text-gray-600'>Current Price</p>
               <p className='text-2xl font-bold text-gray-900'>
-                Rs. {stock.price.toFixed(2)}
+                Rs.{" "}
+                {typeof stock.price === "number"
+                  ? stock.price.toFixed(2)
+                  : "N/A"}
               </p>
             </div>
             <div className='text-right'>

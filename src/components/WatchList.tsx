@@ -28,6 +28,12 @@ export default function WatchList({
   const [watchlist, setWatchlist] = useState<string[]>(CSE_SYMBOLS.slice(0, 8));
 
   const dataSource = getLastDataSource();
+  console.debug(
+    "WatchList: dataSource=",
+    dataSource,
+    "stocks.length=",
+    stocks.length
+  );
   const isMockData = dataSource === "mock" || stocks.length === 0;
 
   const toggleWatchlist = (symbol: string) => {
@@ -38,11 +44,29 @@ export default function WatchList({
     );
   };
 
-  const filteredStocks = stocks.filter(
+  // Build displayed list from watchlist: prefer real stock entries from `stocks`, otherwise show placeholders
+  const displayedStocks = watchlist.map((symbol) => {
+    const found = stocks.find((s) => s.symbol === symbol);
+    if (found) return found;
+    return {
+      symbol,
+      companyName: symbol,
+      date: "",
+      price: null,
+      change: null,
+      changePercent: null,
+      volume: 0,
+      high: null,
+      low: null,
+      open: null,
+      close: null,
+    } as unknown as StockQuote;
+  });
+
+  const filteredStocks = displayedStocks.filter(
     (stock) =>
-      watchlist.includes(stock.symbol) &&
-      (stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        stock.companyName.toLowerCase().includes(searchTerm.toLowerCase()))
+      stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (stock.companyName || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -132,7 +156,10 @@ export default function WatchList({
 
                   <div className='text-right'>
                     <p className='text-lg font-bold text-gray-900'>
-                      Rs. {stock.price.toFixed(2)}
+                      Rs.{" "}
+                      {typeof stock.price === "number"
+                        ? stock.price.toFixed(2)
+                        : "N/A"}
                     </p>
                     <div
                       className={`flex items-center justify-end text-sm font-semibold mt-1 ${

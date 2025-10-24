@@ -34,6 +34,18 @@ export default function StockChart({
   change,
   changePercent,
 }: StockChartProps) {
+  console.debug(
+    "StockChart: symbol=",
+    symbol,
+    "data.length=",
+    data?.length,
+    "currentPrice=",
+    currentPrice,
+    "change=",
+    change,
+    "changePercent=",
+    changePercent
+  );
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("1M");
   const [chartType, setChartType] = useState<ChartType>("line");
 
@@ -146,7 +158,10 @@ export default function StockChart({
           <h2 className='text-2xl font-bold text-gray-900'>{symbol}</h2>
           <div className='flex items-center mt-2 space-x-4'>
             <p className='text-3xl font-bold text-gray-900'>
-              Rs. {currentPrice.toFixed(2)}
+              Rs.{" "}
+              {typeof currentPrice === "number"
+                ? currentPrice.toFixed(2)
+                : "N/A"}
             </p>
             <div
               className={`flex items-center ${
@@ -159,9 +174,12 @@ export default function StockChart({
                 <TrendingDown className='w-5 h-5 mr-1' />
               )}
               <span className='text-lg font-semibold'>
-                {isPositive ? "+" : ""}
-                {change.toFixed(2)} ({isPositive ? "+" : ""}
-                {changePercent.toFixed(2)}%)
+                {typeof change === "number"
+                  ? (isPositive ? "+" : "") + change.toFixed(2)
+                  : "N/A"}{" "}
+                {typeof changePercent === "number"
+                  ? `(${isPositive ? "+" : ""}${changePercent.toFixed(2)}%)`
+                  : ""}
               </span>
             </div>
           </div>

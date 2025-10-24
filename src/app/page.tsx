@@ -18,7 +18,7 @@ import { TrendingUp, RefreshCw } from "lucide-react";
 
 export default function Home() {
   const [stocks, setStocks] = useState<StockQuote[]>([]);
-  const [selectedSymbol, setSelectedSymbol] = useState<string>("JKH");
+  const [selectedSymbol, setSelectedSymbol] = useState<string>("");
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [marketSummary, setMarketSummary] = useState<MarketSummary>({
     totalVolume: 0,
