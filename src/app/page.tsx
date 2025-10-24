@@ -6,6 +6,7 @@ import MarketOverview from "@/components/MarketOverview";
 import StockChart from "@/components/StockChart";
 import WatchList from "@/components/WatchList";
 import MarketDepth from "@/components/MarketDepth";
+import AuthButton from "@/components/auth/AuthButton";
 import {
   fetchLatestStockPrices,
   fetchStockHistory,
@@ -141,21 +142,23 @@ export default function Home() {
     <main className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100'>
       <div className='max-w-[1920px] mx-auto p-6'>
         {/* Header */}
+        {/* Header */}
         <div className='flex justify-between items-center mb-6'>
-          <div className='flex items-center space-x-4'>
-            <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-3'>
-              <TrendingUp className='w-8 h-8 text-white' />
-            </div>
+          <div className='flex items-center space-x-3'>
+            <TrendingUp className='w-10 h-10 text-blue-600' />
             <div>
               <h1 className='text-4xl font-bold text-gray-900'>
-                CSE Trading Platform
+                stock.macm.dev
               </h1>
               <p className='text-gray-600 mt-1'>
-                Colombo Stock Exchange - Real-time Market Data
+                Colombo Stock Exchange - Real-time Market Data & Portfolio
+                Management
               </p>
             </div>
           </div>
           <div className='flex items-center space-x-4'>
+            <AuthButton />
+
             <div className='text-right'>
               <p className='text-sm text-gray-600'>Last Updated</p>
               <p className='text-sm font-semibold text-gray-900'>
@@ -226,10 +229,16 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <div className='mt-8 text-center text-sm text-gray-600'>
-          <p>Data provided by Colombo Stock Exchange (CSE)</p>
+        <div className='mt-8 text-center text-sm text-gray-600 border-t pt-6'>
+          <p className='font-semibold text-gray-700'>stock.macm.dev</p>
+          <p className='mt-2'>Data provided by Colombo Stock Exchange (CSE)</p>
           <p className='mt-1'>
-            Market data may be delayed. For informational purposes only.
+            Market data may be delayed. This platform is for informational
+            purposes only.
+          </p>
+          <p className='mt-1 text-xs'>
+            Not financial advice. Please consult with a licensed financial
+            advisor before making investment decisions.
           </p>
         </div>
       </div>

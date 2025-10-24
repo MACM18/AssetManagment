@@ -110,3 +110,14 @@ export interface FirebaseTimestamp {
   seconds?: number;
   nanoseconds?: number;
 }
+
+// User Profile Types
+export interface UserProfile {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  createdAt: string;
+  lastLogin: string;
+  isAnonymous: boolean;
+}
