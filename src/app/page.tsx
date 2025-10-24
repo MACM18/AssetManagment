@@ -76,19 +76,37 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Attempt anonymous auth so Firestore rules that require auth can pass
-    if (FIREBASE_AVAILABLE) {
-      signInAnonymously(auth).catch((e) => {
-        console.warn("Anonymous sign-in failed:", e);
-      });
-    }
+    let cancelled = false;
+    const init = async () => {
+      // Attempt anonymous auth so Firestore rules that require auth can pass
+      if (FIREBASE_AVAILABLE) {
+        try {
+          const cred = await signInAnonymously(auth);
+          console.debug("Anonymous sign-in success:", cred.user?.uid);
+        } catch (e) {
+          console.warn("Anonymous sign-in failed:", e);
+        }
+      }
 
-    loadMarketData();
-    // Refresh data every 5 minutes
-    const interval = setInterval(() => {
-      loadMarketData();
-    }, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+      if (!cancelled) {
+        await loadMarketData();
+        // Refresh data every 5 minutes
+        const interval = setInterval(() => {
+          loadMarketData();
+        }, 5 * 60 * 1000);
+        return () => clearInterval(interval);
+      }
+      return () => {};
+    };
+
+    const cleanup = init();
+    return () => {
+      cancelled = true;
+      // If init returned a cleanup, call it
+      if (typeof (cleanup as any) === "function") {
+        (cleanup as any)();
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
