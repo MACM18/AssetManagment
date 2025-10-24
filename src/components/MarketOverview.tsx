@@ -66,7 +66,6 @@ export default function MarketOverview({
               </p>
               <div className='mt-2 text-xs text-blue-200'>
                 {dataSource === "firestore" && "📊 Live Data"}
-                {dataSource === "cse-api" && "🔄 CSE API"}
                 {dataSource === "mock" && "🎭 Sample"}
               </div>
             </div>

@@ -15,10 +15,9 @@ import {
   FirestoreStockData,
 } from "@/types";
 import { subDays } from "date-fns";
-import { fetchAllCSEStockData } from "./stockData";
 
-// lastDataSource: 'firestore' | 'cse-api' | 'mock' - exported for UI visibility
-let lastDataSource: "firestore" | "cse-api" | "mock" = "mock";
+// lastDataSource: 'firestore' | 'mock' - exported for UI visibility
+let lastDataSource: "firestore" | "mock" = "mock";
 
 export function getLastDataSource() {
   return lastDataSource;
@@ -75,37 +74,9 @@ export async function fetchLatestStockPrices(): Promise<StockQuote[]> {
       }
     }
 
-    // Fallback: fetch latest from CSE API (bulk) and map to StockQuote
-    try {
-      const cseData = await fetchAllCSEStockData();
-      if (cseData.length > 0) {
-        const stocks: StockQuote[] = cseData.map((d) => ({
-          id: undefined,
-          symbol: d.symbol,
-          companyName: d.companyName || d.symbol,
-          date: d.date,
-          price: d.price || 0,
-          change: d.change || 0,
-          changePercent: d.changePercent || 0,
-          volume: d.volume || 0,
-          high: d.high || d.price || 0,
-          low: d.low || d.price || 0,
-          open: d.open || d.price || 0,
-          close: d.close || d.price || 0,
-          timestamp: new Date().toISOString(),
-        }));
-
-        lastDataSource = "cse-api";
-        return stocks;
-      }
-    } catch (apiError) {
-      console.warn(
-        "Error fetching from CSE API, falling back to mock data",
-        apiError
-      );
-    }
-
-    // Final fallback: return empty array (UI will handle mock generation for charts)
+    // If Firestore is not available or no data was found, do not call the CSE API
+    // The frontend should rely on Firestore. If Firestore is unavailable we
+    // fall back to returning an empty array (UI can render mock/demo state).
     lastDataSource = "mock";
     return [];
   } catch (error) {
