@@ -5,6 +5,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  allowedDevOrigins: ['http://localhost:3000'],
   webpack: (config, { isServer }) => {
     // Prevent bundling Node core modules into client-side builds.
     // Some firebase compat packages reference 'net'/'tls' which are Node-only.

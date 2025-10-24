@@ -29,7 +29,7 @@ try {
   if (typeof window !== "undefined") {
     // Avoid leaking secrets: only log presence (boolean), not actual values
     // eslint-disable-next-line no-console
-    console.debug("firebase.ts: hasValidConfig=", Boolean(hasValidConfig), {
+    console.log("firebase.ts: hasValidConfig=", Boolean(hasValidConfig), {
       apiKey: Boolean(firebaseConfig.apiKey),
       authDomain: Boolean(firebaseConfig.authDomain),
       projectId: Boolean(firebaseConfig.projectId),
@@ -66,6 +66,6 @@ export const FIREBASE_AVAILABLE = Boolean(dbInstance && app);
 try {
   if (typeof window !== "undefined") {
     // eslint-disable-next-line no-console
-    console.debug("firebase.ts: FIREBASE_AVAILABLE=", FIREBASE_AVAILABLE);
+    console.log("firebase.ts: FIREBASE_AVAILABLE=", FIREBASE_AVAILABLE);
   }
 } catch {}
