@@ -28,19 +28,44 @@ export function getLastDataSource() {
  */
 export async function fetchLatestStockPrices(): Promise<StockQuote[]> {
   try {
+    console.debug(
+      "fetchLatestStockPrices: FIREBASE_AVAILABLE=",
+      FIREBASE_AVAILABLE
+    );
     // If Firebase is available, try to fetch from Firestore first
     if (FIREBASE_AVAILABLE) {
       try {
         // Data is stored in stock_prices_by_date collection
         // Each document represents one date with all stocks in an array
+        console.debug(
+          "fetchLatestStockPrices: querying Firestore collection 'stock_prices_by_date' for latest document"
+        );
         const byDateRef = collection(db, "stock_prices_by_date");
         const latestQuery = query(byDateRef, orderBy("date", "desc"), limit(1));
         const latestSnapshot = await getDocs(latestQuery);
+        console.debug(
+          "fetchLatestStockPrices: latestSnapshot.size=",
+          latestSnapshot.size
+        );
 
         if (!latestSnapshot.empty) {
           const latestDoc = latestSnapshot.docs[0];
+          console.debug("fetchLatestStockPrices: latest doc id=", latestDoc.id);
           const data = latestDoc.data() as FirestoreStockPricesByDate;
+          console.debug(
+            "fetchLatestStockPrices: latest doc keys=",
+            Object.keys(data)
+          );
           const stocksArray = data.stocks || [];
+          console.debug(
+            "fetchLatestStockPrices: stocksArray.length=",
+            stocksArray.length
+          );
+          if (stocksArray.length > 0)
+            console.debug(
+              "fetchLatestStockPrices: sample stock=",
+              stocksArray[0]
+            );
 
           // Convert stocks array to StockQuote format
           const stocks: StockQuote[] = stocksArray.map(
@@ -65,21 +90,30 @@ export async function fetchLatestStockPrices(): Promise<StockQuote[]> {
           );
 
           lastDataSource = "firestore";
+          console.info(
+            `fetchLatestStockPrices: returning ${stocks.length} stocks from Firestore (date=${data.date})`
+          );
           return stocks;
         }
-        // If Firestore returned empty, fallthrough to CSE API below
+        // If Firestore returned empty, fallthrough: we'll return an empty array (mock) below
       } catch (fsError) {
-        console.warn(
-          "Error reading from Firestore, falling back to CSE API",
+        console.error(
+          "fetchLatestStockPrices: Error reading from Firestore:",
           fsError
+        );
+        console.warn(
+          "fetchLatestStockPrices: Firestore read failed; frontend will return mock/empty results for debugging"
         );
       }
     }
 
-    // If Firestore is not available or no data was found, do not call the CSE API
+    // If Firestore is not available or no data was found, do not call the CSE API.
     // The frontend should rely on Firestore. If Firestore is unavailable we
-    // fall back to returning an empty array (UI can render mock/demo state).
+    // return an empty array so UI can render mock/demo state and show debug logs.
     lastDataSource = "mock";
+    console.info(
+      "fetchLatestStockPrices: returning empty array (mock/demo mode)"
+    );
     return [];
   } catch (error) {
     console.error("Error fetching latest stock prices:", error);
@@ -95,7 +129,19 @@ export async function fetchStockHistory(
   daysBack: number = 30
 ): Promise<ChartDataPoint[]> {
   try {
+    console.debug(
+      "fetchStockHistory: FIREBASE_AVAILABLE=",
+      FIREBASE_AVAILABLE,
+      "symbol=",
+      symbol,
+      "daysBack=",
+      daysBack
+    );
     if (!FIREBASE_AVAILABLE) {
+      console.warn(
+        "fetchStockHistory: Firebase not available; returning empty history for symbol=",
+        symbol
+      );
       return [];
     }
 
@@ -111,6 +157,7 @@ export async function fetchStockHistory(
     );
 
     const querySnapshot = await getDocs(dateQuery);
+    console.debug("fetchStockHistory: querySnapshot.size=", querySnapshot.size);
 
     const chartData: ChartDataPoint[] = [];
 
@@ -118,6 +165,14 @@ export async function fetchStockHistory(
     querySnapshot.docs.forEach((doc) => {
       const data = doc.data() as FirestoreStockPricesByDate;
       const stocksArray = data.stocks || [];
+      console.debug(
+        "fetchStockHistory: visiting doc=",
+        doc.id,
+        "date=",
+        data.date,
+        "stocks=",
+        stocksArray.length
+      );
 
       // Find the stock with matching symbol (check both normalizedSymbol and symbol)
       const stockData = stocksArray.find(
@@ -126,6 +181,13 @@ export async function fetchStockHistory(
       );
 
       if (stockData) {
+        console.debug(
+          "fetchStockHistory: found stockData for",
+          symbol,
+          "in doc=",
+          doc.id,
+          stockData
+        );
         chartData.push({
           date: data.date || "",
           timestamp: new Date(data.date).getTime(),
@@ -138,6 +200,9 @@ export async function fetchStockHistory(
       }
     });
 
+    console.info(
+      `fetchStockHistory: returning ${chartData.length} data points for ${symbol}`
+    );
     return chartData;
   } catch (error) {
     console.error(`Error fetching stock history for ${symbol}:`, error);
