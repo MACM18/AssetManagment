@@ -121,3 +121,62 @@ export interface UserProfile {
   lastLogin: string;
   isAnonymous: boolean;
 }
+
+// Portfolio Types
+export interface PortfolioHolding {
+  id: string;
+  userId: string;
+  symbol: string;
+  companyName: string;
+  quantity: number;
+  purchasePrice: number;
+  purchaseDate: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Transaction {
+  id: string;
+  userId: string;
+  symbol: string;
+  companyName: string;
+  type: "buy" | "sell";
+  quantity: number;
+  price: number;
+  totalAmount: number;
+  date: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface PortfolioSummary {
+  totalInvested: number;
+  currentValue: number;
+  totalGainLoss: number;
+  totalGainLossPercent: number;
+  holdings: PortfolioHoldingWithMetrics[];
+}
+
+export interface PortfolioHoldingWithMetrics extends PortfolioHolding {
+  currentPrice: number;
+  currentValue: number;
+  gainLoss: number;
+  gainLossPercent: number;
+  invested: number;
+}
+
+export interface PortfolioPerformance {
+  daily: number;
+  weekly: number;
+  monthly: number;
+  yearly: number;
+  allTime: number;
+}
+
+export interface SectorAllocation {
+  sector: string;
+  value: number;
+  percentage: number;
+  holdings: number;
+}

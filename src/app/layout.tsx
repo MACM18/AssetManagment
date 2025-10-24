@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PortfolioProvider } from "@/contexts/PortfolioContext";
 
 export const metadata: Metadata = {
   title: "stock.macm.dev - CSE Stock Market Tracker",
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className='font-sans'>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <PortfolioProvider>{children}</PortfolioProvider>
+        </AuthProvider>
       </body>
     </html>
   );
