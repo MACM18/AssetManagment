@@ -15,6 +15,8 @@ import {
 } from "@/lib/tradingData";
 import { FIREBASE_AVAILABLE } from "@/lib/firebase";
 import { TrendingUp, RefreshCw } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { signInAnonymously } from "firebase/auth";
 
 export default function Home() {
   const [stocks, setStocks] = useState<StockQuote[]>([]);
@@ -74,6 +76,13 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // Attempt anonymous auth so Firestore rules that require auth can pass
+    if (FIREBASE_AVAILABLE) {
+      signInAnonymously(auth).catch((e) => {
+        console.warn("Anonymous sign-in failed:", e);
+      });
+    }
+
     loadMarketData();
     // Refresh data every 5 minutes
     const interval = setInterval(() => {
