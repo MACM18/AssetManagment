@@ -9,6 +9,10 @@ import PortfolioSummaryCard from "@/components/portfolio/PortfolioSummaryCard";
 import HoldingsList from "@/components/portfolio/HoldingsList";
 import TransactionHistory from "@/components/portfolio/TransactionHistory";
 import AddHoldingModal from "@/components/portfolio/AddHoldingModal";
+import PortfolioAllocationChart from "@/components/portfolio/PortfolioAllocationChart";
+import PerformanceChart from "@/components/portfolio/PerformanceChart";
+import PortfolioInsights from "@/components/portfolio/PortfolioInsights";
+import TopHoldings from "@/components/portfolio/TopHoldings";
 import { Plus, RefreshCw } from "lucide-react";
 
 export default function PortfolioDashboard() {
@@ -110,6 +114,18 @@ export default function PortfolioDashboard() {
         {/* Portfolio Summary */}
         <div className='mb-6'>
           <PortfolioSummaryCard />
+        </div>
+
+        {/* Analytics Section */}
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
+          <PortfolioAllocationChart />
+          <PerformanceChart />
+        </div>
+
+        {/* Insights and Top Holdings */}
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
+          <PortfolioInsights />
+          <TopHoldings />
         </div>
 
         {/* Holdings and Transactions */}

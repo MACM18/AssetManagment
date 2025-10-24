@@ -5,8 +5,16 @@ import { usePortfolio } from "@/contexts/PortfolioContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { deleteHolding } from "@/lib/portfolio";
 import { aggregateHoldingsBySymbol } from "@/lib/portfolio";
-import { TrendingUp, TrendingDown, Trash2, Calendar, Hash } from "lucide-react";
-import { StockQuote } from "@/types";
+import {
+  TrendingUp,
+  TrendingDown,
+  Trash2,
+  Calendar,
+  Hash,
+  Eye,
+} from "lucide-react";
+import { StockQuote, PortfolioHoldingWithMetrics } from "@/types";
+import StockDetailModal from "./StockDetailModal";
 
 interface HoldingsListProps {
   currentPrices: StockQuote[];
@@ -16,6 +24,8 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
   const { summary, refreshPortfolio, loading } = usePortfolio();
   const { user, isAuthenticated } = useAuth();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [selectedHolding, setSelectedHolding] =
+    useState<PortfolioHoldingWithMetrics | null>(null);
 
   if (!isAuthenticated) {
     return null;
@@ -114,16 +124,26 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                   </p>
                 </div>
 
-                {originalHolding && (
+                <div className='flex items-center gap-2'>
                   <button
-                    onClick={() => handleDelete(originalHolding.id)}
-                    disabled={deletingId === originalHolding.id}
-                    className='text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed p-2'
-                    title='Delete holding'
+                    onClick={() => setSelectedHolding(holding)}
+                    className='text-blue-600 hover:text-blue-800 p-2'
+                    title='View details'
                   >
-                    <Trash2 className='w-5 h-5' />
+                    <Eye className='w-5 h-5' />
                   </button>
-                )}
+
+                  {originalHolding && (
+                    <button
+                      onClick={() => handleDelete(originalHolding.id)}
+                      disabled={deletingId === originalHolding.id}
+                      className='text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed p-2'
+                      title='Delete holding'
+                    >
+                      <Trash2 className='w-5 h-5' />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-3'>
@@ -218,6 +238,17 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
           );
         })}
       </div>
+
+      {/* Stock Detail Modal */}
+      {selectedHolding && (
+        <StockDetailModal
+          holding={selectedHolding}
+          stockQuote={currentPrices.find(
+            (s) => s.symbol === selectedHolding.symbol
+          )}
+          onClose={() => setSelectedHolding(null)}
+        />
+      )}
     </div>
   );
 }
