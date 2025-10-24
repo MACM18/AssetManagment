@@ -7,9 +7,9 @@ import {
   where,
 } from "firebase/firestore";
 import { db, FIREBASE_AVAILABLE } from "./firebase";
-import { 
-  StockQuote, 
-  ChartDataPoint, 
+import {
+  StockQuote,
+  ChartDataPoint,
   MarketSummary,
   FirestoreStockPricesByDate,
   FirestoreStockData,
@@ -43,24 +43,26 @@ export async function fetchLatestStockPrices(): Promise<StockQuote[]> {
           const stocksArray = data.stocks || [];
 
           // Convert stocks array to StockQuote format
-          const stocks: StockQuote[] = stocksArray.map((stock: FirestoreStockData) => ({
-            id: `${stock.symbol}_${data.date}`,
-            symbol: stock.normalizedSymbol || stock.symbol || "",
-            companyName: stock.companyName || stock.symbol || "",
-            date: stock.date || data.date || "",
-            price: stock.price || 0,
-            change: stock.change || 0,
-            changePercent: stock.changePercent || 0,
-            volume: stock.volume || 0,
-            high: stock.high || stock.price || 0,
-            low: stock.low || stock.price || 0,
-            open: stock.open || stock.price || 0,
-            close: stock.close || stock.price || 0,
-            timestamp: 
-              typeof data.updatedAt === 'object' && data.updatedAt?.toDate 
-                ? data.updatedAt.toDate().toISOString() 
-                : new Date().toISOString(),
-          }));
+          const stocks: StockQuote[] = stocksArray.map(
+            (stock: FirestoreStockData) => ({
+              id: `${stock.symbol}_${data.date}`,
+              symbol: stock.normalizedSymbol || stock.symbol || "",
+              companyName: stock.companyName || stock.symbol || "",
+              date: stock.date || data.date || "",
+              price: stock.price || 0,
+              change: stock.change || 0,
+              changePercent: stock.changePercent || 0,
+              volume: stock.volume || 0,
+              high: stock.high || stock.price || 0,
+              low: stock.low || stock.price || 0,
+              open: stock.open || stock.price || 0,
+              close: stock.close || stock.price || 0,
+              timestamp:
+                typeof data.updatedAt === "object" && data.updatedAt?.toDate
+                  ? data.updatedAt.toDate().toISOString()
+                  : new Date().toISOString(),
+            })
+          );
 
           lastDataSource = "firestore";
           return stocks;
@@ -116,12 +118,11 @@ export async function fetchStockHistory(
     querySnapshot.docs.forEach((doc) => {
       const data = doc.data() as FirestoreStockPricesByDate;
       const stocksArray = data.stocks || [];
-      
+
       // Find the stock with matching symbol (check both normalizedSymbol and symbol)
       const stockData = stocksArray.find(
-        (s: FirestoreStockData) => 
-          s.normalizedSymbol === symbol || 
-          s.symbol === symbol
+        (s: FirestoreStockData) =>
+          s.normalizedSymbol === symbol || s.symbol === symbol
       );
 
       if (stockData) {
