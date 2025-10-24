@@ -23,6 +23,20 @@ const hasValidConfig =
   firebaseConfig.authDomain &&
   firebaseConfig.projectId;
 
+// Debug logs to help diagnose initialization in the browser
+try {
+  // Only log in browser to avoid noisy server logs
+  if (typeof window !== "undefined") {
+    // Avoid leaking secrets: only log presence (boolean), not actual values
+    // eslint-disable-next-line no-console
+    console.debug("firebase.ts: hasValidConfig=", Boolean(hasValidConfig), {
+      apiKey: Boolean(firebaseConfig.apiKey),
+      authDomain: Boolean(firebaseConfig.authDomain),
+      projectId: Boolean(firebaseConfig.projectId),
+    });
+  }
+} catch {}
+
 if (hasValidConfig && typeof window !== "undefined") {
   if (!getApps().length) {
     app = initializeApp(firebaseConfig);
@@ -49,3 +63,9 @@ export { app };
 
 // Indicates whether Firebase was initialized successfully at runtime
 export const FIREBASE_AVAILABLE = Boolean(dbInstance && app);
+try {
+  if (typeof window !== "undefined") {
+    // eslint-disable-next-line no-console
+    console.debug("firebase.ts: FIREBASE_AVAILABLE=", FIREBASE_AVAILABLE);
+  }
+} catch {}
