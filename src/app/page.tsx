@@ -6,7 +6,7 @@ import MarketOverview from "@/components/MarketOverview";
 import StockChart from "@/components/StockChart";
 import WatchList from "@/components/WatchList";
 import MarketDepth from "@/components/MarketDepth";
-import AuthButton from "@/components/auth/AuthButton";
+import Navigation from "@/components/Navigation";
 import {
   fetchLatestStockPrices,
   fetchStockHistory,
@@ -15,7 +15,7 @@ import {
   getLastDataSource,
 } from "@/lib/tradingData";
 import { FIREBASE_AVAILABLE } from "@/lib/firebase";
-import { TrendingUp, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInAnonymously } from "firebase/auth";
 
@@ -140,25 +140,20 @@ export default function Home() {
 
   return (
     <main className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100'>
+      <Navigation />
+
       <div className='max-w-[1920px] mx-auto p-6'>
         {/* Header */}
-        {/* Header */}
         <div className='flex justify-between items-center mb-6'>
-          <div className='flex items-center space-x-3'>
-            <TrendingUp className='w-10 h-10 text-blue-600' />
-            <div>
-              <h1 className='text-4xl font-bold text-gray-900'>
-                stock.macm.dev
-              </h1>
-              <p className='text-gray-600 mt-1'>
-                Colombo Stock Exchange - Real-time Market Data & Portfolio
-                Management
-              </p>
-            </div>
+          <div>
+            <h1 className='text-3xl font-bold text-gray-900'>
+              Market Overview
+            </h1>
+            <p className='text-gray-600 mt-1'>
+              Colombo Stock Exchange - Real-time Market Data
+            </p>
           </div>
           <div className='flex items-center space-x-4'>
-            <AuthButton />
-
             <div className='text-right'>
               <p className='text-sm text-gray-600'>Last Updated</p>
               <p className='text-sm font-semibold text-gray-900'>
