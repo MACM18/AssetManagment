@@ -99,13 +99,15 @@ export default function Home() {
       return () => {};
     };
 
-    const cleanup = init();
+    let intervalCleanup: (() => void) | undefined;
+    init().then((ret) => {
+      // If the async init returned a cleanup, capture it
+      if (typeof ret === "function") intervalCleanup = ret;
+    });
+
     return () => {
       cancelled = true;
-      // If init returned a cleanup, call it
-      if (typeof (cleanup as any) === "function") {
-        (cleanup as any)();
-      }
+      if (intervalCleanup) intervalCleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
