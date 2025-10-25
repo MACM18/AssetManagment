@@ -18,6 +18,7 @@ import {
 } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { format, subDays, subMonths, subYears } from "date-fns";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface StockChartProps {
   data: ChartDataPoint[];
@@ -48,6 +49,7 @@ export default function StockChart({
   );
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("1M");
   const [chartType, setChartType] = useState<ChartType>("line");
+  const { isDark } = useTheme();
 
   // Filter data based on timeframe
   const filteredData = useMemo(() => {
@@ -151,7 +153,7 @@ export default function StockChart({
   };
 
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6'>
+    <div className='glass-card rounded-xl p-6 hover-lift'>
       {/* Header */}
       <div className='flex justify-between items-start mb-6'>
         <div>
@@ -167,7 +169,9 @@ export default function StockChart({
             </p>
             <div
               className={`flex items-center ${
-                isPositive ? "text-green-600" : "text-red-600"
+                isPositive
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-red-600 dark:text-red-400"
               }`}
             >
               {isPositive ? (
@@ -195,8 +199,8 @@ export default function StockChart({
               onClick={() => setChartType(ct.type)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 chartType === ct.type
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 hover:bg-gray-200"
+                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+                  : "bg-gray-100 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700/60"
               }`}
             >
               {ct.label}
@@ -210,13 +214,19 @@ export default function StockChart({
         <ResponsiveContainer width='100%' height='100%'>
           {chartType === "line" ? (
             <LineChart data={filteredData}>
-              <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+              <CartesianGrid
+                strokeDasharray='3 3'
+                stroke={isDark ? "#374151" : "#e5e7eb"}
+              />
               <XAxis
                 dataKey='date'
                 tickFormatter={(date) => format(new Date(date), "MMM dd")}
-                stroke='#9ca3af'
+                stroke={isDark ? "#9ca3af" : "#6b7280"}
               />
-              <YAxis stroke='#9ca3af' domain={["auto", "auto"]} />
+              <YAxis
+                stroke={isDark ? "#9ca3af" : "#6b7280"}
+                domain={["auto", "auto"]}
+              />
               <Tooltip content={<CustomTooltip />} />
               <Line
                 type='monotone'
@@ -228,13 +238,19 @@ export default function StockChart({
             </LineChart>
           ) : chartType === "area" ? (
             <AreaChart data={filteredData}>
-              <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+              <CartesianGrid
+                strokeDasharray='3 3'
+                stroke={isDark ? "#374151" : "#e5e7eb"}
+              />
               <XAxis
                 dataKey='date'
                 tickFormatter={(date) => format(new Date(date), "MMM dd")}
-                stroke='#9ca3af'
+                stroke={isDark ? "#9ca3af" : "#6b7280"}
               />
-              <YAxis stroke='#9ca3af' domain={["auto", "auto"]} />
+              <YAxis
+                stroke={isDark ? "#9ca3af" : "#6b7280"}
+                domain={["auto", "auto"]}
+              />
               <Tooltip content={<CustomTooltip />} />
               <Area
                 type='monotone'
@@ -246,13 +262,19 @@ export default function StockChart({
             </AreaChart>
           ) : (
             <BarChart data={filteredData}>
-              <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+              <CartesianGrid
+                strokeDasharray='3 3'
+                stroke={isDark ? "#374151" : "#e5e7eb"}
+              />
               <XAxis
                 dataKey='date'
                 tickFormatter={(date) => format(new Date(date), "MMM dd")}
-                stroke='#9ca3af'
+                stroke={isDark ? "#9ca3af" : "#6b7280"}
               />
-              <YAxis stroke='#9ca3af' domain={["auto", "auto"]} />
+              <YAxis
+                stroke={isDark ? "#9ca3af" : "#6b7280"}
+                domain={["auto", "auto"]}
+              />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Bar dataKey='open' fill='#8b5cf6' name='Open' />
@@ -296,8 +318,8 @@ export default function StockChart({
             onClick={() => setTimeFrame(tf)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               timeFrame === tf
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 hover:bg-gray-200"
+                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+                : "bg-gray-100 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700/60"
             }`}
           >
             {tf}

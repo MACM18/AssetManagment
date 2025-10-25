@@ -5,158 +5,100 @@ import { Investment } from "@/types";
 interface InvestmentListProps {
   investments: Investment[];
   onDelete: (id: string) => void;
-  onUpdate?: (id: string, updates: Partial<Investment>) => void;
 }
 
-export default function InvestmentList({
+const InvestmentList: React.FC<InvestmentListProps> = ({
   investments,
   onDelete,
-  onUpdate: _onUpdate,
-}: InvestmentListProps) {
-  const getTypeColor = (type: Investment["type"]) => {
-    switch (type) {
-      case "stock":
-        return "bg-blue-100 text-blue-800";
-      case "mutual-fund":
-        return "bg-green-100 text-green-800";
-      case "fd":
-        return "bg-yellow-100 text-yellow-800";
-      case "other":
-        return "bg-gray-100 dark:bg-gray-800 text-gray-800";
-      default:
-        return "bg-gray-100 dark:bg-gray-800 text-gray-800";
-    }
-  };
-
-  const getTypeLabel = (type: Investment["type"]) => {
-    switch (type) {
-      case "stock":
-        return "Stock";
-      case "mutual-fund":
-        return "Mutual Fund";
-      case "fd":
-        return "Fixed Deposit";
-      case "other":
-        return "Other";
-      default:
-        return type;
-    }
-  };
-
+}) => {
   if (investments.length === 0) {
     return (
-      <div className='text-center py-12'>
-        <svg
-          className='mx-auto h-12 w-12 text-gray-400'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-          aria-hidden='true'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M12 6v6m0 0v6m0-6h6m-6 0H6'
-          />
-        </svg>
-        <h3 className='mt-2 text-sm font-medium text-gray-900 dark:text-gray-100'>
-          No investments
-        </h3>
-        <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
-          Get started by adding a new investment.
+      <div className='text-center py-10 px-4 bg-white dark:bg-gray-800/50 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm'>
+        <p className='text-gray-500 dark:text-gray-400'>
+          No investments added yet. Add one to get started!
         </p>
       </div>
     );
   }
 
   return (
-    <div className='overflow-x-auto'>
-      <table className='min-w-full divide-y divide-gray-200'>
-        <thead className='bg-gray-50 dark:bg-gray-900'>
+    <div className='overflow-x-auto bg-white dark:bg-gray-800/50 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm'>
+      <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
+        <thead className='bg-gray-50 dark:bg-gray-700/50'>
           <tr>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
             >
               Name
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
             >
               Type
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
-            >
-              Symbol
-            </th>
-            <th
-              scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
             >
               Amount
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
-            >
-              Quantity
-            </th>
-            <th
-              scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
             >
               Purchase Date
             </th>
-            <th
-              scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
-            >
-              Actions
+            <th scope='col' className='relative px-6 py-3'>
+              <span className='sr-only'>Actions</span>
             </th>
           </tr>
         </thead>
-        <tbody className='bg-white divide-y divide-gray-200'>
+        <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
           {investments.map((investment) => (
-            <tr key={investment.id}>
+            <tr
+              key={investment.id}
+              className='hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150'
+            >
               <td className='px-6 py-4 whitespace-nowrap'>
                 <div className='text-sm font-medium text-gray-900 dark:text-gray-100'>
                   {investment.name}
                 </div>
-                {investment.notes && (
-                  <div className='text-sm text-gray-500 dark:text-gray-400'>
-                    {investment.notes}
+                {investment.symbol && (
+                  <div className='text-xs text-gray-500 dark:text-gray-400'>
+                    {investment.symbol}
                   </div>
                 )}
               </td>
               <td className='px-6 py-4 whitespace-nowrap'>
                 <span
-                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getTypeColor(
-                    investment.type
-                  )}`}
+                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    investment.type === "stock"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
+                      : investment.type === "mutual-fund"
+                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
+                      : investment.type === "fd"
+                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
+                      : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
+                  }`}
                 >
-                  {getTypeLabel(investment.type)}
+                  {investment.type}
                 </span>
               </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
-                {investment.symbol || "-"}
-              </td>
               <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100'>
-                Rs. {investment.amount.toLocaleString()}
-              </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
-                {investment.quantity || "-"}
+                {new Intl.NumberFormat("en-LK", {
+                  style: "currency",
+                  currency: "LKR",
+                }).format(Number(investment.amount))}
               </td>
               <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
                 {new Date(investment.purchaseDate).toLocaleDateString()}
               </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
+              <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                 <button
                   onClick={() => onDelete(investment.id)}
-                  className='text-red-600 hover:text-red-900'
+                  className='text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300'
                 >
                   Delete
                 </button>
@@ -167,4 +109,6 @@ export default function InvestmentList({
       </table>
     </div>
   );
-}
+};
+
+export default InvestmentList;

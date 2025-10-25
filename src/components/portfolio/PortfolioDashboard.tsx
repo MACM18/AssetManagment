@@ -78,12 +78,14 @@ export default function PortfolioDashboard() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 py-8'>
+    <div className='min-h-screen bg-gray-100 dark:bg-gray-900 py-8'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Header */}
-        <div className='mb-6 flex justify-between items-center'>
+        <div className='mb-8 flex justify-between items-center'>
           <div>
-            <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>My Portfolio</h1>
+            <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
+              My Portfolio
+            </h1>
             <p className='text-gray-600 dark:text-gray-400 mt-1'>
               Track your CSE stock investments and performance
             </p>
@@ -93,7 +95,7 @@ export default function PortfolioDashboard() {
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className='flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
+              className='flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
             >
               <RefreshCw
                 className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
@@ -103,7 +105,7 @@ export default function PortfolioDashboard() {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className='flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg'
+              className='flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-blue-500/40'
             >
               <Plus className='w-4 h-4' />
               <span>Add Holding</span>
@@ -112,24 +114,24 @@ export default function PortfolioDashboard() {
         </div>
 
         {/* Portfolio Summary */}
-        <div className='mb-6'>
+        <div className='mb-8'>
           <PortfolioSummaryCard />
         </div>
 
         {/* Analytics Section */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
           <PortfolioAllocationChart />
           <PerformanceChart />
         </div>
 
         {/* Insights and Top Holdings */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
           <PortfolioInsights />
           <TopHoldings />
         </div>
 
         {/* Holdings and Transactions */}
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
           {/* Holdings List */}
           <div className='lg:col-span-2'>
             <HoldingsList currentPrices={stocks} />

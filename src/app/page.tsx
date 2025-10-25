@@ -184,7 +184,7 @@ export default function Home() {
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className='flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors shadow-lg'
+              className='flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white rounded-lg transition-colors shadow-lg dark:shadow-blue-500/30'
             >
               <RefreshCw
                 className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}

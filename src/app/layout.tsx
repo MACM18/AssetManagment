@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en'>
-      <body className='font-sans'>
+      <body className='font-sans bg-gray-50 dark:bg-gray-900'>
         <ThemeProvider>
           <AuthProvider>
             <PortfolioProvider>{children}</PortfolioProvider>

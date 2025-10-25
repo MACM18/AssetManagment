@@ -59,10 +59,15 @@ export default function LoginForm({
   };
 
   return (
-    <div className='w-full max-w-md mx-auto p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700'>
-      <h2 className='text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center'>
-        Sign In
-      </h2>
+    <div className='w-full max-w-md mx-auto p-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-lg'>
+      <div className='text-center mb-8'>
+        <h2 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
+          Welcome Back
+        </h2>
+        <p className='text-gray-500 dark:text-gray-400 mt-2'>
+          Sign in to access your portfolio
+        </p>
+      </div>
 
       {error && (
         <div className='mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm flex items-start gap-2'>
@@ -85,7 +90,7 @@ export default function LoginForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all'
+            className='w-full px-4 py-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all'
             placeholder='you@example.com'
           />
         </div>
@@ -103,7 +108,7 @@ export default function LoginForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all'
+            className='w-full px-4 py-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all'
             placeholder='••••••••'
           />
         </div>

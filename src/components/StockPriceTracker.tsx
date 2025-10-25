@@ -45,11 +45,11 @@ export default function StockPriceTracker() {
   const selectedStock = stockPrices.find((s) => s.symbol === selectedSymbol);
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-6 p-6 bg-white dark:bg-gray-800/50 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm'>
       <div>
         <label
           htmlFor='symbol'
-          className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
+          className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
         >
           Select Stock
         </label>
@@ -57,7 +57,7 @@ export default function StockPriceTracker() {
           id='symbol'
           value={selectedSymbol}
           onChange={(e) => setSelectedSymbol(e.target.value)}
-          className='block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border'
+          className='mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border'
         >
           {CSE_SYMBOLS.map((symbol) => (
             <option key={symbol} value={symbol}>
@@ -68,7 +68,7 @@ export default function StockPriceTracker() {
       </div>
 
       {selectedStock && (
-        <div className='border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800'>
+        <div className='border border-gray-200 dark:border-gray-700/50 rounded-lg p-4 bg-gray-50/50 dark:bg-gray-900/30'>
           <div className='flex justify-between items-start mb-2'>
             <div>
               <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
@@ -101,15 +101,19 @@ export default function StockPriceTracker() {
         </div>
       )}
 
-      <div className='border-t border-gray-200 dark:border-gray-700 pt-4'>
+      <div className='border-t border-gray-200 dark:border-gray-700/50 pt-4'>
         <h4 className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
           All Tracked Stocks
         </h4>
-        <div className='space-y-2 max-h-64 overflow-y-auto custom-scrollbar'>
+        <div className='space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-2'>
           {stockPrices.map((stock) => (
             <div
               key={stock.symbol}
-              className='flex justify-between items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-600 transition-all'
+              className={`flex justify-between items-center p-2 rounded-lg cursor-pointer transition-all ${
+                selectedSymbol === stock.symbol
+                  ? "bg-indigo-100 dark:bg-indigo-900/50"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
+              }`}
               onClick={() => setSelectedSymbol(stock.symbol)}
             >
               <span className='text-sm font-medium text-gray-900 dark:text-gray-100'>
@@ -120,7 +124,7 @@ export default function StockPriceTracker() {
                   Rs. {stock.price.toFixed(2)}
                 </span>
                 <span
-                  className={`ml-2 text-xs ${
+                  className={`ml-3 text-xs font-semibold w-16 text-right inline-block ${
                     stock.change >= 0
                       ? "text-green-600 dark:text-green-400"
                       : "text-red-600 dark:text-red-400"

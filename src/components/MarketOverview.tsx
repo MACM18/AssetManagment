@@ -135,9 +135,9 @@ export default function MarketOverview({
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* Top Gainers */}
         <div className='glass-card rounded-xl p-6 border-t-4 border-green-500 hover-lift'>
-          <h3 className='text-lg font-bold text-gray-900 mb-4 flex items-center'>
-            <div className='bg-green-100 p-2 rounded-lg mr-3'>
-              <TrendingUp className='w-5 h-5 text-green-600' />
+          <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
+            <div className='bg-green-100 dark:bg-green-900/30 p-2 rounded-lg mr-3'>
+              <TrendingUp className='w-5 h-5 text-green-600 dark:text-green-400' />
             </div>
             <span className='gradient-text'>Top Gainers</span>
           </h3>
@@ -146,12 +146,14 @@ export default function MarketOverview({
               topGainers.map((stock, idx) => (
                 <div
                   key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-gradient-to-r from-green-50 to-transparent rounded-lg hover:from-green-100 transition-colors animate-slide-up'
+                  className='flex justify-between items-center p-3 bg-green-50/50 dark:bg-green-900/20 rounded-lg hover:bg-green-100/50 dark:hover:bg-green-900/40 transition-colors animate-slide-up'
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900 dark:text-gray-100'>{stock.symbol}</p>
-                    <p className='text-xs text-gray-500 truncate max-w-[150px]'>
+                    <p className='font-bold text-gray-900 dark:text-gray-100'>
+                      {stock.symbol}
+                    </p>
+                    <p className='text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
@@ -162,7 +164,7 @@ export default function MarketOverview({
                         ? stock.price.toFixed(2)
                         : "N/A"}
                     </p>
-                    <p className='text-sm font-bold text-green-600 flex items-center justify-end'>
+                    <p className='text-sm font-bold text-green-600 dark:text-green-400 flex items-center justify-end'>
                       <TrendingUp className='w-3 h-3 mr-1' />+
                       {stock.changePercent?.toFixed(2)}%
                     </p>
@@ -170,7 +172,7 @@ export default function MarketOverview({
                 </div>
               ))
             ) : (
-              <p className='text-center text-gray-400 py-4'>
+              <p className='text-center text-gray-500 dark:text-gray-400 py-4'>
                 No data available
               </p>
             )}
@@ -179,9 +181,9 @@ export default function MarketOverview({
 
         {/* Top Losers */}
         <div className='glass-card rounded-xl p-6 border-t-4 border-red-500 hover-lift'>
-          <h3 className='text-lg font-bold text-gray-900 mb-4 flex items-center'>
-            <div className='bg-red-100 p-2 rounded-lg mr-3'>
-              <TrendingDown className='w-5 h-5 text-red-600' />
+          <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
+            <div className='bg-red-100 dark:bg-red-900/30 p-2 rounded-lg mr-3'>
+              <TrendingDown className='w-5 h-5 text-red-600 dark:text-red-400' />
             </div>
             <span className='gradient-text'>Top Losers</span>
           </h3>
@@ -190,12 +192,14 @@ export default function MarketOverview({
               topLosers.map((stock, idx) => (
                 <div
                   key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-gradient-to-r from-red-50 to-transparent rounded-lg hover:from-red-100 transition-colors animate-slide-up'
+                  className='flex justify-between items-center p-3 bg-red-50/50 dark:bg-red-900/20 rounded-lg hover:bg-red-100/50 dark:hover:bg-red-900/40 transition-colors animate-slide-up'
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900 dark:text-gray-100'>{stock.symbol}</p>
-                    <p className='text-xs text-gray-500 truncate max-w-[150px]'>
+                    <p className='font-bold text-gray-900 dark:text-gray-100'>
+                      {stock.symbol}
+                    </p>
+                    <p className='text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
@@ -206,7 +210,7 @@ export default function MarketOverview({
                         ? stock.price.toFixed(2)
                         : "N/A"}
                     </p>
-                    <p className='text-sm font-bold text-red-600 flex items-center justify-end'>
+                    <p className='text-sm font-bold text-red-600 dark:text-red-400 flex items-center justify-end'>
                       <TrendingDown className='w-3 h-3 mr-1' />
                       {stock.changePercent?.toFixed(2)}%
                     </p>
@@ -214,7 +218,7 @@ export default function MarketOverview({
                 </div>
               ))
             ) : (
-              <p className='text-center text-gray-400 py-4'>
+              <p className='text-center text-gray-500 dark:text-gray-400 py-4'>
                 No data available
               </p>
             )}
@@ -223,9 +227,9 @@ export default function MarketOverview({
 
         {/* Most Active */}
         <div className='glass-card rounded-xl p-6 border-t-4 border-blue-500 hover-lift'>
-          <h3 className='text-lg font-bold text-gray-900 mb-4 flex items-center'>
-            <div className='bg-blue-100 p-2 rounded-lg mr-3'>
-              <Activity className='w-5 h-5 text-blue-600' />
+          <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
+            <div className='bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg mr-3'>
+              <Activity className='w-5 h-5 text-blue-600 dark:text-blue-400' />
             </div>
             <span className='gradient-text'>Most Active</span>
           </h3>
@@ -234,12 +238,14 @@ export default function MarketOverview({
               mostActive.map((stock, idx) => (
                 <div
                   key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-gradient-to-r from-blue-50 to-transparent rounded-lg hover:from-blue-100 transition-colors animate-slide-up'
+                  className='flex justify-between items-center p-3 bg-blue-50/50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100/50 dark:hover:bg-blue-900/40 transition-colors animate-slide-up'
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900 dark:text-gray-100'>{stock.symbol}</p>
-                    <p className='text-xs text-gray-500 truncate max-w-[150px]'>
+                    <p className='font-bold text-gray-900 dark:text-gray-100'>
+                      {stock.symbol}
+                    </p>
+                    <p className='text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
@@ -251,8 +257,8 @@ export default function MarketOverview({
                         : "N/A"}
                     </p>
                     <div className='flex items-center justify-end gap-1'>
-                      <Activity className='w-3 h-3 text-blue-600' />
-                      <p className='text-xs font-semibold text-blue-600'>
+                      <Activity className='w-3 h-3 text-blue-600 dark:text-blue-400' />
+                      <p className='text-xs font-semibold text-blue-600 dark:text-blue-400'>
                         {((stock.volume || 0) / 1000).toFixed(0)}K
                       </p>
                     </div>
@@ -260,7 +266,7 @@ export default function MarketOverview({
                 </div>
               ))
             ) : (
-              <p className='text-center text-gray-400 py-4'>
+              <p className='text-center text-gray-500 dark:text-gray-400 py-4'>
                 No data available
               </p>
             )}

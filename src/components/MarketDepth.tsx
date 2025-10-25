@@ -43,17 +43,21 @@ export default function MarketDepth({ stock }: MarketDepthProps) {
   );
 
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6'>
+    <div className='glass-card rounded-xl p-6 hover-lift'>
       <div className='flex items-center mb-6'>
-        <BarChart3 className='w-6 h-6 mr-2 text-blue-600' />
-        <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100'>Market Depth</h2>
+        <BarChart3 className='w-6 h-6 mr-3 text-blue-600 dark:text-blue-400' />
+        <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100'>
+          Market Depth
+        </h2>
       </div>
 
       <div className='mb-6'>
-        <div className='bg-gray-50 rounded-lg p-4'>
+        <div className='bg-gray-100 dark:bg-gray-800/50 rounded-lg p-4'>
           <div className='flex justify-between items-center'>
             <div>
-              <p className='text-sm text-gray-600 dark:text-gray-400'>Current Price</p>
+              <p className='text-sm text-gray-600 dark:text-gray-400'>
+                Current Price
+              </p>
               <p className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
                 Rs.{" "}
                 {typeof stock.price === "number"
@@ -74,7 +78,7 @@ export default function MarketDepth({ stock }: MarketDepthProps) {
       <div className='grid grid-cols-2 gap-4'>
         {/* Bids (Buy Orders) */}
         <div>
-          <h3 className='text-sm font-semibold text-green-600 mb-3 flex items-center justify-between'>
+          <h3 className='text-sm font-semibold text-green-600 dark:text-green-400 mb-3 flex items-center justify-between'>
             <span>Bids (Buy)</span>
             <span className='text-xs text-gray-500 dark:text-gray-400'>
               Total:{" "}
@@ -87,11 +91,11 @@ export default function MarketDepth({ stock }: MarketDepthProps) {
               return (
                 <div key={index} className='relative'>
                   <div
-                    className='absolute inset-0 bg-green-100 rounded'
+                    className='absolute inset-0 bg-green-500/20 rounded'
                     style={{ width: `${widthPercent}%` }}
                   />
                   <div className='relative px-3 py-2 flex justify-between text-sm'>
-                    <span className='font-semibold text-green-700 dark:text-green-400'>
+                    <span className='font-semibold text-green-700 dark:text-green-300'>
                       {bid.price.toFixed(2)}
                     </span>
                     <span className='text-gray-600 dark:text-gray-400'>
@@ -106,7 +110,7 @@ export default function MarketDepth({ stock }: MarketDepthProps) {
 
         {/* Asks (Sell Orders) */}
         <div>
-          <h3 className='text-sm font-semibold text-red-600 mb-3 flex items-center justify-between'>
+          <h3 className='text-sm font-semibold text-red-600 dark:text-red-400 mb-3 flex items-center justify-between'>
             <span>Asks (Sell)</span>
             <span className='text-xs text-gray-500 dark:text-gray-400'>
               Total:{" "}
@@ -119,11 +123,11 @@ export default function MarketDepth({ stock }: MarketDepthProps) {
               return (
                 <div key={index} className='relative'>
                   <div
-                    className='absolute inset-0 bg-red-100 rounded'
+                    className='absolute inset-0 bg-red-500/20 rounded'
                     style={{ width: `${widthPercent}%` }}
                   />
                   <div className='relative px-3 py-2 flex justify-between text-sm'>
-                    <span className='font-semibold text-red-700 dark:text-red-400'>
+                    <span className='font-semibold text-red-700 dark:text-red-300'>
                       {ask.price.toFixed(2)}
                     </span>
                     <span className='text-gray-600 dark:text-gray-400'>
@@ -138,30 +142,30 @@ export default function MarketDepth({ stock }: MarketDepthProps) {
       </div>
 
       {/* Trading Statistics */}
-      <div className='mt-6 pt-6 border-t border-gray-200'>
-        <h3 className='text-sm font-semibold text-gray-700 mb-3'>
+      <div className='mt-6 pt-6 border-t border-gray-200 dark:border-gray-700/50'>
+        <h3 className='text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3'>
           Trading Statistics
         </h3>
         <div className='grid grid-cols-2 gap-4 text-sm'>
-          <div className='bg-gray-50 rounded p-3'>
+          <div className='bg-gray-100 dark:bg-gray-800/50 rounded p-3'>
             <p className='text-gray-600 dark:text-gray-400'>Day High</p>
             <p className='font-bold text-gray-900 dark:text-gray-100'>
               Rs. {(stock.high || stock.price).toFixed(2)}
             </p>
           </div>
-          <div className='bg-gray-50 rounded p-3'>
+          <div className='bg-gray-100 dark:bg-gray-800/50 rounded p-3'>
             <p className='text-gray-600 dark:text-gray-400'>Day Low</p>
             <p className='font-bold text-gray-900 dark:text-gray-100'>
               Rs. {(stock.low || stock.price).toFixed(2)}
             </p>
           </div>
-          <div className='bg-gray-50 rounded p-3'>
+          <div className='bg-gray-100 dark:bg-gray-800/50 rounded p-3'>
             <p className='text-gray-600 dark:text-gray-400'>Volume</p>
             <p className='font-bold text-gray-900 dark:text-gray-100'>
               {((stock.volume || 0) / 1000).toFixed(0)}K
             </p>
           </div>
-          <div className='bg-gray-50 rounded p-3'>
+          <div className='bg-gray-100 dark:bg-gray-800/50 rounded p-3'>
             <p className='text-gray-600 dark:text-gray-400'>Prev Close</p>
             <p className='font-bold text-gray-900 dark:text-gray-100'>
               Rs. {(stock.close || stock.price).toFixed(2)}

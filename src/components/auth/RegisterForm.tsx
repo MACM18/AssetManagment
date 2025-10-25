@@ -72,10 +72,15 @@ export default function RegisterForm({
   };
 
   return (
-    <div className='w-full max-w-md mx-auto p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700'>
-      <h2 className='text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center'>
-        Create Account
-      </h2>
+    <div className='w-full max-w-md mx-auto p-8 bg-white dark:bg-gray-900/80 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-lg'>
+      <div className='text-center mb-8'>
+        <h2 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
+          Create Your Account
+        </h2>
+        <p className='text-gray-500 dark:text-gray-400 mt-2'>
+          Join to start tracking your investments
+        </p>
+      </div>
 
       {error && (
         <div className='mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm flex items-start gap-2'>
@@ -98,7 +103,7 @@ export default function RegisterForm({
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             required
-            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all'
+            className='w-full px-4 py-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all'
             placeholder='John Doe'
           />
         </div>
@@ -116,7 +121,7 @@ export default function RegisterForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all'
+            className='w-full px-4 py-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all'
             placeholder='you@example.com'
           />
         </div>
@@ -134,7 +139,7 @@ export default function RegisterForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all'
+            className='w-full px-4 py-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all'
             placeholder='••••••••'
           />
         </div>
@@ -152,7 +157,7 @@ export default function RegisterForm({
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all'
+            className='w-full px-4 py-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all'
             placeholder='••••••••'
           />
         </div>
