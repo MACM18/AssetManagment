@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { signOut } from "@/lib/auth";
 import LoginForm from "./LoginForm";
@@ -10,6 +11,12 @@ export default function AuthButton() {
   const { user, isAuthenticated, loading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -70,29 +77,32 @@ export default function AuthButton() {
         Sign In
       </button>
 
-      {showAuthModal && (
-        <div className='fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto'>
-          <div className='relative w-full max-w-md'>
-            <button
-              onClick={() => setShowAuthModal(false)}
-              className='absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:shadow-xl transition-all z-10 border border-gray-200 dark:border-gray-700'
-            >
-              ✕
-            </button>
-            {authMode === "login" ? (
-              <LoginForm
-                onSwitchToRegister={() => setAuthMode("register")}
-                onClose={() => setShowAuthModal(false)}
-              />
-            ) : (
-              <RegisterForm
-                onSwitchToLogin={() => setAuthMode("login")}
-                onClose={() => setShowAuthModal(false)}
-              />
-            )}
-          </div>
-        </div>
-      )}
+      {mounted &&
+        showAuthModal &&
+        createPortal(
+          <div className='fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto'>
+            <div className='relative w-full max-w-md'>
+              <button
+                onClick={() => setShowAuthModal(false)}
+                className='absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:shadow-xl transition-all z-10 border border-gray-200 dark:border-gray-700'
+              >
+                ✕
+              </button>
+              {authMode === "login" ? (
+                <LoginForm
+                  onSwitchToRegister={() => setAuthMode("register")}
+                  onClose={() => setShowAuthModal(false)}
+                />
+              ) : (
+                <RegisterForm
+                  onSwitchToLogin={() => setAuthMode("login")}
+                  onClose={() => setShowAuthModal(false)}
+                />
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }
