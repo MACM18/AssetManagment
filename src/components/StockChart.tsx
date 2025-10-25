@@ -114,30 +114,30 @@ export default function StockChart({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className='bg-white p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'>
-          <p className='text-sm text-gray-600 mb-2'>
+        <div className='bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'>
+          <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>
             {format(new Date(data.date), "MMM dd, yyyy")}
           </p>
           <div className='space-y-1'>
-            <p className='text-sm'>
+            <p className='text-sm text-gray-900 dark:text-gray-100'>
               <span className='text-gray-600 dark:text-gray-400'>Open: </span>
               <span className='font-semibold'>Rs. {data.open?.toFixed(2)}</span>
             </p>
-            <p className='text-sm'>
+            <p className='text-sm text-gray-900 dark:text-gray-100'>
               <span className='text-gray-600 dark:text-gray-400'>High: </span>
               <span className='font-semibold'>Rs. {data.high?.toFixed(2)}</span>
             </p>
-            <p className='text-sm'>
+            <p className='text-sm text-gray-900 dark:text-gray-100'>
               <span className='text-gray-600 dark:text-gray-400'>Low: </span>
               <span className='font-semibold'>Rs. {data.low?.toFixed(2)}</span>
             </p>
-            <p className='text-sm'>
+            <p className='text-sm text-gray-900 dark:text-gray-100'>
               <span className='text-gray-600 dark:text-gray-400'>Close: </span>
               <span className='font-semibold'>
                 Rs. {data.close?.toFixed(2)}
               </span>
             </p>
-            <p className='text-sm'>
+            <p className='text-sm text-gray-900 dark:text-gray-100'>
               <span className='text-gray-600 dark:text-gray-400'>Volume: </span>
               <span className='font-semibold'>
                 {(data.volume / 1000).toFixed(0)}K
@@ -155,7 +155,9 @@ export default function StockChart({
       {/* Header */}
       <div className='flex justify-between items-start mb-6'>
         <div>
-          <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>{symbol}</h2>
+          <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
+            {symbol}
+          </h2>
           <div className='flex items-center mt-2 space-x-4'>
             <p className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
               Rs.{" "}
@@ -270,8 +272,8 @@ export default function StockChart({
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className='bg-white p-2 rounded shadow-lg border border-gray-200 dark:border-gray-700'>
-                      <p className='text-sm'>
+                    <div className='bg-white dark:bg-gray-800 p-2 rounded shadow-lg border border-gray-200 dark:border-gray-700'>
+                      <p className='text-sm text-gray-900 dark:text-gray-100'>
                         Volume:{" "}
                         {((payload[0].value as number) / 1000).toFixed(0)}K
                       </p>

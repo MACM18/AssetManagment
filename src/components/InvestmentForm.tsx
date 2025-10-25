@@ -48,14 +48,14 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Investment Type
         </label>
         <select
           id="type"
           value={formData.type}
           onChange={(e) => setFormData({ ...formData, type: e.target.value as Investment['type'] })}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
         >
           <option value="stock">Stock (CSE)</option>
           <option value="mutual-fund">Mutual Fund</option>
@@ -65,7 +65,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
       </div>
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Name *
         </label>
         <input
@@ -74,14 +74,14 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
           required
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
           placeholder="e.g., John Keells Holdings"
         />
       </div>
 
       {formData.type === 'stock' && (
         <div>
-          <label htmlFor="symbol" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="symbol" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Symbol
           </label>
           <input
@@ -89,7 +89,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
             id="symbol"
             value={formData.symbol}
             onChange={(e) => setFormData({ ...formData, symbol: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
             placeholder="e.g., JKH.N0000"
           />
         </div>
@@ -97,7 +97,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Amount (Rs.) *
           </label>
           <input
@@ -108,14 +108,14 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
             min="0"
             value={formData.amount}
             onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
             placeholder="0.00"
           />
         </div>
 
         {(formData.type === 'stock' || formData.type === 'mutual-fund') && (
           <div>
-            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Quantity
             </label>
             <input
@@ -125,7 +125,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
               min="0"
               value={formData.quantity}
               onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
               placeholder="0"
             />
           </div>
@@ -133,7 +133,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
       </div>
 
       <div>
-        <label htmlFor="purchaseDate" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="purchaseDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Purchase Date *
         </label>
         <input
@@ -142,12 +142,12 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
           required
           value={formData.purchaseDate}
           onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
         />
       </div>
 
       <div>
-        <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Notes
         </label>
         <textarea
@@ -155,7 +155,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
           rows={3}
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
           placeholder="Additional notes..."
         />
       </div>

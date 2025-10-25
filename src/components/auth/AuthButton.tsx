@@ -35,22 +35,22 @@ export default function AuthButton() {
             <img
               src={user.photoURL}
               alt={user.displayName || "User"}
-              className='w-8 h-8 rounded-full'
+              className='w-8 h-8 rounded-full ring-2 ring-blue-500/20'
             />
           ) : (
-            <div className='w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-medium'>
+            <div className='w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-medium shadow-md'>
               {user.displayName?.[0]?.toUpperCase() ||
                 user.email?.[0]?.toUpperCase() ||
                 "U"}
             </div>
           )}
-          <span className='text-sm font-medium text-gray-700 hidden sm:inline'>
+          <span className='text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline'>
             {user.displayName || user.email}
           </span>
         </div>
         <button
           onClick={handleSignOut}
-          className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900'
+          className='px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm hover:shadow-md'
         >
           Sign Out
         </button>
@@ -65,17 +65,17 @@ export default function AuthButton() {
           setAuthMode("login");
           setShowAuthModal(true);
         }}
-        className='px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
+        className='px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all'
       >
         Sign In
       </button>
 
       {showAuthModal && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
+        <div className='fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in'>
           <div className='relative'>
             <button
               onClick={() => setShowAuthModal(false)}
-              className='absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-gray-900 z-10'
+              className='absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:shadow-xl transition-all z-10 border border-gray-200 dark:border-gray-700'
             >
               ✕
             </button>
