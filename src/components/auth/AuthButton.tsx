@@ -71,8 +71,8 @@ export default function AuthButton() {
       </button>
 
       {showAuthModal && (
-        <div className='fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in'>
-          <div className='relative'>
+        <div className='fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in overflow-y-auto'>
+          <div className='relative w-full max-w-md mx-auto my-8'>
             <button
               onClick={() => setShowAuthModal(false)}
               className='absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:shadow-xl transition-all z-10 border border-gray-200 dark:border-gray-700'
