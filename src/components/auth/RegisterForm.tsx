@@ -72,7 +72,7 @@ export default function RegisterForm({
   };
 
   return (
-    <div className='w-full max-w-md mx-auto p-8 bg-white dark:bg-gray-900/80 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-lg'>
+    <div className='w-full max-w-md mx-auto p-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-lg'>
       <div className='text-center mb-8'>
         <h2 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
           Create Your Account
