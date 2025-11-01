@@ -1,33 +1,33 @@
-import { CSEStockData } from '@/types';
-import axios from 'axios';
-import type { AxiosRequestConfig } from 'axios';
+import { CSEStockData } from "@/types";
+import axios from "axios";
+import type { AxiosRequestConfig } from "axios";
 
 // CSE symbols to track
 // Add or remove stock symbols here as needed
 export const CSE_SYMBOLS = [
-  'JKH',
-  'COMB',
-  'DIAL',
-  'SAMP',
-  'NTB',
-  'SERV',
-  'ACL',
-  'LIOC',
-  'LALU',
-  'AINS',
-  'RICH',
-  'SINS',
-  'ODEL',
-  'DIST',
-  'GHLL',
-  'AMSL',
-  'TILE',
-  'SLTL',
+  "JKH",
+  "COMB",
+  "DIAL",
+  "SAMP",
+  "NTB",
+  "SERV",
+  "ACL",
+  "LIOC",
+  "LALU",
+  "AINS",
+  "RICH",
+  "SINS",
+  "ODEL",
+  "DIST",
+  "GHLL",
+  "AMSL",
+  "TILE",
+  "SLTL",
 ];
 
 // CSE API endpoint - updated to use tradeSummary endpoint
 // This endpoint returns all trade summary data in a single request
-const CSE_API_URL = 'https://www.cse.lk/api/tradeSummary';
+const CSE_API_URL = "https://www.cse.lk/api/tradeSummary";
 
 /**
  * Fetch all stock data from CSE (Colombo Stock Exchange) in a single request
@@ -35,19 +35,19 @@ const CSE_API_URL = 'https://www.cse.lk/api/tradeSummary';
  */
 export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
   try {
-    console.log('Fetching trade summary for all stocks...');
-    
+    console.log("Fetching trade summary for all stocks...");
+
     // Make request to CSE API - using explicit axios.request config
     const config: AxiosRequestConfig = {
-      method: 'post',
+      method: "post",
       maxBodyLength: Infinity,
       url: CSE_API_URL,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       // Empty body for tradeSummary endpoint
       data: {},
-      timeout: 30000 // 30 second timeout for all data
+      timeout: 30000, // 30 second timeout for all data
     };
 
     const response = await axios.request(config);
@@ -58,45 +58,71 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
     const apiDataArray = Array.isArray(dataObj.tradeSummary)
       ? dataObj.tradeSummary
       : Array.isArray(dataObj.reqTradeSummery)
-        ? dataObj.reqTradeSummery
-        : Array.isArray(dataObj.reqTradeSummary)
-          ? dataObj.reqTradeSummary
-          : Array.isArray(dataObj)
-            ? dataObj
-            : [];
-    
+      ? dataObj.reqTradeSummery
+      : Array.isArray(dataObj.reqTradeSummary)
+      ? dataObj.reqTradeSummary
+      : Array.isArray(dataObj)
+      ? dataObj
+      : [];
+
     if (!apiDataArray.length) {
-      console.warn('No trade summary data returned from API');
+      console.warn("No trade summary data returned from API");
       return [];
     }
-    
+
     console.log(`Received data for ${apiDataArray.length} stocks`);
-    
+
     // Convert each stock to our CSEStockData format
     const results: CSEStockData[] = [];
-    const date = new Date().toISOString().split('T')[0];
-    
+    const date = new Date().toISOString().split("T")[0];
+
     for (const apiData of apiDataArray) {
       try {
         // Normalize symbol: API sometimes returns 'JKH.N0000' - strip suffix after '.' to match our CSE_SYMBOLS
-        const rawSymbol = apiData.symbol || apiData.Symbol || apiData.symbolCode || '';
-        const normalizedSymbol = String(rawSymbol).split('.')[0].toUpperCase();
+        const rawSymbol =
+          apiData.symbol || apiData.Symbol || apiData.symbolCode || "";
+        const normalizedSymbol = String(rawSymbol).split(".")[0].toUpperCase();
+
+        // Extract share type from symbol (e.g., 'JKH.N0000' -> 'N', 'ABC.X0000' -> 'X')
+        const shareTypeMatch = String(rawSymbol).match(/\.([NXPZV])\d*$/i);
+        const shareType = shareTypeMatch
+          ? (shareTypeMatch[1].toUpperCase() as "N" | "X" | "P" | "Z" | "V")
+          : undefined;
 
         // Only process stocks that are in our tracking list (compare normalized symbols)
         if (!CSE_SYMBOLS.includes(normalizedSymbol)) {
           continue;
         }
 
-        const companyName = apiData.name || apiData.companyName || apiData.CompanyName || '';
+        const companyName =
+          apiData.name || apiData.companyName || apiData.CompanyName || "";
         // Extract price fields from various possible keys used in the API
-        const currentPriceRaw = apiData.price ?? apiData.closingPrice ?? apiData.priceInfo?.currentPrice ?? apiData.lastPrice ?? 0;
-        const previousCloseRaw = apiData.previousClose ?? apiData.closingPrice ?? apiData.priceInfo?.previousClose ?? 0;
-        const changeRaw = apiData.change ?? (currentPriceRaw - previousCloseRaw);
-        const percentageChangeRaw = apiData.percentageChange ?? apiData.percentageChanged ?? apiData.percentage ?? 0;
+        const currentPriceRaw =
+          apiData.price ??
+          apiData.closingPrice ??
+          apiData.priceInfo?.currentPrice ??
+          apiData.lastPrice ??
+          0;
+        const previousCloseRaw =
+          apiData.previousClose ??
+          apiData.closingPrice ??
+          apiData.priceInfo?.previousClose ??
+          0;
+        const changeRaw = apiData.change ?? currentPriceRaw - previousCloseRaw;
+        const percentageChangeRaw =
+          apiData.percentageChange ??
+          apiData.percentageChanged ??
+          apiData.percentage ??
+          0;
         const openRaw = apiData.open ?? apiData.priceInfo?.open ?? 0;
         const highRaw = apiData.high ?? apiData.priceInfo?.high ?? 0;
         const lowRaw = apiData.low ?? apiData.priceInfo?.low ?? 0;
-        const volumeRaw = apiData.sharevolume ?? apiData.shareVolume ?? apiData.shareVolumeCount ?? apiData.tradevolume ?? 0;
+        const volumeRaw =
+          apiData.sharevolume ??
+          apiData.shareVolume ??
+          apiData.shareVolumeCount ??
+          apiData.tradevolume ??
+          0;
 
         const currentPrice = Number(currentPriceRaw) || 0;
         const previousClose = Number(previousCloseRaw) || 0;
@@ -105,7 +131,7 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
         const open = Number(openRaw) || 0;
         const high = Number(highRaw) || 0;
         const low = Number(lowRaw) || 0;
-        const volume = parseInt(String(volumeRaw || '0'), 10) || 0;
+        const volume = parseInt(String(volumeRaw || "0"), 10) || 0;
 
         // Convert to our CSEStockData format. Preserve the raw symbol returned
         // by the API in `rawSymbol` and keep `symbol` normalized for internal lookup.
@@ -122,26 +148,27 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
           low: low,
           open: open,
           close: previousClose,
+          shareType: shareType,
         };
-        
-  results.push(stockData);
-  console.log(`✓ Processed ${normalizedSymbol}: ${currentPrice}`);
+
+        results.push(stockData);
+        console.log(`✓ Processed ${normalizedSymbol}: ${currentPrice}`);
       } catch (itemError) {
         console.error(`Error parsing data for stock:`, itemError);
         // Continue processing other stocks
       }
     }
-    
+
     return results;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error('Error fetching trade summary:', error.message);
+      console.error("Error fetching trade summary:", error.message);
       if (error.response) {
         console.error(`Response status: ${error.response.status}`);
         console.error(`Response data:`, error.response.data);
       }
     } else {
-      console.error('Error fetching trade summary:', error);
+      console.error("Error fetching trade summary:", error);
     }
     return [];
   }
@@ -151,14 +178,16 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
  * Fetch stock data for a single symbol from CSE
  * This function is kept for backward compatibility but now uses the bulk endpoint
  */
-export async function fetchCSEStockData(symbol: string): Promise<CSEStockData | null> {
+export async function fetchCSEStockData(
+  symbol: string
+): Promise<CSEStockData | null> {
   try {
     console.log(`Fetching data for ${symbol}...`);
-    
+
     // Use the bulk fetch and filter for the specific symbol
     const allStocks = await fetchAllCSEStockData();
-    const stockData = allStocks.find(stock => stock.symbol === symbol);
-    
+    const stockData = allStocks.find((stock) => stock.symbol === symbol);
+
     if (stockData) {
       console.log(`✓ Found ${symbol}: ${stockData.price}`);
       return stockData;
@@ -176,17 +205,23 @@ export async function fetchCSEStockData(symbol: string): Promise<CSEStockData | 
  * Fetch data for multiple symbols
  * Now uses the bulk tradeSummary endpoint for efficiency (single request)
  */
-export async function fetchMultipleStocks(symbols: string[]): Promise<CSEStockData[]> {
-  console.log(`Fetching data for ${symbols.length} symbols using bulk endpoint...`);
-  
+export async function fetchMultipleStocks(
+  symbols: string[]
+): Promise<CSEStockData[]> {
+  console.log(
+    `Fetching data for ${symbols.length} symbols using bulk endpoint...`
+  );
+
   // Use the new bulk fetch - no need for throttling anymore!
   const allStocks = await fetchAllCSEStockData();
-  
+
   // Filter to only include the requested symbols
-  const results = allStocks.filter(stock => symbols.includes(stock.symbol));
-  
-  console.log(`Successfully fetched ${results.length} out of ${symbols.length} requested stocks`);
-  
+  const results = allStocks.filter((stock) => symbols.includes(stock.symbol));
+
+  console.log(
+    `Successfully fetched ${results.length} out of ${symbols.length} requested stocks`
+  );
+
   return results;
 }
 
@@ -195,25 +230,25 @@ export async function fetchMultipleStocks(symbols: string[]): Promise<CSEStockDa
  */
 export function saveStockDataLocally(data: CSEStockData[], date: string): void {
   // Check if running in Node.js environment
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const fs = require('fs');
+    const fs = require("fs");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const path = require('path');
-    
-    const dataDir = path.join(process.cwd(), 'data');
+    const path = require("path");
+
+    const dataDir = path.join(process.cwd(), "data");
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
-    
-  // When saving locally, include rawSymbol in output and prefer rawSymbol in filename
-  const safeDate = date;
-  const filename = path.join(dataDir, `cse-data-${safeDate}.json`);
-  // Include rawSymbol on each record (it was added to the CSEStockData type)
-  fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+
+    // When saving locally, include rawSymbol in output and prefer rawSymbol in filename
+    const safeDate = date;
+    const filename = path.join(dataDir, `cse-data-${safeDate}.json`);
+    // Include rawSymbol on each record (it was added to the CSEStockData type)
+    fs.writeFileSync(filename, JSON.stringify(data, null, 2));
     console.log(`Data saved to ${filename}`);
   } else {
-    console.warn('saveStockDataLocally can only be called on the server side');
+    console.warn("saveStockDataLocally can only be called on the server side");
   }
 }
 

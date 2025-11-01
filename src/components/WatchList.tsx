@@ -31,6 +31,9 @@ export default function WatchList({
   const [searchTerm, setSearchTerm] = useState("");
   const [watchlist, setWatchlist] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [shareTypeFilter, setShareTypeFilter] = useState<
+    "all" | "N" | "X" | "P" | "Z" | "V"
+  >("all");
   const { isAuthenticated, user } = useAuth();
 
   const dataSource = getLastDataSource();
@@ -108,11 +111,18 @@ export default function WatchList({
   };
 
   // Show all stocks by default, but highlight watchlist items for authenticated users
-  const filteredStocks = stocks.filter(
-    (stock) =>
-      stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (stock.companyName || "").toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredStocks = stocks
+    .filter(
+      (stock) =>
+        stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (stock.companyName || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+    )
+    .filter((stock) => {
+      if (shareTypeFilter === "all") return true;
+      return (stock.shareType ?? "N") === shareTypeFilter;
+    });
 
   return (
     <div className='bg-card rounded-xl p-4 sm:p-6 border border-border shadow-md'>
@@ -159,6 +169,65 @@ export default function WatchList({
         )}
       </div>
 
+      {/* Share Type Filter */}
+      <div className='mb-4'>
+        <div className='flex flex-wrap gap-2'>
+          {[
+            { value: "all", label: "All Shares", count: stocks.length },
+            {
+              value: "N",
+              label: "Normal (N)",
+              count: stocks.filter((s) => (s.shareType ?? "N") === "N").length,
+            },
+            {
+              value: "X",
+              label: "Exclusive (X)",
+              count: stocks.filter((s) => (s.shareType ?? "N") === "X").length,
+            },
+            {
+              value: "P",
+              label: "Preferred (P)",
+              count: stocks.filter((s) => (s.shareType ?? "N") === "P").length,
+            },
+            {
+              value: "Z",
+              label: "Zero Board (Z)",
+              count: stocks.filter((s) => (s.shareType ?? "N") === "Z").length,
+            },
+            {
+              value: "V",
+              label: "Voting (V)",
+              count: stocks.filter((s) => (s.shareType ?? "N") === "V").length,
+            },
+          ].map((filter) => (
+            <button
+              key={filter.value}
+              onClick={() =>
+                setShareTypeFilter(
+                  filter.value as "all" | "N" | "X" | "P" | "Z" | "V"
+                )
+              }
+              className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-2 ${
+                shareTypeFilter === filter.value
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              }`}
+            >
+              {filter.label}
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-xs ${
+                  shareTypeFilter === filter.value
+                    ? "bg-primary-foreground/20 text-primary-foreground"
+                    : "bg-muted-foreground/20 text-muted-foreground"
+                }`}
+              >
+                {filter.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className='space-y-2 max-h-[500px] sm:max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent'>
         {filteredStocks.length === 0 ? (
           <div className='text-center py-12'>
@@ -173,6 +242,7 @@ export default function WatchList({
             const isPositive = (stock.changePercent || 0) >= 0;
             const isSelected = stock.symbol === selectedSymbol;
             const isInWatchlist = watchlist.includes(stock.symbol);
+            const st = stock.shareType ?? "N";
 
             return (
               <div
@@ -215,6 +285,23 @@ export default function WatchList({
                       <h3 className='font-bold text-foreground text-sm sm:text-base'>
                         {stock.symbol}
                       </h3>
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                          st === "N"
+                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                            : st === "X"
+                            ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                            : st === "P"
+                            ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                            : st === "Z"
+                            ? "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                            : st === "V"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                        }`}
+                      >
+                        {st}
+                      </span>
                       {isSelected && (
                         <span className='text-xs px-2 py-0.5 bg-primary text-primary-foreground rounded-full font-medium'>
                           Active

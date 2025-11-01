@@ -35,6 +35,7 @@ export interface CSEStockData {
   low?: number;
   open?: number;
   close?: number;
+  shareType?: "N" | "X" | "P" | "Z" | "V"; // N=Normal, X=Exclusive, P=Preferred, Z=Zero Board Lot, V=Voting
 }
 
 export interface MonthlyReport {

@@ -149,32 +149,56 @@ export default function MarketOverview({
           </h3>
           <div className='space-y-3'>
             {topGainers.length > 0 ? (
-              topGainers.map((stock, idx) => (
-                <div
-                  key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
-                  style={{ animationDelay: `${idx * 50}ms` }}
-                >
-                  <div>
-                    <p className='font-bold text-foreground'>{stock.symbol}</p>
-                    <p className='text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[150px]'>
-                      {stock.companyName}
-                    </p>
+              topGainers.map((stock, idx) => {
+                const st = stock.shareType ?? "N";
+                return (
+                  <div
+                    key={stock.symbol}
+                    className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                  >
+                    <div>
+                      <div className='flex items-center gap-2'>
+                        <p className='font-bold text-foreground'>
+                          {stock.symbol}
+                        </p>
+                        <span
+                          className={`px-1 py-0.5 rounded text-xs font-medium ${
+                            st === "N"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : st === "X"
+                              ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                              : st === "P"
+                              ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                              : st === "Z"
+                              ? "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                              : st === "V"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                          }`}
+                        >
+                          {st}
+                        </span>
+                      </div>
+                      <p className='text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[150px]'>
+                        {stock.companyName}
+                      </p>
+                    </div>
+                    <div className='text-right'>
+                      <p className='font-semibold text-foreground'>
+                        Rs.{" "}
+                        {typeof stock.price === "number"
+                          ? stock.price.toFixed(2)
+                          : "N/A"}
+                      </p>
+                      <p className='text-sm font-bold text-success flex items-center justify-end'>
+                        <TrendingUp className='w-3 h-3 mr-1' />+
+                        {stock.changePercent?.toFixed(2)}%
+                      </p>
+                    </div>
                   </div>
-                  <div className='text-right'>
-                    <p className='font-semibold text-foreground'>
-                      Rs.{" "}
-                      {typeof stock.price === "number"
-                        ? stock.price.toFixed(2)
-                        : "N/A"}
-                    </p>
-                    <p className='text-sm font-bold text-success flex items-center justify-end'>
-                      <TrendingUp className='w-3 h-3 mr-1' />+
-                      {stock.changePercent?.toFixed(2)}%
-                    </p>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className='text-center text-muted-foreground py-4'>
                 No data available
@@ -191,32 +215,56 @@ export default function MarketOverview({
           </h3>
           <div className='space-y-3'>
             {topLosers.length > 0 ? (
-              topLosers.map((stock, idx) => (
-                <div
-                  key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
-                  style={{ animationDelay: `${idx * 50}ms` }}
-                >
-                  <div>
-                    <p className='font-bold text-foreground'>{stock.symbol}</p>
-                    <p className='text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[150px]'>
-                      {stock.companyName}
-                    </p>
+              topLosers.map((stock, idx) => {
+                const st = stock.shareType ?? "N";
+                return (
+                  <div
+                    key={stock.symbol}
+                    className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                  >
+                    <div>
+                      <div className='flex items-center gap-2'>
+                        <p className='font-bold text-foreground'>
+                          {stock.symbol}
+                        </p>
+                        <span
+                          className={`px-1 py-0.5 rounded text-xs font-medium ${
+                            st === "N"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : st === "X"
+                              ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                              : st === "P"
+                              ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                              : st === "Z"
+                              ? "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                              : st === "V"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                          }`}
+                        >
+                          {st}
+                        </span>
+                      </div>
+                      <p className='text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[150px]'>
+                        {stock.companyName}
+                      </p>
+                    </div>
+                    <div className='text-right'>
+                      <p className='font-semibold text-foreground'>
+                        Rs.{" "}
+                        {typeof stock.price === "number"
+                          ? stock.price.toFixed(2)
+                          : "N/A"}
+                      </p>
+                      <p className='text-sm font-bold text-destructive flex items-center justify-end'>
+                        <TrendingDown className='w-3 h-3 mr-1' />
+                        {stock.changePercent?.toFixed(2)}%
+                      </p>
+                    </div>
                   </div>
-                  <div className='text-right'>
-                    <p className='font-semibold text-foreground'>
-                      Rs.{" "}
-                      {typeof stock.price === "number"
-                        ? stock.price.toFixed(2)
-                        : "N/A"}
-                    </p>
-                    <p className='text-sm font-bold text-destructive flex items-center justify-end'>
-                      <TrendingDown className='w-3 h-3 mr-1' />
-                      {stock.changePercent?.toFixed(2)}%
-                    </p>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className='text-center text-muted-foreground py-4'>
                 No data available
@@ -233,34 +281,58 @@ export default function MarketOverview({
           </h3>
           <div className='space-y-3'>
             {mostActive.length > 0 ? (
-              mostActive.map((stock, idx) => (
-                <div
-                  key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
-                  style={{ animationDelay: `${idx * 50}ms` }}
-                >
-                  <div>
-                    <p className='font-bold text-foreground'>{stock.symbol}</p>
-                    <p className='text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[150px]'>
-                      {stock.companyName}
-                    </p>
-                  </div>
-                  <div className='text-right'>
-                    <p className='font-semibold text-foreground'>
-                      Rs.{" "}
-                      {typeof stock.price === "number"
-                        ? stock.price.toFixed(2)
-                        : "N/A"}
-                    </p>
-                    <div className='flex items-center justify-end gap-1'>
-                      <Activity className='w-3 h-3 text-primary' />
-                      <p className='text-xs font-semibold text-muted-foreground'>
-                        {((stock.volume || 0) / 1000).toFixed(0)}K
+              mostActive.map((stock, idx) => {
+                const st = stock.shareType ?? "N";
+                return (
+                  <div
+                    key={stock.symbol}
+                    className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                  >
+                    <div>
+                      <div className='flex items-center gap-2'>
+                        <p className='font-bold text-foreground'>
+                          {stock.symbol}
+                        </p>
+                        <span
+                          className={`px-1 py-0.5 rounded text-xs font-medium ${
+                            st === "N"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : st === "X"
+                              ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                              : st === "P"
+                              ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                              : st === "Z"
+                              ? "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                              : st === "V"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                          }`}
+                        >
+                          {st}
+                        </span>
+                      </div>
+                      <p className='text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[150px]'>
+                        {stock.companyName}
                       </p>
                     </div>
+                    <div className='text-right'>
+                      <p className='font-semibold text-foreground'>
+                        Rs.{" "}
+                        {typeof stock.price === "number"
+                          ? stock.price.toFixed(2)
+                          : "N/A"}
+                      </p>
+                      <div className='flex items-center justify-end gap-1'>
+                        <Activity className='w-3 h-3 text-primary' />
+                        <p className='text-xs font-semibold text-muted-foreground'>
+                          {((stock.volume || 0) / 1000).toFixed(0)}K
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className='text-center text-muted-foreground py-4'>
                 No data available
