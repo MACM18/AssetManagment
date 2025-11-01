@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ChartDataPoint, TimeFrame, ChartType } from "@/types";
 import {
   LineChart,
@@ -18,6 +18,7 @@ import {
 } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { format, subDays, subMonths, subYears } from "date-fns";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface StockChartProps {
   data: ChartDataPoint[];
@@ -48,7 +49,43 @@ export default function StockChart({
   );
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("1M");
   const [chartType, setChartType] = useState<ChartType>("line");
-  // Theme removed; use default chart styles without theme-based colors
+  const { actualTheme } = useTheme();
+
+  // Get computed colors from CSS variables
+  const [chartColors, setChartColors] = useState({
+    primary: "#3b82f6",
+    success: "#10b981",
+    destructive: "#ef4444",
+    muted: "#6b7280",
+    grid: "#e5e7eb",
+    text: "#000000",
+    background: "#ffffff",
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+
+    setChartColors({
+      primary:
+        computedStyle.getPropertyValue("--color-primary").trim() || "#3b82f6",
+      success:
+        computedStyle.getPropertyValue("--color-success").trim() || "#10b981",
+      destructive:
+        computedStyle.getPropertyValue("--color-destructive").trim() ||
+        "#ef4444",
+      muted:
+        computedStyle.getPropertyValue("--color-muted-foreground").trim() ||
+        "#6b7280",
+      grid: actualTheme === "dark" ? "#374151" : "#e5e7eb",
+      text:
+        computedStyle.getPropertyValue("--color-foreground").trim() ||
+        "#000000",
+      background:
+        computedStyle.getPropertyValue("--color-background").trim() ||
+        "#ffffff",
+    });
+  }, [actualTheme]);
 
   // Filter data based on timeframe
   const filteredData = useMemo(() => {
@@ -115,31 +152,35 @@ export default function StockChart({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className='p-4 rounded-lg shadow-lg border'>
-          <p className='text-sm mb-2'>
+        <div className='p-4 rounded-lg shadow-lg border border-border bg-card'>
+          <p className='text-sm text-muted-foreground mb-2'>
             {format(new Date(data.date), "MMM dd, yyyy")}
           </p>
           <div className='space-y-1'>
-            <p className='text-sm'>
-              <span>Open: </span>
+            <p className='text-sm text-foreground'>
+              <span className='text-muted-foreground'>Open: </span>
               <span className='font-semibold'>Rs. {data.open?.toFixed(2)}</span>
             </p>
-            <p className='text-sm'>
-              <span>High: </span>
-              <span className='font-semibold'>Rs. {data.high?.toFixed(2)}</span>
+            <p className='text-sm text-foreground'>
+              <span className='text-muted-foreground'>High: </span>
+              <span className='font-semibold text-success'>
+                Rs. {data.high?.toFixed(2)}
+              </span>
             </p>
-            <p className='text-sm'>
-              <span>Low: </span>
-              <span className='font-semibold'>Rs. {data.low?.toFixed(2)}</span>
+            <p className='text-sm text-foreground'>
+              <span className='text-muted-foreground'>Low: </span>
+              <span className='font-semibold text-destructive'>
+                Rs. {data.low?.toFixed(2)}
+              </span>
             </p>
-            <p className='text-sm'>
-              <span>Close: </span>
+            <p className='text-sm text-foreground'>
+              <span className='text-muted-foreground'>Close: </span>
               <span className='font-semibold'>
                 Rs. {data.close?.toFixed(2)}
               </span>
             </p>
-            <p className='text-sm'>
-              <span>Volume: </span>
+            <p className='text-sm text-foreground'>
+              <span className='text-muted-foreground'>Volume: </span>
               <span className='font-semibold'>
                 {(data.volume / 1000).toFixed(0)}K
               </span>
@@ -152,25 +193,31 @@ export default function StockChart({
   };
 
   return (
-    <div className='glass-card rounded-xl p-6 hover-lift'>
+    <div className='bg-card rounded-xl p-4 sm:p-6 border border-border shadow-md hover:shadow-lg transition-shadow'>
       {/* Header */}
-      <div className='flex justify-between items-start mb-6'>
+      <div className='flex flex-col sm:flex-row justify-between items-start gap-4 mb-6'>
         <div>
-          <h2 className='text-2xl font-bold'>{symbol}</h2>
-          <div className='flex items-center mt-2 space-x-4'>
-            <p className='text-3xl font-bold'>
+          <h2 className='text-xl sm:text-2xl font-bold text-foreground'>
+            {symbol}
+          </h2>
+          <div className='flex flex-wrap items-center mt-2 gap-2 sm:gap-4'>
+            <p className='text-2xl sm:text-3xl font-bold text-foreground'>
               Rs.{" "}
               {typeof currentPrice === "number"
                 ? currentPrice.toFixed(2)
                 : "N/A"}
             </p>
-            <div className={`flex items-center`}>
+            <div
+              className={`flex items-center ${
+                isPositive ? "text-success" : "text-destructive"
+              }`}
+            >
               {isPositive ? (
-                <TrendingUp className='w-5 h-5 mr-1' />
+                <TrendingUp className='w-4 h-4 sm:w-5 sm:h-5 mr-1' />
               ) : (
-                <TrendingDown className='w-5 h-5 mr-1' />
+                <TrendingDown className='w-4 h-4 sm:w-5 sm:h-5 mr-1' />
               )}
-              <span className='text-lg font-semibold'>
+              <span className='text-base sm:text-lg font-semibold'>
                 {typeof change === "number"
                   ? (isPositive ? "+" : "") + change.toFixed(2)
                   : "N/A"}{" "}
@@ -183,13 +230,15 @@ export default function StockChart({
         </div>
 
         {/* Chart Type Selector */}
-        <div className='flex space-x-2'>
+        <div className='flex gap-2'>
           {chartTypes.map((ct) => (
             <button
               key={ct.type}
               onClick={() => setChartType(ct.type)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                chartType === ct.type ? "" : "hover:opacity-80"
+              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                chartType === ct.type
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               }`}
             >
               {ct.label}
@@ -203,43 +252,91 @@ export default function StockChart({
         <ResponsiveContainer width='100%' height='100%'>
           {chartType === "line" ? (
             <LineChart data={filteredData}>
-              <CartesianGrid strokeDasharray='3 3' />
+              <CartesianGrid
+                strokeDasharray='3 3'
+                stroke={chartColors.grid}
+                opacity={0.5}
+              />
               <XAxis
                 dataKey='date'
                 tickFormatter={(date) => format(new Date(date), "MMM dd")}
+                stroke={chartColors.muted}
+                style={{ fontSize: "12px" }}
               />
-              <YAxis domain={["auto", "auto"]} />
+              <YAxis
+                domain={["auto", "auto"]}
+                stroke={chartColors.muted}
+                style={{ fontSize: "12px" }}
+              />
               <Tooltip content={<CustomTooltip />} />
               <Line
                 type='monotone'
                 dataKey='close'
+                stroke={chartColors.primary}
                 strokeWidth={2}
                 dot={false}
               />
             </LineChart>
           ) : chartType === "area" ? (
             <AreaChart data={filteredData}>
-              <CartesianGrid strokeDasharray='3 3' />
+              <CartesianGrid
+                strokeDasharray='3 3'
+                stroke={chartColors.grid}
+                opacity={0.5}
+              />
               <XAxis
                 dataKey='date'
                 tickFormatter={(date) => format(new Date(date), "MMM dd")}
+                stroke={chartColors.muted}
+                style={{ fontSize: "12px" }}
               />
-              <YAxis domain={["auto", "auto"]} />
+              <YAxis
+                domain={["auto", "auto"]}
+                stroke={chartColors.muted}
+                style={{ fontSize: "12px" }}
+              />
               <Tooltip content={<CustomTooltip />} />
-              <Area type='monotone' dataKey='close' strokeWidth={2} />
+              <Area
+                type='monotone'
+                dataKey='close'
+                stroke={chartColors.primary}
+                fill={chartColors.primary}
+                fillOpacity={0.2}
+                strokeWidth={2}
+              />
             </AreaChart>
           ) : (
             <BarChart data={filteredData}>
-              <CartesianGrid strokeDasharray='3 3' />
+              <CartesianGrid
+                strokeDasharray='3 3'
+                stroke={chartColors.grid}
+                opacity={0.5}
+              />
               <XAxis
                 dataKey='date'
                 tickFormatter={(date) => format(new Date(date), "MMM dd")}
+                stroke={chartColors.muted}
+                style={{ fontSize: "12px" }}
               />
-              <YAxis domain={["auto", "auto"]} />
+              <YAxis
+                domain={["auto", "auto"]}
+                stroke={chartColors.muted}
+                style={{ fontSize: "12px" }}
+              />
               <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              <Bar dataKey='open' name='Open' />
-              <Bar dataKey='close' name='Close' />
+              <Legend wrapperStyle={{ color: chartColors.text }} />
+              <Bar
+                dataKey='open'
+                name='Open'
+                fill={chartColors.primary}
+                opacity={0.8}
+              />
+              <Bar
+                dataKey='close'
+                name='Close'
+                fill={chartColors.success}
+                opacity={0.8}
+              />
             </BarChart>
           )}
         </ResponsiveContainer>
@@ -251,20 +348,29 @@ export default function StockChart({
           <BarChart data={filteredData}>
             <XAxis dataKey='date' hide />
             <YAxis hide domain={[0, "auto"]} />
-            <Tooltip />
-            <Bar dataKey='volume' opacity={0.6} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: chartColors.background,
+                border: `1px solid ${chartColors.grid}`,
+                borderRadius: "8px",
+                color: chartColors.text,
+              }}
+            />
+            <Bar dataKey='volume' fill={chartColors.primary} opacity={0.4} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Time Frame Selector */}
-      <div className='flex justify-center space-x-2'>
+      <div className='flex justify-center flex-wrap gap-2'>
         {timeFrames.map((tf) => (
           <button
             key={tf}
             onClick={() => setTimeFrame(tf)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${
-              timeFrame === tf ? "" : "hover:opacity-80"
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+              timeFrame === tf
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
             {tf}

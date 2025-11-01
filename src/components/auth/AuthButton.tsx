@@ -30,7 +30,7 @@ export default function AuthButton() {
   if (loading) {
     return (
       <div className='flex items-center gap-2'>
-        <div className='w-8 h-8 rounded-full animate-pulse border'></div>
+        <div className='w-8 h-8 rounded-full animate-pulse bg-muted border border-border'></div>
       </div>
     );
   }
@@ -43,24 +43,24 @@ export default function AuthButton() {
             <Image
               src={user.photoURL}
               alt={user.displayName || "User"}
-              className='w-8 h-8 rounded-full ring-2'
+              className='w-8 h-8 rounded-full ring-2 ring-primary'
               width={32}
               height={32}
             />
           ) : (
-            <div className='w-8 h-8 rounded-full flex items-center justify-center font-medium shadow-md border'>
+            <div className='w-8 h-8 rounded-full flex items-center justify-center font-medium bg-primary text-primary-foreground shadow-md border border-primary'>
               {user.displayName?.[0]?.toUpperCase() ||
                 user.email?.[0]?.toUpperCase() ||
                 "U"}
             </div>
           )}
-          <span className='text-sm font-medium hidden sm:inline'>
+          <span className='text-sm font-medium text-foreground hidden sm:inline'>
             {user.displayName || user.email}
           </span>
         </div>
         <button
           onClick={handleSignOut}
-          className='px-4 py-2 text-sm font-medium border rounded-lg transition-all shadow-sm hover:shadow-md'
+          className='px-3 sm:px-4 py-2 text-sm font-medium bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border rounded-lg transition-all shadow-sm hover:shadow-md'
         >
           Sign Out
         </button>
@@ -75,7 +75,7 @@ export default function AuthButton() {
           setAuthMode("login");
           setShowAuthModal(true);
         }}
-        className='px-4 py-2 text-sm font-medium border rounded-lg shadow-md hover:shadow-lg transition-all'
+        className='px-3 sm:px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 border border-primary rounded-lg shadow-md hover:shadow-lg transition-all'
       >
         Sign In
       </button>
@@ -83,11 +83,11 @@ export default function AuthButton() {
       {mounted &&
         showAuthModal &&
         createPortal(
-          <div className='fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto'>
+          <div className='fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto'>
             <div className='relative w-full max-w-md'>
               <button
                 onClick={() => setShowAuthModal(false)}
-                className='absolute -top-2 -right-2 w-8 h-8 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-all z-10 border'
+                className='absolute -top-2 -right-2 w-8 h-8 rounded-full bg-card text-foreground shadow-lg flex items-center justify-center hover:shadow-xl transition-all z-10 border border-border hover:bg-muted'
               >
                 ✕
               </button>

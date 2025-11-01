@@ -127,10 +127,12 @@ export default function Home() {
 
   if (loading && stocks.length === 0) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center bg-background'>
         <div className='text-center'>
-          <div className='animate-spin rounded-full h-16 w-16 border-b-4 mx-auto mb-4'></div>
-          <p className='text-xl'>Loading Market Data...</p>
+          <div className='animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4'></div>
+          <p className='text-xl font-semibold text-foreground'>
+            Loading Market Data...
+          </p>
         </div>
       </div>
     );
@@ -139,43 +141,51 @@ export default function Home() {
   const selectedStock = stocks.find((s) => s.symbol === selectedSymbol);
 
   return (
-    <main className='min-h-screen'>
+    <main className='min-h-screen bg-background'>
       <Navigation />
 
-      <div className='max-w-[1920px] mx-auto p-6'>
+      <div className='max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6'>
         {/* Header */}
-        <div className='flex justify-between items-center mb-6'>
+        <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6'>
           <div>
-            <h1 className='text-3xl font-bold'>Market Overview</h1>
-            <p className='mt-1'>
+            <h1 className='text-2xl sm:text-3xl font-bold text-foreground'>
+              Market Overview
+            </h1>
+            <p className='text-sm sm:text-base text-muted-foreground mt-1'>
               Colombo Stock Exchange - Real-time Market Data
             </p>
           </div>
-          <div className='flex items-center space-x-4'>
-            <div className='text-right'>
-              <p className='text-sm'>Last Updated</p>
-              <p className='text-sm font-semibold'>
+          <div className='flex flex-wrap items-center gap-2 sm:gap-4'>
+            <div className='text-left sm:text-right'>
+              <p className='text-xs sm:text-sm text-muted-foreground'>
+                Last Updated
+              </p>
+              <p className='text-sm font-semibold text-foreground'>
                 {lastUpdate.toLocaleTimeString()}
               </p>
             </div>
 
             {/* Data source badge */}
-            <div className='flex items-center space-x-2'>
-              <span className='px-3 py-1 rounded-full text-sm font-medium'>
+            <div className='flex flex-wrap items-center gap-2'>
+              <span className='px-3 py-1 bg-muted text-muted-foreground rounded-full text-xs sm:text-sm font-medium'>
                 {FIREBASE_AVAILABLE ? "Firestore" : "No Firestore"}
               </span>
-              <span className='text-sm'>Source: {getLastDataSource()}</span>
+              <span className='text-xs sm:text-sm text-muted-foreground'>
+                Source: {getLastDataSource()}
+              </span>
             </div>
 
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className='flex items-center space-x-2 px-4 py-2 rounded-lg'
+              className='flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md'
             >
               <RefreshCw
-                className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+                className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                  loading ? "animate-spin" : ""
+                }`}
               />
-              <span>Refresh</span>
+              <span className='hidden sm:inline'>Refresh</span>
             </button>
           </div>
         </div>
@@ -186,7 +196,7 @@ export default function Home() {
         </div>
 
         {/* Main Trading Interface */}
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6'>
           {/* Left Column - Watchlist */}
           <div className='lg:col-span-1'>
             <WatchList
@@ -197,7 +207,7 @@ export default function Home() {
           </div>
 
           {/* Center Column - Chart */}
-          <div className='lg:col-span-2 space-y-6'>
+          <div className='lg:col-span-2 space-y-4 lg:space-y-6'>
             {selectedStock && (
               <>
                 <StockChart
@@ -214,8 +224,8 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <div className='mt-8 text-center text-sm pt-6'>
-          <p className='font-semibold'>stock.macm.dev</p>
+        <div className='mt-8 text-center text-xs sm:text-sm text-muted-foreground border-t border-border pt-6'>
+          <p className='font-semibold text-foreground'>stock.macm.dev</p>
           <p className='mt-2'>Data provided by Colombo Stock Exchange (CSE)</p>
           <p className='mt-1'>
             Market data may be delayed. This platform is for informational

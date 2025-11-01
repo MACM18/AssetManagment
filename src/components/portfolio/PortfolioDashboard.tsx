@@ -13,6 +13,7 @@ import PortfolioAllocationChart from "@/components/portfolio/PortfolioAllocation
 import PerformanceChart from "@/components/portfolio/PerformanceChart";
 import PortfolioInsights from "@/components/portfolio/PortfolioInsights";
 import TopHoldings from "@/components/portfolio/TopHoldings";
+import Navigation from "@/components/Navigation";
 import { Plus, RefreshCw } from "lucide-react";
 
 export default function PortfolioDashboard() {
@@ -55,18 +56,20 @@ export default function PortfolioDashboard() {
 
   if (authLoading) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
-        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border'></div>
+      <div className='min-h-screen flex items-center justify-center bg-background'>
+        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary'></div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className='min-h-screen flex items-center justify-center p-4'>
-        <div className='rounded-lg shadow-lg p-8 max-w-md w-full text-center border'>
-          <h1 className='text-2xl font-bold mb-4'>Portfolio Dashboard</h1>
-          <p className='mb-6'>
+      <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
+        <div className='bg-card rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full text-center border border-border'>
+          <h1 className='text-xl sm:text-2xl font-bold text-foreground mb-4'>
+            Portfolio Dashboard
+          </h1>
+          <p className='text-muted-foreground mb-6'>
             Sign in to access your portfolio and track your CSE stock
             investments.
           </p>
@@ -76,22 +79,25 @@ export default function PortfolioDashboard() {
   }
 
   return (
-    <div className='min-h-screen py-8'>
+    <div className='min-h-screen bg-background py-6 sm:py-8'>
+      <Navigation />
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Header */}
-        <div className='mb-8 flex justify-between items-center'>
+        <div className='mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
           <div>
-            <h1 className='text-3xl font-bold'>My Portfolio</h1>
-            <p className='mt-1'>
+            <h1 className='text-2xl sm:text-3xl font-bold text-foreground'>
+              My Portfolio
+            </h1>
+            <p className='text-sm sm:text-base text-muted-foreground mt-1'>
               Track your CSE stock investments and performance
             </p>
           </div>
 
-          <div className='flex gap-3'>
+          <div className='flex gap-2 sm:gap-3'>
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className='flex items-center gap-2 px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
+              className='flex items-center gap-2 px-3 sm:px-4 py-2 bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm hover:shadow-md'
             >
               <RefreshCw
                 className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
@@ -101,7 +107,7 @@ export default function PortfolioDashboard() {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className='flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors shadow-lg'
+              className='flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary text-primary-foreground hover:opacity-90 border border-primary rounded-lg transition-all shadow-md hover:shadow-lg'
             >
               <Plus className='w-4 h-4' />
               <span>Add Holding</span>
@@ -110,24 +116,24 @@ export default function PortfolioDashboard() {
         </div>
 
         {/* Portfolio Summary */}
-        <div className='mb-8'>
+        <div className='mb-6 sm:mb-8'>
           <PortfolioSummaryCard />
         </div>
 
         {/* Analytics Section */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8'>
           <PortfolioAllocationChart />
           <PerformanceChart />
         </div>
 
         {/* Insights and Top Holdings */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8'>
           <PortfolioInsights />
           <TopHoldings />
         </div>
 
         {/* Holdings and Transactions */}
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8'>
           {/* Holdings List */}
           <div className='lg:col-span-2'>
             <HoldingsList currentPrices={stocks} />
