@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StockQuote } from "@/types";
 import {
   Star,
@@ -9,9 +9,13 @@ import {
   Search,
   X,
   AlertCircle,
+  Heart,
 } from "lucide-react";
 import { CSE_SYMBOLS } from "@/lib/stockData";
 import { getLastDataSource } from "@/lib/tradingData";
+import { useAuth } from "@/contexts/AuthContext";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db, FIREBASE_AVAILABLE } from "@/lib/firebase";
 
 interface WatchListProps {
   stocks: StockQuote[];
@@ -25,45 +29,86 @@ export default function WatchList({
   selectedSymbol,
 }: WatchListProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [watchlist, setWatchlist] = useState<string[]>(CSE_SYMBOLS.slice(0, 8));
+  const [watchlist, setWatchlist] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
   const dataSource = getLastDataSource();
   console.debug(
     "WatchList: dataSource=",
     dataSource,
     "stocks.length=",
-    stocks.length
+    stocks.length,
+    "isAuthenticated=",
+    isAuthenticated
   );
   const isMockData = dataSource === "mock" || stocks.length === 0;
 
-  const toggleWatchlist = (symbol: string) => {
-    setWatchlist((prev) =>
-      prev.includes(symbol)
-        ? prev.filter((s) => s !== symbol)
-        : [...prev, symbol]
-    );
+  // Load user's watchlist from Firestore
+  useEffect(() => {
+    if (isAuthenticated && user && FIREBASE_AVAILABLE) {
+      loadUserWatchlist();
+    } else {
+      // For non-authenticated users, show empty watchlist
+      setWatchlist([]);
+    }
+  }, [isAuthenticated, user]);
+
+  const loadUserWatchlist = async () => {
+    if (!user || !FIREBASE_AVAILABLE) return;
+
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setWatchlist(userData.watchlist || []);
+      } else {
+        // Initialize empty watchlist for new users
+        setWatchlist([]);
+      }
+    } catch (error) {
+      console.error("Error loading watchlist:", error);
+      setWatchlist([]);
+    }
   };
 
-  // Build displayed list from watchlist: prefer real stock entries from `stocks`, otherwise show placeholders
-  const displayedStocks = watchlist.map((symbol) => {
-    const found = stocks.find((s) => s.symbol === symbol);
-    if (found) return found;
-    return {
-      symbol,
-      companyName: symbol,
-      date: "",
-      price: null,
-      change: null,
-      changePercent: null,
-      volume: 0,
-      high: null,
-      low: null,
-      open: null,
-      close: null,
-    } as unknown as StockQuote;
-  });
+  const saveUserWatchlist = async (newWatchlist: string[]) => {
+    if (!user || !FIREBASE_AVAILABLE) return;
 
-  const filteredStocks = displayedStocks.filter(
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        await updateDoc(userDocRef, { watchlist: newWatchlist });
+      } else {
+        await setDoc(userDocRef, {
+          watchlist: newWatchlist,
+          createdAt: new Date(),
+        });
+      }
+    } catch (error) {
+      console.error("Error saving watchlist:", error);
+    }
+  };
+
+  const toggleWatchlist = async (symbol: string) => {
+    if (!isAuthenticated) return;
+
+    setLoading(true);
+    const newWatchlist = watchlist.includes(symbol)
+      ? watchlist.filter((s) => s !== symbol)
+      : [...watchlist, symbol];
+
+    setWatchlist(newWatchlist);
+    await saveUserWatchlist(newWatchlist);
+    setLoading(false);
+  };
+
+  // Show all stocks by default, but highlight watchlist items for authenticated users
+  const filteredStocks = stocks.filter(
     (stock) =>
       stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (stock.companyName || "").toLowerCase().includes(searchTerm.toLowerCase())
@@ -72,9 +117,17 @@ export default function WatchList({
   return (
     <div className='bg-card rounded-xl p-4 sm:p-6 border border-border shadow-md'>
       <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-lg sm:text-xl font-bold text-foreground'>
-          Watchlist
-        </h2>
+        <div className='flex items-center gap-2'>
+          <h2 className='text-lg sm:text-xl font-bold text-foreground'>
+            Market Overview
+          </h2>
+          {isAuthenticated && (
+            <div className='flex items-center gap-1 text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium'>
+              <Heart className='w-3 h-3 fill-current' />
+              Watchlist
+            </div>
+          )}
+        </div>
         <div className='flex items-center gap-2'>
           <span className='text-xs sm:text-sm text-muted-foreground'>
             {filteredStocks.length} stocks
@@ -110,17 +163,16 @@ export default function WatchList({
         {filteredStocks.length === 0 ? (
           <div className='text-center py-12'>
             <AlertCircle className='w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3' />
-            <p className='text-foreground font-medium'>
-              No stocks in watchlist
-            </p>
+            <p className='text-foreground font-medium'>No stocks found</p>
             <p className='text-sm text-muted-foreground mt-1'>
-              Click the star icon to add stocks
+              Try adjusting your search terms
             </p>
           </div>
         ) : (
           filteredStocks.map((stock) => {
             const isPositive = (stock.changePercent || 0) >= 0;
             const isSelected = stock.symbol === selectedSymbol;
+            const isInWatchlist = watchlist.includes(stock.symbol);
 
             return (
               <div
@@ -129,28 +181,48 @@ export default function WatchList({
                 className={`p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer animate-slide-up ${
                   isSelected
                     ? "border-primary bg-primary/5 shadow-md"
+                    : isInWatchlist && isAuthenticated
+                    ? "border-primary/30 bg-primary/5"
                     : "border-border bg-card hover:bg-muted/50 hover:border-muted"
                 }`}
               >
                 <div className='flex justify-between items-start'>
                   <div className='flex-1'>
                     <div className='flex items-center gap-2 mb-1'>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleWatchlist(stock.symbol);
-                        }}
-                        className='text-primary hover:text-primary/80 transition-colors'
-                        aria-label={`Remove ${stock.symbol} from watchlist`}
-                      >
-                        <Star className='w-4 h-4 fill-primary' />
-                      </button>
+                      {isAuthenticated && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWatchlist(stock.symbol);
+                          }}
+                          disabled={loading}
+                          className={`transition-colors ${
+                            isInWatchlist
+                              ? "text-primary hover:text-primary/80"
+                              : "text-muted-foreground hover:text-primary"
+                          }`}
+                          aria-label={`${isInWatchlist ? "Remove" : "Add"} ${
+                            stock.symbol
+                          } to watchlist`}
+                        >
+                          <Heart
+                            className={`w-4 h-4 ${
+                              isInWatchlist ? "fill-current" : ""
+                            }`}
+                          />
+                        </button>
+                      )}
                       <h3 className='font-bold text-foreground text-sm sm:text-base'>
                         {stock.symbol}
                       </h3>
                       {isSelected && (
                         <span className='text-xs px-2 py-0.5 bg-primary text-primary-foreground rounded-full font-medium'>
                           Active
+                        </span>
+                      )}
+                      {isInWatchlist && isAuthenticated && !isSelected && (
+                        <span className='text-xs px-2 py-0.5 bg-primary/20 text-primary rounded-full font-medium'>
+                          Watchlist
                         </span>
                       )}
                     </div>
@@ -216,25 +288,19 @@ export default function WatchList({
         )}
       </div>
 
-      <div className='mt-4 pt-4 border-t border-border'>
-        <p className='text-xs sm:text-sm font-medium text-foreground mb-3 flex items-center'>
-          <Star className='w-4 h-4 text-muted-foreground mr-1' />
-          Add more stocks:
-        </p>
-        <div className='flex flex-wrap gap-2'>
-          {CSE_SYMBOLS.filter((symbol) => !watchlist.includes(symbol))
-            .slice(0, 6)
-            .map((symbol) => (
-              <button
-                key={symbol}
-                onClick={() => toggleWatchlist(symbol)}
-                className='px-3 py-1.5 bg-muted hover:bg-accent text-muted-foreground hover:text-accent-foreground border border-border rounded-full text-xs sm:text-sm font-medium transition-all hover:shadow-sm'
-              >
-                + {symbol}
-              </button>
-            ))}
+      {!isAuthenticated && (
+        <div className='mt-4 pt-4 border-t border-border'>
+          <div className='text-center py-4'>
+            <Heart className='w-8 h-8 text-muted-foreground mx-auto mb-2' />
+            <p className='text-sm font-medium text-foreground mb-1'>
+              Create a Watchlist
+            </p>
+            <p className='text-xs text-muted-foreground'>
+              Sign in to save your favorite stocks and get personalized alerts
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -272,7 +272,9 @@ export default function StockChart({
               <Line
                 type='monotone'
                 dataKey='close'
-                stroke={chartColors.primary}
+                stroke={
+                  isPositive ? chartColors.success : chartColors.destructive
+                }
                 strokeWidth={2}
                 dot={false}
               />
@@ -299,8 +301,12 @@ export default function StockChart({
               <Area
                 type='monotone'
                 dataKey='close'
-                stroke={chartColors.primary}
-                fill={chartColors.primary}
+                stroke={
+                  isPositive ? chartColors.success : chartColors.destructive
+                }
+                fill={
+                  isPositive ? chartColors.success : chartColors.destructive
+                }
                 fillOpacity={0.2}
                 strokeWidth={2}
               />
