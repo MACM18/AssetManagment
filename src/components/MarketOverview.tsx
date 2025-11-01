@@ -42,14 +42,12 @@ export default function MarketOverview({
     <div className='space-y-6 animate-slide-up'>
       {/* Mock Data Warning Banner */}
       {isMockData && (
-        <div className='bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-l-4 border-amber-500 rounded-lg p-4 shadow-md hover-lift'>
-          <div className='flex items-start'>
-            <AlertCircle className='w-6 h-6 text-amber-600 dark:text-amber-400 mr-3 flex-shrink-0 mt-0.5' />
+        <div className='rounded-lg p-4 shadow-md'>
+          <div className='flex items-start gap-3'>
+            <AlertCircle className='w-6 h-6 flex-shrink-0 mt-0.5' />
             <div>
-              <h3 className='text-amber-900 dark:text-amber-100 font-semibold text-sm'>
-                Demo Mode - Sample Data
-              </h3>
-              <p className='text-amber-800 text-sm mt-1'>
+              <h3 className='font-semibold text-sm'>Demo Mode - Sample Data</h3>
+              <p className='text-sm mt-1'>
                 No live data available. Showing sample market data for
                 demonstration. Connect to Firestore or run data collection to
                 see real CSE data.
@@ -61,16 +59,14 @@ export default function MarketOverview({
 
       {/* Market Summary Cards */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-        <div className='bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-xl p-6 text-white shadow-glow-blue hover-lift transform transition-all'>
+        <div className='rounded-xl p-6 shadow transform transition-all'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-blue-100 text-sm font-medium mb-1'>
-                Total Volume
-              </p>
+              <p className='text-sm font-medium mb-1'>Total Volume</p>
               <p className='text-3xl font-bold'>
                 {(marketSummary.totalVolume / 1000000).toFixed(2)}M
               </p>
-              <div className='mt-2 text-xs text-blue-200'>
+              <div className='mt-2 text-xs'>
                 {dataSource === "firestore" && "📊 Live Data"}
                 {dataSource === "mock" && "🎭 Sample"}
               </div>
@@ -79,14 +75,12 @@ export default function MarketOverview({
           </div>
         </div>
 
-        <div className='bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-xl p-6 text-white shadow-glow-green hover-lift transform transition-all'>
+        <div className='rounded-xl p-6 shadow transform transition-all'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-green-100 text-sm font-medium mb-1'>
-                Advancers
-              </p>
+              <p className='text-sm font-medium mb-1'>Advancers</p>
               <p className='text-3xl font-bold'>{marketSummary.advancers}</p>
-              <div className='mt-2 text-xs text-green-200'>
+              <div className='mt-2 text-xs'>
                 {(
                   (marketSummary.advancers / (marketSummary.totalTrades || 1)) *
                   100
@@ -98,12 +92,12 @@ export default function MarketOverview({
           </div>
         </div>
 
-        <div className='bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-xl p-6 text-white shadow-glow-red hover-lift transform transition-all'>
+        <div className='rounded-xl p-6 shadow transform transition-all'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-red-100 text-sm font-medium mb-1'>Decliners</p>
+              <p className='text-sm font-medium mb-1'>Decliners</p>
               <p className='text-3xl font-bold'>{marketSummary.decliners}</p>
-              <div className='mt-2 text-xs text-red-200'>
+              <div className='mt-2 text-xs'>
                 {(
                   (marketSummary.decliners / (marketSummary.totalTrades || 1)) *
                   100
@@ -115,14 +109,12 @@ export default function MarketOverview({
           </div>
         </div>
 
-        <div className='bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 rounded-xl p-6 text-white shadow-lg hover-lift transform transition-all'>
+        <div className='rounded-xl p-6 shadow transform transition-all'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-purple-100 text-sm font-medium mb-1'>
-                Total Trades
-              </p>
+              <p className='text-sm font-medium mb-1'>Total Trades</p>
               <p className='text-3xl font-bold'>{marketSummary.totalTrades}</p>
-              <div className='mt-2 text-xs text-purple-200'>
+              <div className='mt-2 text-xs'>
                 {marketSummary.unchanged} unchanged
               </div>
             </div>
@@ -134,37 +126,33 @@ export default function MarketOverview({
       {/* Market Movers */}
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* Top Gainers */}
-        <div className='glass-card rounded-xl p-6 border-t-4 border-green-500 hover-lift'>
-          <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
-            <div className='bg-green-100 dark:bg-green-900/30 p-2 rounded-lg mr-3'>
-              <TrendingUp className='w-5 h-5 text-green-600 dark:text-green-400' />
-            </div>
-            <span className='gradient-text'>Top Gainers</span>
+        <div className='rounded-xl p-6 shadow'>
+          <h3 className='text-lg font-bold mb-4 flex items-center gap-3'>
+            <TrendingUp className='w-5 h-5' />
+            <span>Top Gainers</span>
           </h3>
           <div className='space-y-3'>
             {topGainers.length > 0 ? (
               topGainers.map((stock, idx) => (
                 <div
                   key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-green-50/50 dark:bg-green-900/20 rounded-lg hover:bg-green-100/50 dark:hover:bg-green-900/40 transition-colors animate-slide-up'
+                  className='flex justify-between items-center p-3 rounded-lg animate-slide-up'
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900 dark:text-gray-100'>
-                      {stock.symbol}
-                    </p>
-                    <p className='text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]'>
+                    <p className='font-bold'>{stock.symbol}</p>
+                    <p className='text-xs truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
                   <div className='text-right'>
-                    <p className='font-semibold text-gray-900 dark:text-gray-100'>
+                    <p className='font-semibold'>
                       Rs.{" "}
                       {typeof stock.price === "number"
                         ? stock.price.toFixed(2)
                         : "N/A"}
                     </p>
-                    <p className='text-sm font-bold text-green-600 dark:text-green-400 flex items-center justify-end'>
+                    <p className='text-sm font-bold flex items-center justify-end'>
                       <TrendingUp className='w-3 h-3 mr-1' />+
                       {stock.changePercent?.toFixed(2)}%
                     </p>
@@ -172,45 +160,39 @@ export default function MarketOverview({
                 </div>
               ))
             ) : (
-              <p className='text-center text-gray-500 dark:text-gray-400 py-4'>
-                No data available
-              </p>
+              <p className='text-center py-4'>No data available</p>
             )}
           </div>
         </div>
 
         {/* Top Losers */}
-        <div className='glass-card rounded-xl p-6 border-t-4 border-red-500 hover-lift'>
-          <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
-            <div className='bg-red-100 dark:bg-red-900/30 p-2 rounded-lg mr-3'>
-              <TrendingDown className='w-5 h-5 text-red-600 dark:text-red-400' />
-            </div>
-            <span className='gradient-text'>Top Losers</span>
+        <div className='rounded-xl p-6 shadow'>
+          <h3 className='text-lg font-bold mb-4 flex items-center gap-3'>
+            <TrendingDown className='w-5 h-5' />
+            <span>Top Losers</span>
           </h3>
           <div className='space-y-3'>
             {topLosers.length > 0 ? (
               topLosers.map((stock, idx) => (
                 <div
                   key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-red-50/50 dark:bg-red-900/20 rounded-lg hover:bg-red-100/50 dark:hover:bg-red-900/40 transition-colors animate-slide-up'
+                  className='flex justify-between items-center p-3 rounded-lg animate-slide-up'
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900 dark:text-gray-100'>
-                      {stock.symbol}
-                    </p>
-                    <p className='text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]'>
+                    <p className='font-bold'>{stock.symbol}</p>
+                    <p className='text-xs truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
                   <div className='text-right'>
-                    <p className='font-semibold text-gray-900 dark:text-gray-100'>
+                    <p className='font-semibold'>
                       Rs.{" "}
                       {typeof stock.price === "number"
                         ? stock.price.toFixed(2)
                         : "N/A"}
                     </p>
-                    <p className='text-sm font-bold text-red-600 dark:text-red-400 flex items-center justify-end'>
+                    <p className='text-sm font-bold flex items-center justify-end'>
                       <TrendingDown className='w-3 h-3 mr-1' />
                       {stock.changePercent?.toFixed(2)}%
                     </p>
@@ -218,47 +200,41 @@ export default function MarketOverview({
                 </div>
               ))
             ) : (
-              <p className='text-center text-gray-500 dark:text-gray-400 py-4'>
-                No data available
-              </p>
+              <p className='text-center py-4'>No data available</p>
             )}
           </div>
         </div>
 
         {/* Most Active */}
-        <div className='glass-card rounded-xl p-6 border-t-4 border-blue-500 hover-lift'>
-          <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
-            <div className='bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg mr-3'>
-              <Activity className='w-5 h-5 text-blue-600 dark:text-blue-400' />
-            </div>
-            <span className='gradient-text'>Most Active</span>
+        <div className='rounded-xl p-6 shadow'>
+          <h3 className='text-lg font-bold mb-4 flex items-center gap-3'>
+            <Activity className='w-5 h-5' />
+            <span>Most Active</span>
           </h3>
           <div className='space-y-3'>
             {mostActive.length > 0 ? (
               mostActive.map((stock, idx) => (
                 <div
                   key={stock.symbol}
-                  className='flex justify-between items-center p-3 bg-blue-50/50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100/50 dark:hover:bg-blue-900/40 transition-colors animate-slide-up'
+                  className='flex justify-between items-center p-3 rounded-lg animate-slide-up'
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div>
-                    <p className='font-bold text-gray-900 dark:text-gray-100'>
-                      {stock.symbol}
-                    </p>
-                    <p className='text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]'>
+                    <p className='font-bold'>{stock.symbol}</p>
+                    <p className='text-xs truncate max-w-[150px]'>
                       {stock.companyName}
                     </p>
                   </div>
                   <div className='text-right'>
-                    <p className='font-semibold text-gray-900 dark:text-gray-100'>
+                    <p className='font-semibold'>
                       Rs.{" "}
                       {typeof stock.price === "number"
                         ? stock.price.toFixed(2)
                         : "N/A"}
                     </p>
                     <div className='flex items-center justify-end gap-1'>
-                      <Activity className='w-3 h-3 text-blue-600 dark:text-blue-400' />
-                      <p className='text-xs font-semibold text-blue-600 dark:text-blue-400'>
+                      <Activity className='w-3 h-3' />
+                      <p className='text-xs font-semibold'>
                         {((stock.volume || 0) / 1000).toFixed(0)}K
                       </p>
                     </div>
@@ -266,9 +242,7 @@ export default function MarketOverview({
                 </div>
               ))
             ) : (
-              <p className='text-center text-gray-500 dark:text-gray-400 py-4'>
-                No data available
-              </p>
+              <p className='text-center py-4'>No data available</p>
             )}
           </div>
         </div>

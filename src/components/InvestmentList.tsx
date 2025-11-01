@@ -13,40 +13,38 @@ const InvestmentList: React.FC<InvestmentListProps> = ({
 }) => {
   if (investments.length === 0) {
     return (
-      <div className='text-center py-10 px-4 bg-white dark:bg-gray-800/50 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm'>
-        <p className='text-gray-500 dark:text-gray-400'>
-          No investments added yet. Add one to get started!
-        </p>
+      <div className='text-center py-10 px-4 rounded-xl shadow-lg border backdrop-blur-sm'>
+        <p>No investments added yet. Add one to get started!</p>
       </div>
     );
   }
 
   return (
-    <div className='overflow-x-auto bg-white dark:bg-gray-800/50 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm'>
-      <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
-        <thead className='bg-gray-50 dark:bg-gray-700/50'>
+    <div className='overflow-x-auto rounded-xl shadow-lg border backdrop-blur-sm'>
+      <table className='min-w-full divide-y'>
+        <thead>
           <tr>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider'
             >
               Name
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider'
             >
               Type
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider'
             >
               Amount
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider'
             >
               Purchase Date
             </th>
@@ -55,50 +53,33 @@ const InvestmentList: React.FC<InvestmentListProps> = ({
             </th>
           </tr>
         </thead>
-        <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+        <tbody className='divide-y'>
           {investments.map((investment) => (
-            <tr
-              key={investment.id}
-              className='hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150'
-            >
+            <tr key={investment.id} className='transition-colors duration-150'>
               <td className='px-6 py-4 whitespace-nowrap'>
-                <div className='text-sm font-medium text-gray-900 dark:text-gray-100'>
-                  {investment.name}
-                </div>
+                <div className='text-sm font-medium'>{investment.name}</div>
                 {investment.symbol && (
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>
-                    {investment.symbol}
-                  </div>
+                  <div className='text-xs'>{investment.symbol}</div>
                 )}
               </td>
               <td className='px-6 py-4 whitespace-nowrap'>
-                <span
-                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    investment.type === "stock"
-                      ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
-                      : investment.type === "mutual-fund"
-                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
-                      : investment.type === "fd"
-                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300"
-                      : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
-                  }`}
-                >
+                <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full border'>
                   {investment.type}
                 </span>
               </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100'>
+              <td className='px-6 py-4 whitespace-nowrap text-sm'>
                 {new Intl.NumberFormat("en-LK", {
                   style: "currency",
                   currency: "LKR",
                 }).format(Number(investment.amount))}
               </td>
-              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
+              <td className='px-6 py-4 whitespace-nowrap text-sm'>
                 {new Date(investment.purchaseDate).toLocaleDateString()}
               </td>
               <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                 <button
                   onClick={() => onDelete(investment.id)}
-                  className='text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300'
+                  className='underline'
                 >
                   Delete
                 </button>

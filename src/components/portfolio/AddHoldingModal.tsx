@@ -107,22 +107,22 @@ export default function AddHoldingModal({
 
   return (
     <div
-      className='fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto'
+      className='fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto'
       role='dialog'
       aria-modal='true'
       aria-labelledby='add-holding-title'
     >
-      <div className='relative w-full max-w-lg mx-auto my-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-lg'>
-        <div className='sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700/50 px-6 py-4 flex justify-between items-center rounded-t-2xl'>
+      <div className='relative w-full max-w-lg mx-auto my-8 rounded-2xl shadow-2xl border backdrop-blur-lg'>
+        <div className='sticky top-0 backdrop-blur-lg border-b px-6 py-4 flex justify-between items-center rounded-t-2xl'>
           <h2
             id='add-holding-title'
-            className='text-2xl font-bold text-gray-900 dark:text-gray-100'
+            className='text-2xl font-bold'
           >
             Add Stock Holding
           </h2>
           <button
             onClick={onClose}
-            className='text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors'
+            className='transition-colors'
           >
             <X className='w-6 h-6' />
           </button>
@@ -130,7 +130,7 @@ export default function AddHoldingModal({
 
         <form onSubmit={handleSubmit} className='p-6 space-y-4'>
           {error && (
-            <div className='p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm'>
+            <div className='p-3 border rounded-lg text-sm'>
               {error}
             </div>
           )}
@@ -139,7 +139,7 @@ export default function AddHoldingModal({
           <div>
             <label
               htmlFor='symbol'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-sm font-medium mb-1'
             >
               Stock Symbol *
             </label>
@@ -148,7 +148,7 @@ export default function AddHoldingModal({
               value={symbol}
               onChange={(e) => setSymbol(e.target.value)}
               required
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border rounded-lg focus:outline-none'
             >
               <option value=''>Select a stock</option>
               {stocks.map((stock) => (
@@ -163,7 +163,7 @@ export default function AddHoldingModal({
           <div>
             <label
               htmlFor='quantity'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-sm font-medium mb-1'
             >
               Quantity (Shares) *
             </label>
@@ -176,7 +176,7 @@ export default function AddHoldingModal({
               onChange={(e) => setQuantity(e.target.value)}
               required
               inputMode='numeric'
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border rounded-lg focus:outline-none'
               placeholder='100'
             />
           </div>
@@ -185,7 +185,7 @@ export default function AddHoldingModal({
           <div>
             <label
               htmlFor='purchasePrice'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-sm font-medium mb-1'
             >
               Purchase Price (LKR per share) *
             </label>
@@ -198,11 +198,11 @@ export default function AddHoldingModal({
               onChange={(e) => setPurchasePrice(e.target.value)}
               required
               inputMode='decimal'
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border rounded-lg focus:outline-none'
               placeholder='1250.00'
             />
             {selectedStock && (
-              <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
+              <p className='mt-1 text-sm'>
                 Current price: LKR {selectedStock.price.toFixed(2)}
               </p>
             )}
@@ -212,7 +212,7 @@ export default function AddHoldingModal({
           <div>
             <label
               htmlFor='purchaseDate'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-sm font-medium mb-1'
             >
               Purchase Date *
             </label>
@@ -223,7 +223,7 @@ export default function AddHoldingModal({
               onChange={(e) => setPurchaseDate(e.target.value)}
               required
               max={new Date().toISOString().split("T")[0]}
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border rounded-lg focus:outline-none'
             />
           </div>
 
@@ -231,7 +231,7 @@ export default function AddHoldingModal({
           <div>
             <label
               htmlFor='notes'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-sm font-medium mb-1'
             >
               Notes (Optional)
             </label>
@@ -240,37 +240,37 @@ export default function AddHoldingModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border rounded-lg focus:outline-none'
               placeholder='Add any notes about this investment...'
             />
           </div>
 
           {/* Investment Summary */}
           {quantity && purchasePrice && (
-            <div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4'>
-              <p className='text-sm font-medium text-gray-700 mb-2'>
+            <div className='border rounded-lg p-4'>
+              <p className='text-sm font-medium mb-2'>
                 Investment Summary
               </p>
               <div className='space-y-1 text-sm'>
                 <div className='flex justify-between'>
-                  <span className='text-gray-600 dark:text-gray-400'>
+                  <span>
                     Total Shares:
                   </span>
                   <span className='font-medium'>{quantity}</span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-gray-600 dark:text-gray-400'>
+                  <span>
                     Price per Share:
                   </span>
                   <span className='font-medium'>
                     LKR {sanitizeNumber(purchasePrice).toFixed(2)}
                   </span>
                 </div>
-                <div className='flex justify-between border-t border-blue-300 pt-1 mt-1'>
-                  <span className='font-medium text-gray-700 dark:text-gray-300'>
+                <div className='flex justify-between border-t pt-1 mt-1'>
+                  <span className='font-medium'>
                     Total Investment:
                   </span>
-                  <span className='font-bold text-blue-700'>
+                  <span className='font-bold'>
                     LKR{" "}
                     {(
                       sanitizeNumber(quantity) * sanitizeNumber(purchasePrice)
@@ -286,17 +286,17 @@ export default function AddHoldingModal({
             <button
               type='button'
               onClick={onClose}
-              className='flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 font-medium'
+              className='flex-1 px-4 py-2 border rounded-lg font-medium'
             >
               Cancel
             </button>
             <button
               type='submit'
               disabled={loading}
-              className='flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2'
+              className='flex-1 px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2'
             >
               {loading && (
-                <span className='inline-block h-4 w-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin' />
+                <span className='inline-block h-4 w-4 border-2 border-t-transparent rounded-full animate-spin' />
               )}
               {loading ? "Adding..." : "Add Holding"}
             </button>

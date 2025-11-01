@@ -55,20 +55,20 @@ export default function PortfolioDashboard() {
 
   if (authLoading) {
     return (
-      <div className='min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center'>
-        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border'></div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className='min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4'>
-        <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full text-center'>
-          <h1 className='text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4'>
+      <div className='min-h-screen flex items-center justify-center p-4'>
+        <div className='rounded-lg shadow-lg p-8 max-w-md w-full text-center border'>
+          <h1 className='text-2xl font-bold mb-4'>
             Portfolio Dashboard
           </h1>
-          <p className='text-gray-600 dark:text-gray-300 mb-6'>
+          <p className='mb-6'>
             Sign in to access your portfolio and track your CSE stock
             investments.
           </p>
@@ -78,15 +78,15 @@ export default function PortfolioDashboard() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-100 dark:bg-gray-900 py-8'>
+    <div className='min-h-screen py-8'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Header */}
         <div className='mb-8 flex justify-between items-center'>
           <div>
-            <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
+            <h1 className='text-3xl font-bold'>
               My Portfolio
             </h1>
-            <p className='text-gray-600 dark:text-gray-400 mt-1'>
+            <p className='mt-1'>
               Track your CSE stock investments and performance
             </p>
           </div>
@@ -95,7 +95,7 @@ export default function PortfolioDashboard() {
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className='flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
+              className='flex items-center gap-2 px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
             >
               <RefreshCw
                 className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
@@ -105,7 +105,7 @@ export default function PortfolioDashboard() {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className='flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-blue-500/40'
+              className='flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors shadow-lg'
             >
               <Plus className='w-4 h-4' />
               <span>Add Holding</span>

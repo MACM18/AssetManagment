@@ -33,11 +33,11 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
 
   if (loading) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
-        <h2 className='text-xl font-bold text-gray-900 mb-4'>My Holdings</h2>
+      <div className='rounded-lg shadow-lg p-6 border'>
+        <h2 className='text-xl font-bold mb-4'>My Holdings</h2>
         <div className='animate-pulse space-y-3'>
           {[1, 2, 3].map((i) => (
-            <div key={i} className='h-24 bg-gray-200 dark:bg-gray-700 rounded'></div>
+            <div key={i} className='h-24 rounded border'></div>
           ))}
         </div>
       </div>
@@ -46,9 +46,9 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
 
   if (!summary || summary.holdings.length === 0) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700'>
-        <h2 className='text-xl font-bold text-gray-900 mb-4'>My Holdings</h2>
-        <div className='text-center py-8 text-gray-500 dark:text-gray-400'>
+      <div className='rounded-lg shadow-lg p-6 border'>
+        <h2 className='text-xl font-bold mb-4'>My Holdings</h2>
+        <div className='text-center py-8'>
           <p>No holdings to display</p>
           <p className='text-sm mt-1'>Add your first stock to get started</p>
         </div>
@@ -84,12 +84,12 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
   };
 
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'>
-      <div className='p-6 border-b border-gray-200'>
-        <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100'>My Holdings</h2>
+    <div className='rounded-lg shadow-lg border'>
+      <div className='p-6 border-b'>
+        <h2 className='text-xl font-bold'>My Holdings</h2>
       </div>
 
-      <div className='divide-y divide-gray-200'>
+      <div className='divide-y'>
         {aggregatedHoldings.map((holding) => {
           const isGain = holding.gainLoss >= 0;
           // Find the original holding ID for delete action
@@ -100,26 +100,20 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
           return (
             <div
               key={holding.id}
-              className='p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+              className='p-6 transition-colors'
             >
               <div className='flex justify-between items-start mb-3'>
                 <div className='flex-1'>
                   <div className='flex items-center gap-2'>
-                    <h3 className='text-lg font-bold text-gray-900 dark:text-gray-100'>
+                    <h3 className='text-lg font-bold'>
                       {holding.symbol}
                     </h3>
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
-                        isGain
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
+                    <span className='px-2 py-1 rounded text-xs font-medium border'>
                       {isGain ? "+" : ""}
                       {holding.gainLossPercent.toFixed(2)}%
                     </span>
                   </div>
-                  <p className='text-sm text-gray-600 mt-1'>
+                  <p className='text-sm mt-1'>
                     {holding.companyName}
                   </p>
                 </div>
@@ -127,7 +121,7 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                 <div className='flex items-center gap-2'>
                   <button
                     onClick={() => setSelectedHolding(holding)}
-                    className='text-blue-600 hover:text-blue-800 p-2'
+                    className='p-2 underline'
                     title='View details'
                   >
                     <Eye className='w-5 h-5' />
@@ -137,7 +131,7 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                     <button
                       onClick={() => handleDelete(originalHolding.id)}
                       disabled={deletingId === originalHolding.id}
-                      className='text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed p-2'
+                      className='disabled:opacity-50 disabled:cursor-not-allowed p-2 underline'
                       title='Delete holding'
                     >
                       <Trash2 className='w-5 h-5' />
@@ -149,40 +143,40 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
               <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-3'>
                 {/* Quantity */}
                 <div>
-                  <div className='flex items-center gap-1 text-xs text-gray-500 mb-1'>
+                  <div className='flex items-center gap-1 text-xs mb-1'>
                     <Hash className='w-3 h-3' />
                     <span>Shares</span>
                   </div>
-                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
+                  <p className='text-sm font-semibold'>
                     {holding.quantity.toLocaleString()}
                   </p>
                 </div>
 
                 {/* Purchase Price */}
                 <div>
-                  <div className='flex items-center gap-1 text-xs text-gray-500 mb-1'>
+                  <div className='flex items-center gap-1 text-xs mb-1'>
                     <Calendar className='w-3 h-3' />
                     <span>Avg. Buy</span>
                   </div>
-                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
+                  <p className='text-sm font-semibold'>
                     LKR {holding.purchasePrice.toFixed(2)}
                   </p>
                 </div>
 
                 {/* Current Price */}
                 <div>
-                  <div className='flex items-center gap-1 text-xs text-gray-500 mb-1'>
+                  <div className='flex items-center gap-1 text-xs mb-1'>
                     <TrendingUp className='w-3 h-3' />
                     <span>Current</span>
                   </div>
-                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
+                  <p className='text-sm font-semibold'>
                     LKR {holding.currentPrice.toFixed(2)}
                   </p>
                 </div>
 
                 {/* Gain/Loss */}
                 <div>
-                  <div className='flex items-center gap-1 text-xs text-gray-500 mb-1'>
+                  <div className='flex items-center gap-1 text-xs mb-1'>
                     {isGain ? (
                       <TrendingUp className='w-3 h-3' />
                     ) : (
@@ -190,11 +184,7 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                     )}
                     <span>Gain/Loss</span>
                   </div>
-                  <p
-                    className={`text-sm font-semibold ${
-                      isGain ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
+                  <p className='text-sm font-semibold'>
                     {isGain ? "+" : ""}
                     {holding.gainLoss.toLocaleString("en-LK", {
                       minimumFractionDigits: 2,
@@ -205,10 +195,10 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
               </div>
 
               {/* Investment Summary */}
-              <div className='flex justify-between items-center pt-3 border-t border-gray-100'>
+              <div className='flex justify-between items-center pt-3 border-t'>
                 <div>
-                  <p className='text-xs text-gray-500 dark:text-gray-400'>Invested</p>
-                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
+                  <p className='text-xs'>Invested</p>
+                  <p className='text-sm font-semibold'>
                     LKR{" "}
                     {holding.invested.toLocaleString("en-LK", {
                       minimumFractionDigits: 2,
@@ -217,8 +207,8 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                   </p>
                 </div>
                 <div className='text-right'>
-                  <p className='text-xs text-gray-500 dark:text-gray-400'>Current Value</p>
-                  <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
+                  <p className='text-xs'>Current Value</p>
+                  <p className='text-sm font-semibold'>
                     LKR{" "}
                     {holding.currentValue.toLocaleString("en-LK", {
                       minimumFractionDigits: 2,
@@ -229,9 +219,9 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
               </div>
 
               {holding.notes && (
-                <div className='mt-3 pt-3 border-t border-gray-100'>
-                  <p className='text-xs text-gray-500 mb-1'>Notes</p>
-                  <p className='text-sm text-gray-700 dark:text-gray-300'>{holding.notes}</p>
+                <div className='mt-3 pt-3 border-t'>
+                  <p className='text-xs mb-1'>Notes</p>
+                  <p className='text-sm'>{holding.notes}</p>
                 </div>
               )}
             </div>

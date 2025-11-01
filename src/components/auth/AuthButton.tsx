@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { signOut } from "@/lib/auth";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
+import Image from "next/image";
 
 export default function AuthButton() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -29,7 +30,7 @@ export default function AuthButton() {
   if (loading) {
     return (
       <div className='flex items-center gap-2'>
-        <div className='w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse'></div>
+        <div className='w-8 h-8 rounded-full animate-pulse border'></div>
       </div>
     );
   }
@@ -39,25 +40,27 @@ export default function AuthButton() {
       <div className='flex items-center gap-3'>
         <div className='flex items-center gap-2'>
           {user.photoURL ? (
-            <img
+            <Image
               src={user.photoURL}
               alt={user.displayName || "User"}
-              className='w-8 h-8 rounded-full ring-2 ring-blue-500/20'
+              className='w-8 h-8 rounded-full ring-2'
+              width={32}
+              height={32}
             />
           ) : (
-            <div className='w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-medium shadow-md'>
+            <div className='w-8 h-8 rounded-full flex items-center justify-center font-medium shadow-md border'>
               {user.displayName?.[0]?.toUpperCase() ||
                 user.email?.[0]?.toUpperCase() ||
                 "U"}
             </div>
           )}
-          <span className='text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline'>
+          <span className='text-sm font-medium hidden sm:inline'>
             {user.displayName || user.email}
           </span>
         </div>
         <button
           onClick={handleSignOut}
-          className='px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm hover:shadow-md'
+          className='px-4 py-2 text-sm font-medium border rounded-lg transition-all shadow-sm hover:shadow-md'
         >
           Sign Out
         </button>
@@ -72,7 +75,7 @@ export default function AuthButton() {
           setAuthMode("login");
           setShowAuthModal(true);
         }}
-        className='px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all'
+        className='px-4 py-2 text-sm font-medium border rounded-lg shadow-md hover:shadow-lg transition-all'
       >
         Sign In
       </button>
@@ -80,11 +83,11 @@ export default function AuthButton() {
       {mounted &&
         showAuthModal &&
         createPortal(
-          <div className='fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto'>
+          <div className='fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto'>
             <div className='relative w-full max-w-md'>
               <button
                 onClick={() => setShowAuthModal(false)}
-                className='absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:shadow-xl transition-all z-10 border border-gray-200 dark:border-gray-700'
+                className='absolute -top-2 -right-2 w-8 h-8 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-all z-10 border'
               >
                 ✕
               </button>

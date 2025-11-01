@@ -70,15 +70,13 @@ export default function WatchList({
   );
 
   return (
-    <div className='glass-card rounded-xl p-6 hover-lift'>
+    <div className='rounded-xl p-6 border'>
       <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-xl font-bold gradient-text'>Watchlist</h2>
+        <h2 className='text-xl font-bold'>Watchlist</h2>
         <div className='flex items-center gap-2'>
-          <span className='text-sm text-gray-500 dark:text-gray-400'>
-            {filteredStocks.length} stocks
-          </span>
+          <span className='text-sm'>{filteredStocks.length} stocks</span>
           {isMockData && (
-            <div className='bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-medium'>
+            <div className='text-xs px-2 py-1 rounded-full font-medium border'>
               Demo
             </div>
           )}
@@ -86,34 +84,30 @@ export default function WatchList({
       </div>
 
       <div className='relative mb-4'>
-        <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' />
+        <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5' />
         <input
           type='text'
           placeholder='Search stocks...'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className='w-full pl-10 pr-10 py-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm hover:shadow-md placeholder:text-gray-500 dark:placeholder:text-gray-400'
+          className='w-full pl-10 pr-10 py-3 border rounded-lg transition-all'
         />
         {searchTerm && (
           <button
             onClick={() => setSearchTerm("")}
-            className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
+            className='absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors'
           >
             <X className='w-5 h-5' />
           </button>
         )}
       </div>
 
-      <div className='space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar pr-2'>
+      <div className='space-y-2 max-h-[600px] overflow-y-auto pr-2'>
         {filteredStocks.length === 0 ? (
           <div className='text-center py-12'>
-            <AlertCircle className='w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3' />
-            <p className='text-gray-500 dark:text-gray-400'>
-              No stocks in watchlist
-            </p>
-            <p className='text-sm text-gray-400 mt-1'>
-              Click the star icon to add stocks
-            </p>
+            <AlertCircle className='w-12 h-12 mx-auto mb-3' />
+            <p>No stocks in watchlist</p>
+            <p className='text-sm mt-1'>Click the star icon to add stocks</p>
           </div>
         ) : (
           filteredStocks.map((stock) => {
@@ -124,10 +118,8 @@ export default function WatchList({
               <div
                 key={stock.symbol}
                 onClick={() => onSelectStock(stock.symbol)}
-                className={`p-4 rounded-xl border-2 transition-all cursor-pointer hover-lift animate-slide-up ${
-                  isSelected
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-glow-blue"
-                    : "border-gray-200 dark:border-gray-700/50 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                className={`p-4 rounded-xl border-2 transition-all cursor-pointer animate-slide-up ${
+                  isSelected ? "" : "hover:opacity-90"
                 }`}
               >
                 <div className='flex justify-between items-start'>
@@ -138,37 +130,29 @@ export default function WatchList({
                           e.stopPropagation();
                           toggleWatchlist(stock.symbol);
                         }}
-                        className='text-yellow-400 hover:text-yellow-500 dark:text-yellow-500 dark:hover:text-yellow-400 transition-colors'
+                        className='transition-colors'
                       >
-                        <Star className='w-4 h-4 fill-current' />
+                        <Star className='w-4 h-4' />
                       </button>
-                      <h3 className='font-bold text-gray-900 dark:text-gray-100'>
-                        {stock.symbol}
-                      </h3>
+                      <h3 className='font-bold'>{stock.symbol}</h3>
                       {isSelected && (
-                        <span className='text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full font-medium'>
+                        <span className='text-xs px-2 py-0.5 rounded-full font-medium border'>
                           Active
                         </span>
                       )}
                     </div>
-                    <p className='text-xs text-gray-500 dark:text-gray-400 truncate'>
-                      {stock.companyName}
-                    </p>
+                    <p className='text-xs truncate'>{stock.companyName}</p>
                   </div>
 
                   <div className='text-right'>
-                    <p className='text-lg font-bold text-gray-900 dark:text-gray-100'>
+                    <p className='text-lg font-bold'>
                       Rs.{" "}
                       {typeof stock.price === "number"
                         ? stock.price.toFixed(2)
                         : "N/A"}
                     </p>
                     <div
-                      className={`flex items-center justify-end text-sm font-semibold mt-1 ${
-                        isPositive
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-red-600 dark:text-red-400"
-                      }`}
+                      className={`flex items-center justify-end text-sm font-semibold mt-1`}
                     >
                       {isPositive ? (
                         <TrendingUp className='w-4 h-4 mr-1' />
@@ -183,34 +167,28 @@ export default function WatchList({
                   </div>
                 </div>
 
-                <div className='mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50 grid grid-cols-4 gap-2 text-xs'>
+                <div className='mt-3 pt-3 border-t grid grid-cols-4 gap-2 text-xs'>
                   <div>
-                    <p className='text-gray-500 dark:text-gray-400 mb-1'>
-                      Open
-                    </p>
-                    <p className='font-semibold text-gray-900 dark:text-gray-100'>
+                    <p className='mb-1'>Open</p>
+                    <p className='font-semibold'>
                       {stock.open?.toFixed(2) || "N/A"}
                     </p>
                   </div>
                   <div>
-                    <p className='text-gray-500 dark:text-gray-400 mb-1'>
-                      High
-                    </p>
-                    <p className='font-semibold text-green-600 dark:text-green-400'>
+                    <p className='mb-1'>High</p>
+                    <p className='font-semibold'>
                       {stock.high?.toFixed(2) || "N/A"}
                     </p>
                   </div>
                   <div>
-                    <p className='text-gray-500 dark:text-gray-400 mb-1'>Low</p>
-                    <p className='font-semibold text-red-600 dark:text-red-400'>
+                    <p className='mb-1'>Low</p>
+                    <p className='font-semibold'>
                       {stock.low?.toFixed(2) || "N/A"}
                     </p>
                   </div>
                   <div>
-                    <p className='text-gray-500 dark:text-gray-400 mb-1'>
-                      Volume
-                    </p>
-                    <p className='font-semibold text-blue-600 dark:text-blue-400'>
+                    <p className='mb-1'>Volume</p>
+                    <p className='font-semibold'>
                       {((stock.volume || 0) / 1000).toFixed(0)}K
                     </p>
                   </div>
@@ -221,9 +199,9 @@ export default function WatchList({
         )}
       </div>
 
-      <div className='mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/50'>
-        <p className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center'>
-          <Star className='w-4 h-4 mr-1 text-gray-400' />
+      <div className='mt-4 pt-4 border-t'>
+        <p className='text-sm font-medium mb-3 flex items-center'>
+          <Star className='w-4 h-4 mr-1' />
           Add more stocks:
         </p>
         <div className='flex flex-wrap gap-2'>
@@ -233,7 +211,7 @@ export default function WatchList({
               <button
                 key={symbol}
                 onClick={() => toggleWatchlist(symbol)}
-                className='px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 transition-all hover-lift'
+                className='px-3 py-1.5 border rounded-full text-sm font-medium transition-all'
               >
                 + {symbol}
               </button>
