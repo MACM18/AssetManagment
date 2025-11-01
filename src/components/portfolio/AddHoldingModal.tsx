@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { FirebaseError } from "firebase/app";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePortfolio } from "@/contexts/PortfolioContext";
 import { addHolding } from "@/lib/portfolio";
@@ -33,6 +34,9 @@ export default function AddHoldingModal({
 
   const selectedStock = stocks.find((s) => s.symbol === symbol);
 
+  const sanitizeNumber = (val: string) =>
+    Number(String(val).replace(/,/g, "").trim());
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -47,8 +51,19 @@ export default function AddHoldingModal({
       return;
     }
 
-    const quantityNum = parseFloat(quantity);
-    const priceNum = parseFloat(purchasePrice);
+    // Ensure the symbol exists in provided stock list
+    if (!stocks.some((s) => s.symbol === symbol)) {
+      setError("Please select a valid stock symbol from the list");
+      return;
+    }
+
+    const quantityNum = sanitizeNumber(quantity);
+    const priceNum = sanitizeNumber(purchasePrice);
+
+    if (!Number.isFinite(quantityNum) || !Number.isFinite(priceNum)) {
+      setError("Quantity and price must be valid numbers");
+      return;
+    }
 
     if (quantityNum <= 0 || priceNum <= 0) {
       setError("Quantity and price must be positive numbers");
@@ -71,7 +86,16 @@ export default function AddHoldingModal({
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      const code = (err as FirebaseError)?.code;
+      if (code === "permission-denied") {
+        setError(
+          "Permission denied when writing to your portfolio. Please ensure your account has access."
+        );
+      } else if (code === "unavailable") {
+        setError(
+          "Service temporarily unavailable. Please check your connection and try again."
+        );
+      } else if (err instanceof Error) {
         setError(err.message);
       } else {
         setError("Failed to add holding. Please try again.");
@@ -82,15 +106,20 @@ export default function AddHoldingModal({
   };
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 p-4'>
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto'>
-        <div className='sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center'>
-          <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
+    <div
+      className='fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto'
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='add-holding-title'
+    >
+      <div className='relative w-full max-w-lg mx-auto my-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-lg'>
+        <div className='sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700/50 px-6 py-4 flex justify-between items-center rounded-t-2xl'>
+          <h2 id='add-holding-title' className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
             Add Stock Holding
           </h2>
           <button
             onClick={onClose}
-            className='text-gray-400 hover:text-gray-600 transition-colors'
+            className='text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors'
           >
             <X className='w-6 h-6' />
           </button>
@@ -98,7 +127,7 @@ export default function AddHoldingModal({
 
         <form onSubmit={handleSubmit} className='p-6 space-y-4'>
           {error && (
-            <div className='p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-400 text-sm'>
+            <div className='p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm'>
               {error}
             </div>
           )}
@@ -116,7 +145,7 @@ export default function AddHoldingModal({
               value={symbol}
               onChange={(e) => setSymbol(e.target.value)}
               required
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
             >
               <option value=''>Select a stock</option>
               {stocks.map((stock) => (
@@ -143,7 +172,8 @@ export default function AddHoldingModal({
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               required
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              inputMode='numeric'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='100'
             />
           </div>
@@ -164,7 +194,8 @@ export default function AddHoldingModal({
               value={purchasePrice}
               onChange={(e) => setPurchasePrice(e.target.value)}
               required
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              inputMode='decimal'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='1250.00'
             />
             {selectedStock && (
@@ -189,7 +220,7 @@ export default function AddHoldingModal({
               onChange={(e) => setPurchaseDate(e.target.value)}
               required
               max={new Date().toISOString().split("T")[0]}
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
           </div>
 
@@ -206,14 +237,14 @@ export default function AddHoldingModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='Add any notes about this investment...'
             />
           </div>
 
           {/* Investment Summary */}
           {quantity && purchasePrice && (
-            <div className='bg-blue-50 border border-blue-200 rounded-lg p-4'>
+            <div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4'>
               <p className='text-sm font-medium text-gray-700 mb-2'>
                 Investment Summary
               </p>
@@ -225,7 +256,7 @@ export default function AddHoldingModal({
                 <div className='flex justify-between'>
                   <span className='text-gray-600 dark:text-gray-400'>Price per Share:</span>
                   <span className='font-medium'>
-                    LKR {parseFloat(purchasePrice).toFixed(2)}
+                    LKR {sanitizeNumber(purchasePrice).toFixed(2)}
                   </span>
                 </div>
                 <div className='flex justify-between border-t border-blue-300 pt-1 mt-1'>
@@ -234,9 +265,7 @@ export default function AddHoldingModal({
                   </span>
                   <span className='font-bold text-blue-700'>
                     LKR{" "}
-                    {(parseFloat(quantity) * parseFloat(purchasePrice)).toFixed(
-                      2
-                    )}
+                    {(sanitizeNumber(quantity) * sanitizeNumber(purchasePrice)).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -248,15 +277,18 @@ export default function AddHoldingModal({
             <button
               type='button'
               onClick={onClose}
-              className='flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 font-medium'
+              className='flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 font-medium'
             >
               Cancel
             </button>
             <button
               type='submit'
               disabled={loading}
-              className='flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium'
+              className='flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2'
             >
+              {loading && (
+                <span className='inline-block h-4 w-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin' />
+              )}
               {loading ? "Adding..." : "Add Holding"}
             </button>
           </div>

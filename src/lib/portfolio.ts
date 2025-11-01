@@ -13,6 +13,7 @@ import {
   orderBy,
   serverTimestamp,
   Timestamp,
+  writeBatch,
 } from "firebase/firestore";
 import { db, FIREBASE_AVAILABLE } from "./firebase";
 import {
@@ -31,19 +32,35 @@ export async function addHolding(
   holding: Omit<PortfolioHolding, "id" | "userId" | "createdAt" | "updatedAt">
 ): Promise<string> {
   if (!FIREBASE_AVAILABLE) {
-    throw new Error("Firebase is not initialized");
+    throw new Error(
+      "Unable to add holding: Firebase is not configured. Please set NEXT_PUBLIC_FIREBASE_* environment variables."
+    );
   }
 
-  const holdingsRef = collection(db, "portfolios", userId, "holdings");
-  const docRef = await addDoc(holdingsRef, {
+  // Use a write batch so the holding and its transaction are written atomically
+  const batch = writeBatch(db);
+
+  const holdingsCol = collection(db, "portfolios", userId, "holdings");
+  const newHoldingRef = doc(holdingsCol);
+
+  const transactionsCol = collection(db, "portfolios", userId, "transactions");
+  const newTransactionRef = doc(transactionsCol);
+
+  type HoldingWrite = Omit<PortfolioHolding, "id" | "createdAt" | "updatedAt"> & {
+    createdAt: unknown;
+    updatedAt: unknown;
+  };
+  const holdingPayload: HoldingWrite = {
     ...holding,
     userId,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  });
+  };
 
-  // Also add a transaction record
-  await addTransaction(userId, {
+  type TransactionWrite = Omit<Transaction, "id" | "createdAt"> & {
+    createdAt: unknown;
+  };
+  const transactionPayload: TransactionWrite = {
     symbol: holding.symbol,
     companyName: holding.companyName,
     type: "buy",
@@ -52,9 +69,16 @@ export async function addHolding(
     totalAmount: holding.quantity * holding.purchasePrice,
     date: holding.purchaseDate,
     notes: holding.notes,
-  });
+    userId,
+    createdAt: serverTimestamp(),
+  };
 
-  return docRef.id;
+  batch.set(newHoldingRef, holdingPayload);
+  batch.set(newTransactionRef, transactionPayload);
+
+  await batch.commit();
+
+  return newHoldingRef.id;
 }
 
 /**
