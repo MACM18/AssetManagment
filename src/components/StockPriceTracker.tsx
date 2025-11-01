@@ -47,10 +47,7 @@ export default function StockPriceTracker() {
   return (
     <div className='space-y-6 p-6 rounded-xl shadow-lg border backdrop-blur-sm'>
       <div>
-        <label
-          htmlFor='symbol'
-          className='block text-sm font-medium mb-1'
-        >
+        <label htmlFor='symbol' className='block text-sm font-medium mb-1'>
           Select Stock
         </label>
         <select
@@ -71,9 +68,7 @@ export default function StockPriceTracker() {
         <div className='border rounded-lg p-4'>
           <div className='flex justify-between items-start mb-2'>
             <div>
-              <h3 className='text-lg font-semibold'>
-                {selectedStock.symbol}
-              </h3>
+              <h3 className='text-lg font-semibold'>{selectedStock.symbol}</h3>
               <p className='text-3xl font-bold mt-2'>
                 Rs. {selectedStock.price.toFixed(2)}
               </p>
@@ -96,9 +91,7 @@ export default function StockPriceTracker() {
       )}
 
       <div className='border-t pt-4'>
-        <h4 className='text-sm font-medium mb-2'>
-          All Tracked Stocks
-        </h4>
+        <h4 className='text-sm font-medium mb-2'>All Tracked Stocks</h4>
         <div className='space-y-2 max-h-64 overflow-y-auto pr-2'>
           {stockPrices.map((stock) => (
             <div
@@ -106,13 +99,9 @@ export default function StockPriceTracker() {
               className='flex justify-between items-center p-2 rounded-lg cursor-pointer transition-all border'
               onClick={() => setSelectedSymbol(stock.symbol)}
             >
-              <span className='text-sm font-medium'>
-                {stock.symbol}
-              </span>
+              <span className='text-sm font-medium'>{stock.symbol}</span>
               <div className='text-right'>
-                <span className='text-sm'>
-                  Rs. {stock.price.toFixed(2)}
-                </span>
+                <span className='text-sm'>Rs. {stock.price.toFixed(2)}</span>
                 <span className='ml-3 text-xs font-semibold w-16 text-right inline-block'>
                   {stock.change >= 0 ? "+" : ""}
                   {stock.changePercent.toFixed(2)}%

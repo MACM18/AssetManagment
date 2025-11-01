@@ -51,10 +51,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
       className='space-y-6 p-6 rounded-xl shadow-lg border backdrop-blur-sm'
     >
       <div>
-        <label
-          htmlFor='type'
-          className='block text-sm font-medium mb-1'
-        >
+        <label htmlFor='type' className='block text-sm font-medium mb-1'>
           Investment Type
         </label>
         <select
@@ -76,10 +73,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
       </div>
 
       <div>
-        <label
-          htmlFor='name'
-          className='block text-sm font-medium mb-1'
-        >
+        <label htmlFor='name' className='block text-sm font-medium mb-1'>
           Name *
         </label>
         <input
@@ -95,10 +89,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
 
       {formData.type === "stock" && (
         <div>
-          <label
-            htmlFor='symbol'
-            className='block text-sm font-medium mb-1'
-          >
+          <label htmlFor='symbol' className='block text-sm font-medium mb-1'>
             Symbol
           </label>
           <input
@@ -116,10 +107,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
 
       <div className='grid grid-cols-2 gap-4'>
         <div>
-          <label
-            htmlFor='amount'
-            className='block text-sm font-medium mb-1'
-          >
+          <label htmlFor='amount' className='block text-sm font-medium mb-1'>
             Amount (Rs.) *
           </label>
           <input
@@ -181,10 +169,7 @@ export default function InvestmentForm({ onSubmit }: InvestmentFormProps) {
       </div>
 
       <div>
-        <label
-          htmlFor='notes'
-          className='block text-sm font-medium mb-1'
-        >
+        <label htmlFor='notes' className='block text-sm font-medium mb-1'>
           Notes
         </label>
         <textarea

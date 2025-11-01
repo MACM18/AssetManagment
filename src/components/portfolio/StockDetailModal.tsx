@@ -56,9 +56,7 @@ export default function StockDetailModal({
         <div className='sticky top-0 border-b px-6 py-4 flex justify-between items-start'>
           <div>
             <div className='flex items-center gap-3'>
-              <h2 className='text-2xl font-bold'>
-                {holding.symbol}
-              </h2>
+              <h2 className='text-2xl font-bold'>{holding.symbol}</h2>
               <span className='px-3 py-1 rounded-full text-sm font-medium border'>
                 {isGain ? "+" : ""}
                 {holding.gainLossPercent.toFixed(2)}%
@@ -66,10 +64,7 @@ export default function StockDetailModal({
             </div>
             <p className='mt-1'>{holding.companyName}</p>
           </div>
-          <button
-            onClick={onClose}
-            className='transition-colors'
-          >
+          <button onClick={onClose} className='transition-colors'>
             <X className='w-6 h-6' />
           </button>
         </div>
@@ -80,9 +75,7 @@ export default function StockDetailModal({
             <div className='border rounded-lg p-4'>
               <div className='flex items-center gap-2 mb-1'>
                 <DollarSign className='w-4 h-4' />
-                <p className='text-xs font-medium uppercase'>
-                  Current Price
-                </p>
+                <p className='text-xs font-medium uppercase'>Current Price</p>
               </div>
               <p className='text-xl font-bold'>
                 LKR {holding.currentPrice.toFixed(2)}
@@ -92,9 +85,7 @@ export default function StockDetailModal({
             <div className='border rounded-lg p-4'>
               <div className='flex items-center gap-2 mb-1'>
                 <Calendar className='w-4 h-4' />
-                <p className='text-xs font-medium uppercase'>
-                  Purchase Price
-                </p>
+                <p className='text-xs font-medium uppercase'>Purchase Price</p>
               </div>
               <p className='text-xl font-bold'>
                 LKR {holding.purchasePrice.toFixed(2)}
@@ -108,9 +99,7 @@ export default function StockDetailModal({
                 ) : (
                   <TrendingDown className='w-4 h-4' />
                 )}
-                <p className='text-xs font-medium uppercase'>
-                  Gain/Loss
-                </p>
+                <p className='text-xs font-medium uppercase'>Gain/Loss</p>
               </div>
               <p className='text-xl font-bold'>
                 {isGain ? "+" : ""}
@@ -119,9 +108,7 @@ export default function StockDetailModal({
             </div>
 
             <div className='border rounded-lg p-4'>
-              <p className='text-xs font-medium uppercase mb-1'>
-                Quantity
-              </p>
+              <p className='text-xs font-medium uppercase mb-1'>Quantity</p>
               <p className='text-xl font-bold'>
                 {holding.quantity.toLocaleString()}
               </p>
@@ -131,25 +118,28 @@ export default function StockDetailModal({
 
           {/* Price Trend Chart */}
           <div className='border rounded-lg p-4'>
-            <h3 className='text-sm font-bold mb-4'>
-              Price Trend (30 Days)
-            </h3>
+            <h3 className='text-sm font-bold mb-4'>Price Trend (30 Days)</h3>
             <ResponsiveContainer width='100%' height={200}>
               <LineChart data={priceHistory}>
                 <CartesianGrid strokeDasharray='3 3' />
                 <XAxis dataKey='day' />
                 <YAxis domain={["auto", "auto"]} />
-                <Tooltip formatter={(value: number) => `LKR ${value.toFixed(2)}`} />
-                <Line type='monotone' dataKey='price' strokeWidth={2} dot={false} />
+                <Tooltip
+                  formatter={(value: number) => `LKR ${value.toFixed(2)}`}
+                />
+                <Line
+                  type='monotone'
+                  dataKey='price'
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
           {/* Investment Summary */}
           <div className='border rounded-lg p-4'>
-            <h3 className='text-sm font-bold mb-4'>
-              Investment Summary
-            </h3>
+            <h3 className='text-sm font-bold mb-4'>Investment Summary</h3>
             <div className='space-y-3'>
               <div className='flex justify-between items-center'>
                 <span className='text-sm'>Total Invested</span>
@@ -172,9 +162,7 @@ export default function StockDetailModal({
                 </span>
               </div>
               <div className='flex justify-between items-center pt-3 border-t'>
-                <span className='text-sm font-bold'>
-                  Total Return
-                </span>
+                <span className='text-sm font-bold'>Total Return</span>
                 <div className='text-right'>
                   <span className='text-sm font-bold'>
                     {isGain ? "+" : ""}
@@ -198,9 +186,7 @@ export default function StockDetailModal({
             <div className='space-y-4'>
               {stockQuote && (
                 <div className='border rounded-lg p-4'>
-                  <h3 className='text-sm font-bold mb-3'>
-                    Market Data
-                  </h3>
+                  <h3 className='text-sm font-bold mb-3'>Market Data</h3>
                   <div className='grid grid-cols-2 gap-3 text-sm'>
                     {stockQuote.high && (
                       <div>
@@ -232,9 +218,7 @@ export default function StockDetailModal({
 
               {holding.notes && (
                 <div className='border rounded-lg p-4'>
-                  <h3 className='text-sm font-bold mb-2'>
-                    Notes
-                  </h3>
+                  <h3 className='text-sm font-bold mb-2'>Notes</h3>
                   <p className='text-sm'>{holding.notes}</p>
                 </div>
               )}

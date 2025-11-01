@@ -22,9 +22,7 @@ export default function PortfolioAllocationChart() {
   if (!summary || summary.holdings.length === 0) {
     return (
       <div className='rounded-lg shadow-lg p-6 border'>
-        <h3 className='text-lg font-bold mb-4'>
-          Portfolio Allocation
-        </h3>
+        <h3 className='text-lg font-bold mb-4'>Portfolio Allocation</h3>
         <div className='text-center py-8'>
           <p>No data to display</p>
           <p className='text-sm mt-1'>Add holdings to see allocation</p>
@@ -35,13 +33,18 @@ export default function PortfolioAllocationChart() {
 
   return (
     <div className='rounded-lg shadow-lg p-6 border'>
-      <h3 className='text-lg font-bold mb-4'>
-        Portfolio Allocation
-      </h3>
+      <h3 className='text-lg font-bold mb-4'>Portfolio Allocation</h3>
 
       <ResponsiveContainer width='100%' height={300}>
         <PieChart>
-          <Pie data={chartData} cx='50%' cy='50%' labelLine={false} outerRadius={100} dataKey='value' />
+          <Pie
+            data={chartData}
+            cx='50%'
+            cy='50%'
+            labelLine={false}
+            outerRadius={100}
+            dataKey='value'
+          />
           <Tooltip
             formatter={(value: number) =>
               `LKR ${value.toLocaleString("en-LK", {

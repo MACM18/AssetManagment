@@ -30,9 +30,7 @@ export default function PerformanceChart() {
   if (!summary || summary.holdings.length === 0) {
     return (
       <div className='rounded-lg shadow-lg p-6 border'>
-        <h3 className='text-lg font-bold mb-4'>
-          Performance by Stock
-        </h3>
+        <h3 className='text-lg font-bold mb-4'>Performance by Stock</h3>
         <div className='text-center py-8'>
           <p>No data to display</p>
           <p className='text-sm mt-1'>Add holdings to see performance</p>
@@ -43,16 +41,23 @@ export default function PerformanceChart() {
 
   return (
     <div className='rounded-lg shadow-lg p-6 border'>
-      <h3 className='text-lg font-bold mb-4'>
-        Performance by Stock
-      </h3>
+      <h3 className='text-lg font-bold mb-4'>Performance by Stock</h3>
 
       <ResponsiveContainer width='100%' height={300}>
         <BarChart data={chartData}>
           <CartesianGrid strokeDasharray='3 3' />
           <XAxis dataKey='symbol' />
-          <YAxis tickFormatter={(value) => `${value >= 0 ? "+" : ""}${value}`} />
-          <Tooltip formatter={(value: number) => `LKR ${value.toLocaleString("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
+          <YAxis
+            tickFormatter={(value) => `${value >= 0 ? "+" : ""}${value}`}
+          />
+          <Tooltip
+            formatter={(value: number) =>
+              `LKR ${value.toLocaleString("en-LK", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`
+            }
+          />
           <Bar dataKey='gainLoss' radius={[8, 8, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>

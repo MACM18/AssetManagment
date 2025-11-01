@@ -65,9 +65,7 @@ export default function PortfolioDashboard() {
     return (
       <div className='min-h-screen flex items-center justify-center p-4'>
         <div className='rounded-lg shadow-lg p-8 max-w-md w-full text-center border'>
-          <h1 className='text-2xl font-bold mb-4'>
-            Portfolio Dashboard
-          </h1>
+          <h1 className='text-2xl font-bold mb-4'>Portfolio Dashboard</h1>
           <p className='mb-6'>
             Sign in to access your portfolio and track your CSE stock
             investments.
@@ -83,9 +81,7 @@ export default function PortfolioDashboard() {
         {/* Header */}
         <div className='mb-8 flex justify-between items-center'>
           <div>
-            <h1 className='text-3xl font-bold'>
-              My Portfolio
-            </h1>
+            <h1 className='text-3xl font-bold'>My Portfolio</h1>
             <p className='mt-1'>
               Track your CSE stock investments and performance
             </p>

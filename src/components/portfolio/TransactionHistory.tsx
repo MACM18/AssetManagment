@@ -15,9 +15,7 @@ export default function TransactionHistory() {
   if (loading) {
     return (
       <div className='rounded-lg shadow-lg p-6 border'>
-        <h2 className='text-xl font-bold mb-4'>
-          Transaction History
-        </h2>
+        <h2 className='text-xl font-bold mb-4'>Transaction History</h2>
         <div className='animate-pulse space-y-3'>
           {[1, 2, 3].map((i) => (
             <div key={i} className='h-16 rounded border'></div>
@@ -30,9 +28,7 @@ export default function TransactionHistory() {
   if (transactions.length === 0) {
     return (
       <div className='rounded-lg shadow-lg p-6 border'>
-        <h2 className='text-xl font-bold mb-4'>
-          Transaction History
-        </h2>
+        <h2 className='text-xl font-bold mb-4'>Transaction History</h2>
         <div className='text-center py-8'>
           <p>No transactions yet</p>
           <p className='text-sm mt-1'>
@@ -54,10 +50,7 @@ export default function TransactionHistory() {
           const isBuy = transaction.type === "buy";
 
           return (
-            <div
-              key={transaction.id}
-              className='p-4 transition-colors'
-            >
+            <div key={transaction.id} className='p-4 transition-colors'>
               <div className='flex items-start justify-between'>
                 <div className='flex items-start gap-3 flex-1'>
                   <div className='p-2 rounded-full border'>
@@ -77,9 +70,7 @@ export default function TransactionHistory() {
                         {transaction.symbol}
                       </h3>
                     </div>
-                    <p className='text-xs mt-1'>
-                      {transaction.companyName}
-                    </p>
+                    <p className='text-xs mt-1'>{transaction.companyName}</p>
 
                     <div className='flex items-center gap-4 mt-2 text-xs'>
                       <div className='flex items-center gap-1'>
@@ -102,9 +93,7 @@ export default function TransactionHistory() {
                     </div>
 
                     {transaction.notes && (
-                      <p className='text-xs mt-2 italic'>
-                        {transaction.notes}
-                      </p>
+                      <p className='text-xs mt-2 italic'>{transaction.notes}</p>
                     )}
                   </div>
                 </div>

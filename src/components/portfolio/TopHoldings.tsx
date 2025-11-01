@@ -22,9 +22,7 @@ export default function TopHoldings() {
 
   return (
     <div className='rounded-lg shadow-lg p-6 border'>
-      <h3 className='text-lg font-bold mb-4'>
-        Top Holdings by Value
-      </h3>
+      <h3 className='text-lg font-bold mb-4'>Top Holdings by Value</h3>
 
       <div className='space-y-3'>
         {topHoldings.map((holding, index) => {
@@ -38,9 +36,7 @@ export default function TopHoldings() {
             >
               {/* Rank */}
               <div className='flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center'>
-                <span className='text-sm font-bold'>
-                  {index + 1}
-                </span>
+                <span className='text-sm font-bold'>{index + 1}</span>
               </div>
 
               {/* Stock Info */}
@@ -52,9 +48,7 @@ export default function TopHoldings() {
                     {holding.gainLossPercent.toFixed(2)}%
                   </span>
                 </div>
-                <p className='text-xs truncate'>
-                  {holding.companyName}
-                </p>
+                <p className='text-xs truncate'>{holding.companyName}</p>
               </div>
 
               {/* Value and Percentage */}
@@ -65,9 +59,7 @@ export default function TopHoldings() {
                     maximumFractionDigits: 0,
                   })}
                 </p>
-                <p className='text-xs'>
-                  {percentage.toFixed(1)}%
-                </p>
+                <p className='text-xs'>{percentage.toFixed(1)}%</p>
               </div>
             </div>
           );

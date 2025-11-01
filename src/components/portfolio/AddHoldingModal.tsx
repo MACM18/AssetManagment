@@ -114,33 +114,22 @@ export default function AddHoldingModal({
     >
       <div className='relative w-full max-w-lg mx-auto my-8 rounded-2xl shadow-2xl border backdrop-blur-lg'>
         <div className='sticky top-0 backdrop-blur-lg border-b px-6 py-4 flex justify-between items-center rounded-t-2xl'>
-          <h2
-            id='add-holding-title'
-            className='text-2xl font-bold'
-          >
+          <h2 id='add-holding-title' className='text-2xl font-bold'>
             Add Stock Holding
           </h2>
-          <button
-            onClick={onClose}
-            className='transition-colors'
-          >
+          <button onClick={onClose} className='transition-colors'>
             <X className='w-6 h-6' />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className='p-6 space-y-4'>
           {error && (
-            <div className='p-3 border rounded-lg text-sm'>
-              {error}
-            </div>
+            <div className='p-3 border rounded-lg text-sm'>{error}</div>
           )}
 
           {/* Stock Selection */}
           <div>
-            <label
-              htmlFor='symbol'
-              className='block text-sm font-medium mb-1'
-            >
+            <label htmlFor='symbol' className='block text-sm font-medium mb-1'>
               Stock Symbol *
             </label>
             <select
@@ -229,10 +218,7 @@ export default function AddHoldingModal({
 
           {/* Notes */}
           <div>
-            <label
-              htmlFor='notes'
-              className='block text-sm font-medium mb-1'
-            >
+            <label htmlFor='notes' className='block text-sm font-medium mb-1'>
               Notes (Optional)
             </label>
             <textarea
@@ -248,28 +234,20 @@ export default function AddHoldingModal({
           {/* Investment Summary */}
           {quantity && purchasePrice && (
             <div className='border rounded-lg p-4'>
-              <p className='text-sm font-medium mb-2'>
-                Investment Summary
-              </p>
+              <p className='text-sm font-medium mb-2'>Investment Summary</p>
               <div className='space-y-1 text-sm'>
                 <div className='flex justify-between'>
-                  <span>
-                    Total Shares:
-                  </span>
+                  <span>Total Shares:</span>
                   <span className='font-medium'>{quantity}</span>
                 </div>
                 <div className='flex justify-between'>
-                  <span>
-                    Price per Share:
-                  </span>
+                  <span>Price per Share:</span>
                   <span className='font-medium'>
                     LKR {sanitizeNumber(purchasePrice).toFixed(2)}
                   </span>
                 </div>
                 <div className='flex justify-between border-t pt-1 mt-1'>
-                  <span className='font-medium'>
-                    Total Investment:
-                  </span>
+                  <span className='font-medium'>Total Investment:</span>
                   <span className='font-bold'>
                     LKR{" "}
                     {(

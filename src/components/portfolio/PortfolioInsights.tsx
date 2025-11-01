@@ -31,9 +31,7 @@ export default function PortfolioInsights() {
 
   return (
     <div className='rounded-lg shadow-lg p-6 border'>
-      <h3 className='text-lg font-bold mb-4'>
-        Portfolio Insights
-      </h3>
+      <h3 className='text-lg font-bold mb-4'>Portfolio Insights</h3>
 
       <div className='space-y-4'>
         {/* Best Performer */}
@@ -44,15 +42,9 @@ export default function PortfolioInsights() {
                 <Award className='w-5 h-5' />
               </div>
               <div>
-                <p className='text-sm font-medium'>
-                  Best Performer
-                </p>
-                <p className='text-lg font-bold'>
-                  {bestPerformer.symbol}
-                </p>
-                <p className='text-xs mt-1'>
-                  {bestPerformer.companyName}
-                </p>
+                <p className='text-sm font-medium'>Best Performer</p>
+                <p className='text-lg font-bold'>{bestPerformer.symbol}</p>
+                <p className='text-xs mt-1'>{bestPerformer.companyName}</p>
               </div>
             </div>
             <div className='text-right'>
@@ -78,15 +70,9 @@ export default function PortfolioInsights() {
                   <TrendingDown className='w-5 h-5' />
                 </div>
                 <div>
-                  <p className='text-sm font-medium'>
-                    Needs Attention
-                  </p>
-                  <p className='text-lg font-bold'>
-                    {worstPerformer.symbol}
-                  </p>
-                  <p className='text-xs mt-1'>
-                    {worstPerformer.companyName}
-                  </p>
+                  <p className='text-sm font-medium'>Needs Attention</p>
+                  <p className='text-lg font-bold'>{worstPerformer.symbol}</p>
+                  <p className='text-xs mt-1'>{worstPerformer.companyName}</p>
                 </div>
               </div>
               <div className='text-right'>
@@ -109,9 +95,7 @@ export default function PortfolioInsights() {
           <div className='border rounded-lg p-4'>
             <div className='flex items-center gap-2 mb-2'>
               <Target className='w-4 h-4' />
-              <p className='text-xs font-medium uppercase'>
-                Avg Return
-              </p>
+              <p className='text-xs font-medium uppercase'>Avg Return</p>
             </div>
             <p className='text-2xl font-bold'>
               {avgGainLoss >= 0 ? "+" : ""}
@@ -122,9 +106,7 @@ export default function PortfolioInsights() {
           <div className='border rounded-lg p-4'>
             <div className='flex items-center gap-2 mb-2'>
               <Award className='w-4 h-4' />
-              <p className='text-xs font-medium uppercase'>
-                Win Rate
-              </p>
+              <p className='text-xs font-medium uppercase'>Win Rate</p>
             </div>
             <p className='text-2xl font-bold'>
               {profitablePercentage.toFixed(0)}%

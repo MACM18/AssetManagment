@@ -98,24 +98,17 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
           );
 
           return (
-            <div
-              key={holding.id}
-              className='p-6 transition-colors'
-            >
+            <div key={holding.id} className='p-6 transition-colors'>
               <div className='flex justify-between items-start mb-3'>
                 <div className='flex-1'>
                   <div className='flex items-center gap-2'>
-                    <h3 className='text-lg font-bold'>
-                      {holding.symbol}
-                    </h3>
+                    <h3 className='text-lg font-bold'>{holding.symbol}</h3>
                     <span className='px-2 py-1 rounded text-xs font-medium border'>
                       {isGain ? "+" : ""}
                       {holding.gainLossPercent.toFixed(2)}%
                     </span>
                   </div>
-                  <p className='text-sm mt-1'>
-                    {holding.companyName}
-                  </p>
+                  <p className='text-sm mt-1'>{holding.companyName}</p>
                 </div>
 
                 <div className='flex items-center gap-2'>
