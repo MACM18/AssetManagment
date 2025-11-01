@@ -153,7 +153,7 @@ export default function MarketOverview({
                 const st = stock.shareType ?? "N";
                 return (
                   <div
-                    key={stock.symbol}
+                    key={`${stock.symbol}-${st}`}
                     className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
@@ -219,7 +219,7 @@ export default function MarketOverview({
                 const st = stock.shareType ?? "N";
                 return (
                   <div
-                    key={stock.symbol}
+                    key={`${stock.symbol}-${st}`}
                     className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
@@ -285,7 +285,7 @@ export default function MarketOverview({
                 const st = stock.shareType ?? "N";
                 return (
                   <div
-                    key={stock.symbol}
+                    key={`${stock.symbol}-${st}`}
                     className='flex justify-between items-center p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors animate-slide-up'
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
