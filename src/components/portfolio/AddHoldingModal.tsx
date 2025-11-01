@@ -114,7 +114,10 @@ export default function AddHoldingModal({
     >
       <div className='relative w-full max-w-lg mx-auto my-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-lg'>
         <div className='sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700/50 px-6 py-4 flex justify-between items-center rounded-t-2xl'>
-          <h2 id='add-holding-title' className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
+          <h2
+            id='add-holding-title'
+            className='text-2xl font-bold text-gray-900 dark:text-gray-100'
+          >
             Add Stock Holding
           </h2>
           <button
@@ -250,11 +253,15 @@ export default function AddHoldingModal({
               </p>
               <div className='space-y-1 text-sm'>
                 <div className='flex justify-between'>
-                  <span className='text-gray-600 dark:text-gray-400'>Total Shares:</span>
+                  <span className='text-gray-600 dark:text-gray-400'>
+                    Total Shares:
+                  </span>
                   <span className='font-medium'>{quantity}</span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-gray-600 dark:text-gray-400'>Price per Share:</span>
+                  <span className='text-gray-600 dark:text-gray-400'>
+                    Price per Share:
+                  </span>
                   <span className='font-medium'>
                     LKR {sanitizeNumber(purchasePrice).toFixed(2)}
                   </span>
@@ -265,7 +272,9 @@ export default function AddHoldingModal({
                   </span>
                   <span className='font-bold text-blue-700'>
                     LKR{" "}
-                    {(sanitizeNumber(quantity) * sanitizeNumber(purchasePrice)).toFixed(2)}
+                    {(
+                      sanitizeNumber(quantity) * sanitizeNumber(purchasePrice)
+                    ).toFixed(2)}
                   </span>
                 </div>
               </div>

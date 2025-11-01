@@ -46,7 +46,10 @@ export async function addHolding(
   const transactionsCol = collection(db, "portfolios", userId, "transactions");
   const newTransactionRef = doc(transactionsCol);
 
-  type HoldingWrite = Omit<PortfolioHolding, "id" | "createdAt" | "updatedAt"> & {
+  type HoldingWrite = Omit<
+    PortfolioHolding,
+    "id" | "createdAt" | "updatedAt"
+  > & {
     createdAt: unknown;
     updatedAt: unknown;
   };
