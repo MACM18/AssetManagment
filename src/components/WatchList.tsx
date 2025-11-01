@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { StockQuote } from "@/types";
+import { StockQuote, SelectedStockKey, ShareTypeCode } from "@/types";
 import {
   Star,
   TrendingUp,
@@ -11,7 +11,6 @@ import {
   AlertCircle,
   Heart,
 } from "lucide-react";
-import { CSE_SYMBOLS } from "@/lib/stockData";
 import { getLastDataSource } from "@/lib/tradingData";
 import { useAuth } from "@/contexts/AuthContext";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
@@ -19,14 +18,14 @@ import { db, FIREBASE_AVAILABLE } from "@/lib/firebase";
 
 interface WatchListProps {
   stocks: StockQuote[];
-  onSelectStock: (symbol: string) => void;
-  selectedSymbol?: string;
+  onSelectStock: (symbol: string, shareType?: ShareTypeCode) => void;
+  selected?: SelectedStockKey;
 }
 
 export default function WatchList({
   stocks,
   onSelectStock,
-  selectedSymbol,
+  selected,
 }: WatchListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [watchlist, setWatchlist] = useState<string[]>([]);
@@ -194,11 +193,6 @@ export default function WatchList({
               label: "Zero Board (Z)",
               count: stocks.filter((s) => (s.shareType ?? "N") === "Z").length,
             },
-            {
-              value: "V",
-              label: "Voting (V)",
-              count: stocks.filter((s) => (s.shareType ?? "N") === "V").length,
-            },
           ].map((filter) => (
             <button
               key={filter.value}
@@ -240,14 +234,17 @@ export default function WatchList({
         ) : (
           filteredStocks.map((stock) => {
             const isPositive = (stock.changePercent || 0) >= 0;
-            const isSelected = stock.symbol === selectedSymbol;
+            const isSelected = selected
+              ? stock.symbol === selected.symbol &&
+                (stock.shareType ?? "N") === (selected.shareType ?? "N")
+              : false;
             const isInWatchlist = watchlist.includes(stock.symbol);
             const st = stock.shareType ?? "N";
 
             return (
               <div
-                key={stock.symbol}
-                onClick={() => onSelectStock(stock.symbol)}
+                key={`${stock.symbol}-${st}`}
+                onClick={() => onSelectStock(stock.symbol, st as ShareTypeCode)}
                 className={`p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer animate-slide-up ${
                   isSelected
                     ? "border-primary bg-primary/5 shadow-md"

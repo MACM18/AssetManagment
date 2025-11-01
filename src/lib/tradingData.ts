@@ -69,24 +69,43 @@ export async function fetchLatestStockPrices(): Promise<StockQuote[]> {
 
           // Convert stocks array to StockQuote format
           const stocks: StockQuote[] = stocksArray.map(
-            (stock: FirestoreStockData) => ({
-              id: `${stock.symbol}_${data.date}`,
-              symbol: stock.normalizedSymbol || stock.symbol || "",
-              companyName: stock.companyName || stock.symbol || "",
-              date: stock.date || data.date || "",
-              price: stock.price || 0,
-              change: stock.change || 0,
-              changePercent: stock.changePercent || 0,
-              volume: stock.volume || 0,
-              high: stock.high || stock.price || 0,
-              low: stock.low || stock.price || 0,
-              open: stock.open || stock.price || 0,
-              close: stock.close || stock.price || 0,
-              timestamp:
-                typeof data.updatedAt === "object" && data.updatedAt?.toDate
-                  ? data.updatedAt.toDate().toISOString()
-                  : new Date().toISOString(),
-            })
+            (stock: FirestoreStockData) => {
+              // Extract shareType from symbol if not present (e.g., 'JKH.N0000' -> 'N')
+              let shareType = stock.shareType;
+              if (!shareType) {
+                const shareTypeMatch = String(stock.symbol).match(
+                  /\.([NXPZV])\d*$/i
+                );
+                shareType = shareTypeMatch
+                  ? (shareTypeMatch[1].toUpperCase() as
+                      | "N"
+                      | "X"
+                      | "P"
+                      | "Z"
+                      | "V")
+                  : "N";
+              }
+              return {
+                id: `${stock.symbol}_${data.date}`,
+                symbol: stock.normalizedSymbol || stock.symbol || "",
+                companyName: stock.companyName || stock.symbol || "",
+                date: stock.date || data.date || "",
+                price: stock.price || 0,
+                change: stock.change || 0,
+                changePercent: stock.changePercent || 0,
+                volume: stock.volume || 0,
+                high: stock.high || stock.price || 0,
+                low: stock.low || stock.price || 0,
+                open: stock.open || stock.price || 0,
+                close: stock.close || stock.price || 0,
+                timestamp:
+                  typeof data.updatedAt === "object" && data.updatedAt?.toDate
+                    ? data.updatedAt.toDate().toISOString()
+                    : new Date().toISOString(),
+                prevClose: stock.close || stock.price || 0,
+                shareType: shareType,
+              };
+            }
           );
 
           lastDataSource = "firestore";
@@ -126,7 +145,8 @@ export async function fetchLatestStockPrices(): Promise<StockQuote[]> {
  */
 export async function fetchStockHistory(
   symbol: string,
-  daysBack: number = 30
+  daysBack: number = 30,
+  shareType?: "N" | "X" | "P" | "Z" | "V"
 ): Promise<ChartDataPoint[]> {
   try {
     console.debug(
@@ -135,7 +155,9 @@ export async function fetchStockHistory(
       "symbol=",
       symbol,
       "daysBack=",
-      daysBack
+      daysBack,
+      "shareType=",
+      shareType ?? "N"
     );
     if (!FIREBASE_AVAILABLE) {
       console.warn(
@@ -161,7 +183,7 @@ export async function fetchStockHistory(
 
     const chartData: ChartDataPoint[] = [];
 
-    // Iterate through each date document and find the specific stock
+    // Iterate through each date document and find the specific stock (matching symbol and shareType when provided)
     querySnapshot.docs.forEach((doc) => {
       const data = doc.data() as FirestoreStockPricesByDate;
       const stocksArray = data.stocks || [];
@@ -174,11 +196,16 @@ export async function fetchStockHistory(
         stocksArray.length
       );
 
-      // Find the stock with matching symbol (check both normalizedSymbol and symbol)
-      const stockData = stocksArray.find(
-        (s: FirestoreStockData) =>
-          s.normalizedSymbol === symbol || s.symbol === symbol
-      );
+      // Find the stock with matching symbol (check both normalizedSymbol and symbol) AND matching shareType if provided
+      const stockData = stocksArray.find((s: FirestoreStockData) => {
+        const symbolMatch =
+          s.normalizedSymbol === symbol || s.symbol === symbol;
+        if (!symbolMatch) return false;
+        // If shareType is provided, require equality (default to 'N' for comparison)
+        const targetST = (shareType ?? "N").toUpperCase();
+        const thisST = (s.shareType ?? "N").toUpperCase();
+        return thisST === targetST;
+      });
 
       if (stockData) {
         console.debug(

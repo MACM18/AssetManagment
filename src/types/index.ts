@@ -20,7 +20,11 @@ export interface StockData {
   low?: number;
   open?: number;
   close?: number;
+  change?: number;
+  changePercent?: number;
+  shareType?: "N" | "X" | "P" | "Z"; // N=Normal, X=Exclusive, P=Preferred, Z=Zero Board Lot
 }
+export type ShareTypeCode = "N" | "X" | "P" | "Z";
 
 export interface CSEStockData {
   symbol: string;
@@ -35,7 +39,7 @@ export interface CSEStockData {
   low?: number;
   open?: number;
   close?: number;
-  shareType?: "N" | "X" | "P" | "Z" | "V"; // N=Normal, X=Exclusive, P=Preferred, Z=Zero Board Lot, V=Voting
+  shareType?: "N" | "X" | "P" | "Z"; // N=Normal, X=Exclusive, P=Preferred, Z=Zero Board Lot
 }
 
 export interface MonthlyReport {
@@ -103,6 +107,13 @@ export interface FirestoreStockData {
   change: number | null;
   changePercent: number | null;
   volume: number | null;
+  shareType?: "N" | "X" | "P" | "Z";
+}
+
+// UI selection key for a stock variant (symbol + shareType)
+export interface SelectedStockKey {
+  symbol: string;
+  shareType?: ShareTypeCode; // defaults to 'N' in UI if missing
 }
 
 // Firebase Timestamp type (can be Firestore Timestamp or ISO string)

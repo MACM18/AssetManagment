@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { StockQuote, ChartDataPoint, MarketSummary } from "@/types";
+import {
+  StockQuote,
+  ChartDataPoint,
+  MarketSummary,
+  SelectedStockKey,
+} from "@/types";
 import MarketOverview from "@/components/MarketOverview";
 import StockChart from "@/components/StockChart";
 import WatchList from "@/components/WatchList";
@@ -21,7 +26,7 @@ import { signInAnonymously } from "firebase/auth";
 
 export default function Home() {
   const [stocks, setStocks] = useState<StockQuote[]>([]);
-  const [selectedSymbol, setSelectedSymbol] = useState<string>("");
+  const [selected, setSelected] = useState<SelectedStockKey | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [marketSummary, setMarketSummary] = useState<MarketSummary>({
     totalVolume: 0,
@@ -44,8 +49,11 @@ export default function Home() {
         setLastUpdate(new Date());
 
         // Set default selected symbol if not set
-        if (!selectedSymbol && stockData.length > 0) {
-          setSelectedSymbol(stockData[0].symbol);
+        if (!selected && stockData.length > 0) {
+          setSelected({
+            symbol: stockData[0].symbol,
+            shareType: stockData[0].shareType ?? "N",
+          });
         }
       } else {
         console.warn("No stock data available");
@@ -57,15 +65,21 @@ export default function Home() {
     }
   };
 
-  const loadStockChart = async (symbol: string) => {
+  const loadStockChart = async (
+    symbol: string,
+    shareType?: "N" | "X" | "P" | "Z" | "V"
+  ) => {
     try {
-      const history = await fetchStockHistory(symbol, 90);
+      const history = await fetchStockHistory(symbol, 90, shareType);
 
       if (history.length > 0) {
         setChartData(history);
       } else {
         // Fallback to mock data if no historical data
-        const selectedStock = stocks.find((s) => s.symbol === symbol);
+        const stKey = (shareType ?? "N").toUpperCase();
+        const selectedStock = stocks.find(
+          (s) => s.symbol === symbol && (s.shareType ?? "N") === stKey
+        );
         if (selectedStock) {
           const mockData = generateMockChartData(selectedStock.price, 90);
           setChartData(mockData);
@@ -114,11 +128,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (selectedSymbol) {
-      loadStockChart(selectedSymbol);
+    if (selected?.symbol) {
+      loadStockChart(selected.symbol, selected.shareType ?? "N");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSymbol]);
+  }, [selected?.symbol, selected?.shareType]);
 
   const handleRefresh = () => {
     setLoading(true);
@@ -138,7 +152,13 @@ export default function Home() {
     );
   }
 
-  const selectedStock = stocks.find((s) => s.symbol === selectedSymbol);
+  const selectedStock = selected
+    ? stocks.find(
+        (s) =>
+          s.symbol === selected.symbol &&
+          (s.shareType ?? "N") === (selected.shareType ?? "N")
+      )
+    : undefined;
 
   return (
     <main className='min-h-screen bg-background'>
@@ -201,8 +221,10 @@ export default function Home() {
           <div className='lg:col-span-1'>
             <WatchList
               stocks={stocks}
-              onSelectStock={setSelectedSymbol}
-              selectedSymbol={selectedSymbol}
+              onSelectStock={(symbol, shareType) =>
+                setSelected({ symbol, shareType: shareType ?? "N" })
+              }
+              selected={selected ?? undefined}
             />
           </div>
 
