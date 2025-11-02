@@ -23,8 +23,10 @@ import { FIREBASE_AVAILABLE } from "@/lib/firebase";
 import { RefreshCw } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInAnonymously } from "firebase/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
+  const { user, loading: authLoading } = useAuth();
   const [stocks, setStocks] = useState<StockQuote[]>([]);
   const [selected, setSelected] = useState<SelectedStockKey | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
@@ -92,41 +94,39 @@ export default function Home() {
 
   useEffect(() => {
     let cancelled = false;
+    let interval: NodeJS.Timeout | undefined;
+
     const init = async () => {
-      // Attempt anonymous auth so Firestore rules that require auth can pass
-      // Only sign in anonymously if not already authenticated
-      if (FIREBASE_AVAILABLE && !auth.currentUser) {
-        try {
-          const cred = await signInAnonymously(auth);
-          console.debug("Anonymous sign-in success:", cred.user?.uid);
-        } catch (e) {
-          console.warn("Anonymous sign-in failed:", e);
+      // Wait for auth to initialize before attempting anonymous sign-in
+      if (!authLoading && FIREBASE_AVAILABLE) {
+        // Only attempt anonymous auth if there's definitively no user
+        if (!auth.currentUser && !user) {
+          try {
+            const cred = await signInAnonymously(auth);
+            console.debug("Anonymous sign-in success:", cred.user?.uid);
+          } catch (e) {
+            console.warn("Anonymous sign-in failed:", e);
+          }
+        }
+
+        if (!cancelled) {
+          await loadMarketData();
+          // Refresh data every 5 minutes
+          interval = setInterval(() => {
+            loadMarketData();
+          }, 5 * 60 * 1000);
         }
       }
-
-      if (!cancelled) {
-        await loadMarketData();
-        // Refresh data every 5 minutes
-        const interval = setInterval(() => {
-          loadMarketData();
-        }, 5 * 60 * 1000);
-        return () => clearInterval(interval);
-      }
-      return () => {};
     };
 
-    let intervalCleanup: (() => void) | undefined;
-    init().then((ret) => {
-      // If the async init returned a cleanup, capture it
-      if (typeof ret === "function") intervalCleanup = ret;
-    });
+    init();
 
     return () => {
       cancelled = true;
-      if (intervalCleanup) intervalCleanup();
+      if (interval) clearInterval(interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authLoading, user]);
 
   useEffect(() => {
     if (selected?.symbol) {
