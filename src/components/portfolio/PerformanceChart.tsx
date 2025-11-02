@@ -125,15 +125,20 @@ export default function PerformanceChart() {
               })}`
             }
             contentStyle={{
-              backgroundColor: chartColors.card,
-              border: `1px solid ${chartColors.grid}`,
+              backgroundColor: actualTheme === "dark" ? "#1f2937" : "#ffffff",
+              border: `1px solid ${
+                actualTheme === "dark" ? "#374151" : "#e5e7eb"
+              }`,
               borderRadius: "8px",
-              color: chartColors.text,
+              color: actualTheme === "dark" ? "#f9fafb" : "#111827",
               boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
             }}
             labelStyle={{
-              color: chartColors.text,
+              color: actualTheme === "dark" ? "#f9fafb" : "#111827",
               fontWeight: 600,
+            }}
+            itemStyle={{
+              color: actualTheme === "dark" ? "#e5e7eb" : "#374151",
             }}
           />
           <Bar dataKey='gainLoss' radius={[6, 6, 0, 0]} maxBarSize={60}>

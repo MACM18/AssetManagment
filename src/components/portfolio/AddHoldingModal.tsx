@@ -112,17 +112,28 @@ export default function AddHoldingModal({
 
   return (
     <div
-      className='fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto'
+      className='fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-4 overflow-y-auto'
       role='dialog'
       aria-modal='true'
       aria-labelledby='add-holding-title'
+      onClick={onClose}
     >
-      <div className='relative w-full max-w-lg mx-auto my-8 rounded-2xl shadow-2xl border backdrop-blur-lg'>
-        <div className='sticky top-0 backdrop-blur-lg border-b px-6 py-4 flex justify-between items-center rounded-t-2xl'>
-          <h2 id='add-holding-title' className='text-2xl font-bold'>
+      <div
+        className='relative w-full max-w-lg mx-auto my-8 rounded-2xl shadow-2xl border border-border bg-card'
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className='sticky top-0 bg-card/95 backdrop-blur-lg border-b border-border px-6 py-4 flex justify-between items-center rounded-t-2xl'>
+          <h2
+            id='add-holding-title'
+            className='text-2xl font-bold text-foreground'
+          >
             {holding ? "Edit Stock Holding" : "Add Stock Holding"}
           </h2>
-          <button onClick={onClose} className='transition-colors'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='transition-colors hover:bg-secondary rounded-lg p-1 text-muted-foreground hover:text-foreground'
+          >
             <X className='w-6 h-6' />
           </button>
         </div>
@@ -269,14 +280,14 @@ export default function AddHoldingModal({
             <button
               type='button'
               onClick={onClose}
-              className='flex-1 px-4 py-2 border rounded-lg font-medium'
+              className='flex-1 px-4 py-2 border border-border bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground rounded-lg font-medium transition-colors'
             >
               Cancel
             </button>
             <button
               type='submit'
               disabled={loading}
-              className='flex-1 px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2'
+              className='flex-1 px-4 py-2 bg-primary text-primary-foreground hover:opacity-90 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all'
             >
               {loading && (
                 <span className='inline-block h-4 w-4 border-2 border-t-transparent rounded-full animate-spin' />

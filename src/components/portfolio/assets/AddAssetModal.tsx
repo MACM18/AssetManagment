@@ -1266,18 +1266,29 @@ export default function AddAssetModal({
 
   return (
     <div
-      className='fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4'
+      className='fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-2 sm:p-4'
       role='dialog'
       aria-modal='true'
       aria-labelledby='add-asset-title'
+      onClick={onClose}
     >
-      <div className='relative w-full max-w-2xl mx-auto my-4 sm:my-8 rounded-2xl shadow-2xl border backdrop-blur-lg max-h-[95vh] sm:max-h-[90vh] flex flex-col'>
+      <div
+        className='relative w-full max-w-2xl mx-auto my-4 sm:my-8 rounded-2xl shadow-2xl border border-border bg-card max-h-[95vh] sm:max-h-[90vh] flex flex-col'
+        onClick={(e) => e.stopPropagation()}
+      >
         <form onSubmit={handleSubmit} className='flex-1 overflow-y-auto'>
-          <div className='sticky top-0 backdrop-blur-lg border-b px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-2xl z-10'>
-            <h2 id='add-asset-title' className='text-lg sm:text-2xl font-bold'>
+          <div className='sticky top-0 bg-card/95 backdrop-blur-lg border-b border-border px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-2xl z-10'>
+            <h2
+              id='add-asset-title'
+              className='text-lg sm:text-2xl font-bold text-foreground'
+            >
               {asset ? "Edit Portfolio Asset" : "Add Portfolio Asset"}
             </h2>
-            <button onClick={onClose} className='transition-colors p-1'>
+            <button
+              type='button'
+              onClick={onClose}
+              className='transition-colors p-1 hover:bg-secondary rounded-lg text-muted-foreground hover:text-foreground'
+            >
               <X className='w-5 h-5 sm:w-6 sm:h-6' />
             </button>
           </div>
@@ -1358,19 +1369,19 @@ export default function AddAssetModal({
             </div>
           </div>
 
-          <div className='sticky bottom-0 backdrop-blur-lg border-t px-4 sm:px-6 py-3 sm:py-4 rounded-b-2xl'>
-            <div className='flex gap-3 backdrop-blur-lg'>
+          <div className='sticky bottom-0 bg-card/95 backdrop-blur-lg border-t border-border px-4 sm:px-6 py-3 sm:py-4 rounded-b-2xl'>
+            <div className='flex gap-3'>
               <button
                 type='button'
                 onClick={onClose}
-                className='flex-1 px-4 py-2 border rounded-lg font-medium'
+                className='flex-1 px-4 py-2 border border-border bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground rounded-lg font-medium transition-colors'
               >
                 Cancel
               </button>
               <button
                 type='submit'
                 disabled={loading}
-                className='flex-1 px-4 py-2 border rounded-lg font-semibold disabled:opacity-50'
+                className='flex-1 px-4 py-2 bg-primary text-primary-foreground hover:opacity-90 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md'
               >
                 {loading
                   ? asset
