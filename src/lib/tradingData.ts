@@ -223,6 +223,8 @@ export async function fetchStockHistory(
           low: stockData.low || stockData.price || 0,
           close: stockData.close || stockData.price || 0,
           volume: stockData.volume || 0,
+          label: data.date || "",
+          value: stockData.close || stockData.price || 0,
         });
       }
     });
@@ -290,6 +292,8 @@ export function generateMockChartData(
       low,
       close,
       volume: Math.floor(Math.random() * 50000) + 10000,
+      label: dateStr,
+      value: close,
     });
   }
 

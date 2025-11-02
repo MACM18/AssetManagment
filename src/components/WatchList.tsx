@@ -45,34 +45,34 @@ export default function WatchList({
   );
   const isMockData = dataSource === "mock" || stocks.length === 0;
 
-  // Load user's watchlist from Firestore
-  const loadUserWatchlist = async () => {
-    if (!user || !FIREBASE_AVAILABLE) return;
+  useEffect(() => {
+    const loadUserWatchlist = async () => {
+      if (!user || !FIREBASE_AVAILABLE) return;
 
-    try {
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
 
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setWatchlist(userData.watchlist || []);
-      } else {
-        // Initialize empty watchlist for new users
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setWatchlist(userData.watchlist || []);
+        } else {
+          // Initialize empty watchlist for new users
+          setWatchlist([]);
+        }
+      } catch (error) {
+        console.error("Error loading watchlist:", error);
         setWatchlist([]);
       }
-    } catch (error) {
-      console.error("Error loading watchlist:", error);
-      setWatchlist([]);
-    }
-  };
-  useEffect(() => {
+    };
+
     if (isAuthenticated && user && FIREBASE_AVAILABLE) {
       loadUserWatchlist();
     } else {
       // For non-authenticated users, show empty watchlist
       setWatchlist([]);
     }
-  }, [isAuthenticated, user, loadUserWatchlist]);
+  }, [isAuthenticated, user]);
 
   const saveUserWatchlist = async (newWatchlist: string[]) => {
     if (!user || !FIREBASE_AVAILABLE) return;

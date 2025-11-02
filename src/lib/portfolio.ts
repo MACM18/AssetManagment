@@ -26,6 +26,7 @@ import {
   AssetWithMetrics,
   AssetsSummary,
   AssetType,
+  SectorAllocation,
 } from "@/types";
 
 /**
@@ -64,6 +65,11 @@ export async function addHolding(
     updatedAt: serverTimestamp(),
   };
 
+  // Filter out undefined values to avoid Firestore errors
+  const cleanHoldingPayload = Object.fromEntries(
+    Object.entries(holdingPayload).filter(([, value]) => value !== undefined)
+  );
+
   type TransactionWrite = Omit<Transaction, "id" | "createdAt"> & {
     createdAt: unknown;
   };
@@ -80,8 +86,15 @@ export async function addHolding(
     createdAt: serverTimestamp(),
   };
 
-  batch.set(newHoldingRef, holdingPayload);
-  batch.set(newTransactionRef, transactionPayload);
+  // Filter out undefined values
+  const cleanTransactionPayload = Object.fromEntries(
+    Object.entries(transactionPayload).filter(
+      ([, value]) => value !== undefined
+    )
+  );
+
+  batch.set(newHoldingRef, cleanHoldingPayload);
+  batch.set(newTransactionRef, cleanTransactionPayload);
 
   await batch.commit();
 
@@ -101,8 +114,11 @@ export async function updateHolding(
   }
 
   const holdingRef = doc(db, "portfolios", userId, "holdings", holdingId);
+  const cleanUpdates = Object.fromEntries(
+    Object.entries(updates).filter(([, value]) => value !== undefined)
+  );
   await updateDoc(holdingRef, {
-    ...updates,
+    ...cleanUpdates,
     updatedAt: serverTimestamp(),
   });
 }
@@ -198,8 +214,11 @@ export async function addTransaction(
   }
 
   const transactionsRef = collection(db, "portfolios", userId, "transactions");
+  const cleanTransaction = Object.fromEntries(
+    Object.entries(transaction).filter(([, value]) => value !== undefined)
+  );
   const docRef = await addDoc(transactionsRef, {
-    ...transaction,
+    ...cleanTransaction,
     userId,
     createdAt: serverTimestamp(),
   });
@@ -302,6 +321,22 @@ export async function calculatePortfolioSummary(
         gainLoss,
         gainLossPercent,
         invested,
+        isPositive: gainLoss >= 0,
+        formattedGainLoss: new Intl.NumberFormat("en-LK", {
+          style: "currency",
+          currency: "LKR",
+          minimumFractionDigits: 2,
+        }).format(Math.abs(gainLoss)),
+        formattedCurrentValue: new Intl.NumberFormat("en-LK", {
+          style: "currency",
+          currency: "LKR",
+          minimumFractionDigits: 2,
+        }).format(current),
+        formattedInvested: new Intl.NumberFormat("en-LK", {
+          style: "currency",
+          currency: "LKR",
+          minimumFractionDigits: 2,
+        }).format(invested),
       };
     }
   );
@@ -310,12 +345,43 @@ export async function calculatePortfolioSummary(
   const totalGainLossPercent =
     totalInvested > 0 ? (totalGainLoss / totalInvested) * 100 : 0;
 
+  // Sort for top/worst performers
+  const sortedByGain = [...holdingsWithMetrics].sort(
+    (a, b) => b.gainLossPercent - a.gainLossPercent
+  );
+  const topPerformers = sortedByGain.slice(0, 5);
+  const worstPerformers = sortedByGain.slice(-5).reverse();
+
+  // Calculate sector allocation
+  const sectorMap = new Map<string, { value: number; holdings: number }>();
+  holdingsWithMetrics.forEach((holding) => {
+    const sector = holding.sector || "Unknown";
+    const existing = sectorMap.get(sector) || { value: 0, holdings: 0 };
+    sectorMap.set(sector, {
+      value: existing.value + holding.currentValue,
+      holdings: existing.holdings + 1,
+    });
+  });
+
+  const sectorAllocation: SectorAllocation[] = Array.from(sectorMap.entries())
+    .map(([sector, data]) => ({
+      sector,
+      value: data.value,
+      percentage: totalInvested > 0 ? (data.value / totalInvested) * 100 : 0,
+      holdings: data.holdings,
+    }))
+    .sort((a, b) => b.value - a.value);
+
   return {
     totalInvested,
     currentValue,
     totalGainLoss,
     totalGainLossPercent,
     holdings: holdingsWithMetrics,
+    topPerformers,
+    worstPerformers,
+    sectorAllocation,
+    lastUpdated: new Date().toISOString(),
   };
 }
 
@@ -366,14 +432,16 @@ export async function addAsset(
   }
   const assetsCol = collection(db, "portfolios", userId, "assets");
   const docRef = doc(assetsCol);
-  await writeBatch(db)
-    .set(docRef, {
-      ...asset,
-      userId,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    })
-    .commit();
+  const assetPayload = {
+    ...asset,
+    userId,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+  const cleanPayload = Object.fromEntries(
+    Object.entries(assetPayload).filter(([, value]) => value !== undefined)
+  );
+  await writeBatch(db).set(docRef, cleanPayload).commit();
   return docRef.id;
 }
 
@@ -385,7 +453,10 @@ export async function updateAsset(
 ): Promise<void> {
   if (!FIREBASE_AVAILABLE) throw new Error("Firebase is not initialized");
   const ref = doc(db, "portfolios", userId, "assets", assetId);
-  await updateDoc(ref, { ...updates, updatedAt: serverTimestamp() });
+  const cleanUpdates = Object.fromEntries(
+    Object.entries(updates).filter(([, value]) => value !== undefined)
+  );
+  await updateDoc(ref, { ...cleanUpdates, updatedAt: serverTimestamp() });
 }
 
 /** Delete an asset */
@@ -448,13 +519,30 @@ export function computeAssetMetrics(
   asset: PortfolioAsset,
   asOfISO = new Date().toISOString()
 ): AssetWithMetrics {
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+      minimumFractionDigits: 2,
+    }).format(value);
+
   switch (asset.type) {
     case "fixed-asset": {
       const invested = asset.purchasePrice;
       const currentValue = asset.currentValue ?? invested;
       const gainLoss = currentValue - invested;
       const gainLossPercent = invested > 0 ? (gainLoss / invested) * 100 : 0;
-      return { ...asset, invested, currentValue, gainLoss, gainLossPercent };
+      return {
+        ...asset,
+        invested,
+        currentValue,
+        gainLoss,
+        gainLossPercent,
+        isPositive: gainLoss >= 0,
+        formattedGainLoss: formatCurrency(Math.abs(gainLoss)),
+        formattedCurrentValue: formatCurrency(currentValue),
+        formattedInvested: formatCurrency(invested),
+      };
     }
     case "fixed-deposit": {
       const p = asset.principal;
@@ -482,11 +570,43 @@ export function computeAssetMetrics(
       const invested = p;
       const gainLoss = currentValue - invested;
       const gainLossPercent = invested > 0 ? (gainLoss / invested) * 100 : 0;
-      return { ...asset, invested, currentValue, gainLoss, gainLossPercent };
+
+      // Calculate days to maturity
+      const daysToMaturity = asset.maturityDate
+        ? Math.max(
+            0,
+            Math.ceil(
+              (new Date(asset.maturityDate).getTime() -
+                new Date(asOfISO).getTime()) /
+                (1000 * 60 * 60 * 24)
+            )
+          )
+        : undefined;
+
+      const isMatured = daysToMaturity === 0;
+
+      return {
+        ...asset,
+        invested,
+        currentValue,
+        gainLoss,
+        gainLossPercent,
+        isPositive: gainLoss >= 0,
+        formattedGainLoss: formatCurrency(Math.abs(gainLoss)),
+        formattedCurrentValue: formatCurrency(currentValue),
+        formattedInvested: formatCurrency(invested),
+        status: isMatured ? "matured" : "active",
+        daysToMaturity,
+      };
     }
     case "savings": {
       const currentValue = asset.balance;
-      return { ...asset, currentValue };
+      return {
+        ...asset,
+        currentValue,
+        formattedCurrentValue: formatCurrency(currentValue),
+        status: "active",
+      };
     }
     case "mutual-fund": {
       const invested =
@@ -501,7 +621,20 @@ export function computeAssetMetrics(
         invested && invested > 0 && gainLoss !== undefined
           ? (gainLoss / invested) * 100
           : undefined;
-      return { ...asset, invested, currentValue, gainLoss, gainLossPercent };
+      return {
+        ...asset,
+        invested,
+        currentValue,
+        gainLoss,
+        gainLossPercent,
+        isPositive: gainLoss ? gainLoss >= 0 : undefined,
+        formattedGainLoss: gainLoss
+          ? formatCurrency(Math.abs(gainLoss))
+          : undefined,
+        formattedCurrentValue: formatCurrency(currentValue),
+        formattedInvested: invested ? formatCurrency(invested) : undefined,
+        status: "active",
+      };
     }
     case "treasury-bond": {
       const price = asset.currentMarketPrice ?? asset.faceValue;
@@ -511,13 +644,41 @@ export function computeAssetMetrics(
         : asset.faceValue * (asset.units || 0);
       const gainLoss = currentValue - invested;
       const gainLossPercent = invested > 0 ? (gainLoss / invested) * 100 : 0;
-      return { ...asset, invested, currentValue, gainLoss, gainLossPercent };
+
+      // Calculate days to maturity
+      const daysToMaturity = asset.maturityDate
+        ? Math.max(
+            0,
+            Math.ceil(
+              (new Date(asset.maturityDate).getTime() -
+                new Date(asOfISO).getTime()) /
+                (1000 * 60 * 60 * 24)
+            )
+          )
+        : undefined;
+
+      const isMatured = daysToMaturity === 0;
+
+      return {
+        ...asset,
+        invested,
+        currentValue,
+        gainLoss,
+        gainLossPercent,
+        isPositive: gainLoss >= 0,
+        formattedGainLoss: formatCurrency(Math.abs(gainLoss)),
+        formattedCurrentValue: formatCurrency(currentValue),
+        formattedInvested: formatCurrency(invested),
+        status: isMatured ? "matured" : "active",
+        daysToMaturity,
+      };
     }
     default: {
       const neverType: never = asset as never;
       return {
         ...(neverType as unknown as PortfolioAsset),
         currentValue: 0,
+        formattedCurrentValue: formatCurrency(0),
       } as AssetWithMetrics;
     }
   }
@@ -544,12 +705,47 @@ export async function calculateAssetsSummary(
   const byType = Array.from(byMap.entries()).map(([type, value]) => ({
     type: type as AssetType,
     value,
+    percentage: totalCurrentValue > 0 ? (value / totalCurrentValue) * 100 : 0,
   }));
+
+  // Calculate by category
+  const categoryMap = new Map<string, number>();
+  withMetrics.forEach((a) => {
+    let category = "Other";
+    if (a.type === "fixed-asset" && a.category) {
+      category = a.category;
+    } else if (a.type === "mutual-fund" && a.category) {
+      category = a.category;
+    } else {
+      category = a.type;
+    }
+    categoryMap.set(
+      category,
+      (categoryMap.get(category) || 0) + (a.currentValue || 0)
+    );
+  });
+
+  const byCategory = Array.from(categoryMap.entries()).map(
+    ([category, value]) => ({
+      category,
+      value,
+      percentage: totalCurrentValue > 0 ? (value / totalCurrentValue) * 100 : 0,
+    })
+  );
+
+  // Find matured assets
+  const maturedAssets = withMetrics.filter((a) => a.status === "matured");
+
   return {
     totalCurrentValue,
     totalInvested,
     totalGainLoss,
+    totalGainLossPercent:
+      totalInvested > 0 ? (totalGainLoss / totalInvested) * 100 : 0,
     items: withMetrics,
     byType,
+    byCategory,
+    maturedAssets,
+    lastUpdated: new Date().toISOString(),
   };
 }

@@ -29,7 +29,9 @@ export default function AddAssetModal({
 
   const [type, setType] = useState<AssetType>("fixed-asset");
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [notes, setNotes] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -39,15 +41,18 @@ export default function AddAssetModal({
 
   // Type-specific state
   const [faCategory, setFaCategory] = useState<
-    "land" | "gold" | "property" | "vehicle" | "other"
+    "land" | "gold" | "property" | "vehicle" | "jewelry" | "art" | "other"
   >("land");
   const [faPurchaseDate, setFaPurchaseDate] = useState(today);
   const [faPurchasePrice, setFaPurchasePrice] = useState("");
   const [faCurrentValue, setFaCurrentValue] = useState("");
   const [faAppraisalDate, setFaAppraisalDate] = useState("");
   const [faDetails, setFaDetails] = useState("");
+  const [faInsuranceValue, setFaInsuranceValue] = useState("");
+  const [faDepreciationRate, setFaDepreciationRate] = useState("");
 
   const [fdBank, setFdBank] = useState("");
+  const [fdAccountNumber, setFdAccountNumber] = useState("");
   const [fdPrincipal, setFdPrincipal] = useState("");
   const [fdRate, setFdRate] = useState("");
   const [fdComp, setFdComp] = useState<
@@ -58,17 +63,34 @@ export default function AddAssetModal({
   const [fdAuto, setFdAuto] = useState(true);
 
   const [svBank, setSvBank] = useState("");
+  const [svAccountNumber, setSvAccountNumber] = useState("");
+  const [svAccountType, setSvAccountType] = useState<
+    "regular" | "high-yield" | "business" | "joint" | "other"
+  >("regular");
   const [svBalance, setSvBalance] = useState("");
   const [svRate, setSvRate] = useState("");
   const [svUpdated, setSvUpdated] = useState(today);
+  const [svMinimumBalance, setSvMinimumBalance] = useState("");
+  const [svMonthlyFee, setSvMonthlyFee] = useState("");
 
   const [mfCode, setMfCode] = useState("");
+  const [mfManager, setMfManager] = useState("");
+  const [mfCategory, setMfCategory] = useState<
+    "equity" | "debt" | "balanced" | "index" | "sectoral" | "other"
+  >("equity");
   const [mfUnits, setMfUnits] = useState("");
   const [mfBuyNav, setMfBuyNav] = useState("");
   const [mfLastNav, setMfLastNav] = useState("");
   const [mfLastNavDate, setMfLastNavDate] = useState("");
+  const [mfExpenseRatio, setMfExpenseRatio] = useState("");
+  const [mfDividendFreq, setMfDividendFreq] = useState<
+    "monthly" | "quarterly" | "annual" | "none"
+  >("annual");
 
   const [tbIssue, setTbIssue] = useState("");
+  const [tbIssuer, setTbIssuer] = useState<
+    "government" | "corporate" | "municipal"
+  >("government");
   const [tbFace, setTbFace] = useState("");
   const [tbUnits, setTbUnits] = useState("");
   const [tbCoupon, setTbCoupon] = useState("");
@@ -112,13 +134,19 @@ export default function AddAssetModal({
         > = {
           type,
           name: name.trim(),
+          description: description.trim() || undefined,
           notes: notes.trim() || undefined,
+          tags: tags.filter((t) => t.trim()),
           category: faCategory,
           purchaseDate: faPurchaseDate,
           purchasePrice: num(faPurchasePrice),
           currentValue: faCurrentValue ? num(faCurrentValue) : undefined,
           appraisalDate: faAppraisalDate || undefined,
           locationOrDetails: faDetails || undefined,
+          insuranceValue: faInsuranceValue ? num(faInsuranceValue) : undefined,
+          depreciationRate: faDepreciationRate
+            ? num(faDepreciationRate)
+            : undefined,
         };
         payload = obj;
       } else if (type === "fixed-deposit") {
@@ -133,14 +161,17 @@ export default function AddAssetModal({
         > = {
           type,
           name: name.trim(),
+          description: description.trim() || undefined,
           notes: notes.trim() || undefined,
+          tags: tags.filter((t) => t.trim()),
           bank: fdBank,
+          accountNumber: fdAccountNumber || undefined,
           principal: num(fdPrincipal),
           interestRate: num(fdRate),
           compounding: fdComp,
           startDate: fdStart,
-          autoRenewal: fdAuto,
           maturityDate: fdMaturity || "",
+          autoRenewal: fdAuto,
         };
         payload = obj;
       } else if (type === "savings") {
@@ -155,11 +186,17 @@ export default function AddAssetModal({
         > = {
           type,
           name: name.trim(),
+          description: description.trim() || undefined,
           notes: notes.trim() || undefined,
+          tags: tags.filter((t) => t.trim()),
           bank: svBank,
+          accountNumber: svAccountNumber || undefined,
+          accountType: svAccountType,
           balance: num(svBalance),
           interestRate: svRate ? num(svRate) : undefined,
           lastUpdated: svUpdated || undefined,
+          minimumBalance: svMinimumBalance ? num(svMinimumBalance) : undefined,
+          monthlyFee: svMonthlyFee ? num(svMonthlyFee) : undefined,
         };
         payload = obj;
       } else if (type === "mutual-fund") {
@@ -174,17 +211,23 @@ export default function AddAssetModal({
         > = {
           type,
           name: name.trim(),
+          description: description.trim() || undefined,
           notes: notes.trim() || undefined,
+          tags: tags.filter((t) => t.trim()),
           fundCode: mfCode || undefined,
+          fundManager: mfManager || undefined,
+          category: mfCategory,
           units: num(mfUnits),
           buyNav: mfBuyNav ? num(mfBuyNav) : undefined,
           lastNav: mfLastNav ? num(mfLastNav) : undefined,
           lastNavDate: mfLastNavDate || undefined,
+          expenseRatio: mfExpenseRatio ? num(mfExpenseRatio) : undefined,
+          dividendFrequency: mfDividendFreq,
         };
         payload = obj;
       } else if (type === "treasury-bond") {
-        if (!tbUnits || !tbFace) {
-          setError("Enter units and face value");
+        if (!tbUnits || !tbFace || !tbMaturityDate) {
+          setError("Enter units, face value and maturity date");
           setLoading(false);
           return;
         }
@@ -194,15 +237,18 @@ export default function AddAssetModal({
         > = {
           type,
           name: name.trim(),
+          description: description.trim() || undefined,
           notes: notes.trim() || undefined,
+          tags: tags.filter((t) => t.trim()),
           issueCode: tbIssue || undefined,
+          issuer: tbIssuer,
           faceValue: num(tbFace),
           units: num(tbUnits),
           couponRate: tbCoupon ? num(tbCoupon) : undefined,
           couponFrequency: tbFreq,
           purchasePrice: tbPurchasePrice ? num(tbPurchasePrice) : undefined,
           purchaseDate: tbPurchaseDate || undefined,
-          maturityDate: tbMaturityDate || undefined,
+          maturityDate: tbMaturityDate,
           currentMarketPrice: tbMarketPrice ? num(tbMarketPrice) : undefined,
         };
         payload = obj;
@@ -239,6 +285,8 @@ export default function AddAssetModal({
                 <option value='gold'>Gold</option>
                 <option value='property'>Property</option>
                 <option value='vehicle'>Vehicle</option>
+                <option value='jewelry'>Jewelry</option>
+                <option value='art'>Art</option>
                 <option value='other'>Other</option>
               </select>
             </div>
@@ -266,7 +314,7 @@ export default function AddAssetModal({
                 />
               </div>
             </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>
                   Current Value (LKR)
@@ -282,6 +330,36 @@ export default function AddAssetModal({
                 />
               </div>
               <div>
+                <label className='block text-sm mb-1'>
+                  Insurance Value (LKR)
+                </label>
+                <input
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={faInsuranceValue}
+                  onChange={(e) => setFaInsuranceValue(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>
+                  Depreciation Rate (%)
+                </label>
+                <input
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={faDepreciationRate}
+                  onChange={(e) => setFaDepreciationRate(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
                 <label className='block text-sm mb-1'>Appraisal Date</label>
                 <input
                   type='date'
@@ -291,16 +369,16 @@ export default function AddAssetModal({
                   placeholder='Optional'
                 />
               </div>
-            </div>
-            <div>
-              <label className='block text-sm mb-1'>Details</label>
-              <input
-                type='text'
-                value={faDetails}
-                onChange={(e) => setFaDetails(e.target.value)}
-                className='w-full px-3 py-2 border rounded-lg'
-                placeholder='Address / description (optional)'
-              />
+              <div>
+                <label className='block text-sm mb-1'>Details</label>
+                <input
+                  type='text'
+                  value={faDetails}
+                  onChange={(e) => setFaDetails(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Address / description (optional)'
+                />
+              </div>
             </div>
           </div>
         );
@@ -318,6 +396,18 @@ export default function AddAssetModal({
                 />
               </div>
               <div>
+                <label className='block text-sm mb-1'>Account Number</label>
+                <input
+                  type='text'
+                  value={fdAccountNumber}
+                  onChange={(e) => setFdAccountNumber(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
                 <label className='block text-sm mb-1'>Principal (LKR)</label>
                 <input
                   type='number'
@@ -328,8 +418,6 @@ export default function AddAssetModal({
                   className='w-full px-3 py-2 border rounded-lg'
                 />
               </div>
-            </div>
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>
                   Interest Rate (% p.a.)
@@ -343,6 +431,8 @@ export default function AddAssetModal({
                   className='w-full px-3 py-2 border rounded-lg'
                 />
               </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>Compounding</label>
                 <select
@@ -356,19 +446,6 @@ export default function AddAssetModal({
                   <option value='annually'>Annually</option>
                 </select>
               </div>
-              <div className='flex items-center gap-2 pt-6'>
-                <input
-                  id='fd-auto'
-                  type='checkbox'
-                  checked={fdAuto}
-                  onChange={(e) => setFdAuto(e.target.checked)}
-                />
-                <label htmlFor='fd-auto' className='text-sm'>
-                  Auto Renew
-                </label>
-              </div>
-            </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>Start Date</label>
                 <input
@@ -389,6 +466,17 @@ export default function AddAssetModal({
                 />
               </div>
             </div>
+            <div className='flex items-center gap-2'>
+              <input
+                id='fd-auto'
+                type='checkbox'
+                checked={fdAuto}
+                onChange={(e) => setFdAuto(e.target.checked)}
+              />
+              <label htmlFor='fd-auto' className='text-sm'>
+                Auto Renew
+              </label>
+            </div>
           </div>
         );
       case "savings":
@@ -405,6 +493,34 @@ export default function AddAssetModal({
                 />
               </div>
               <div>
+                <label className='block text-sm mb-1'>Account Number</label>
+                <input
+                  type='text'
+                  value={svAccountNumber}
+                  onChange={(e) => setSvAccountNumber(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
+                <label className='block text-sm mb-1'>Account Type</label>
+                <select
+                  value={svAccountType}
+                  onChange={(e) =>
+                    setSvAccountType(e.target.value as typeof svAccountType)
+                  }
+                  className='w-full px-3 py-2 border rounded-lg'
+                >
+                  <option value='regular'>Regular</option>
+                  <option value='high-yield'>High Yield</option>
+                  <option value='business'>Business</option>
+                  <option value='joint'>Joint</option>
+                  <option value='other'>Other</option>
+                </select>
+              </div>
+              <div>
                 <label className='block text-sm mb-1'>Balance (LKR)</label>
                 <input
                   type='number'
@@ -416,7 +532,7 @@ export default function AddAssetModal({
                 />
               </div>
             </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>
                   Interest Rate (% p.a.)
@@ -432,14 +548,40 @@ export default function AddAssetModal({
                 />
               </div>
               <div>
-                <label className='block text-sm mb-1'>Last Updated</label>
+                <label className='block text-sm mb-1'>
+                  Minimum Balance (LKR)
+                </label>
                 <input
-                  type='date'
-                  value={svUpdated}
-                  onChange={(e) => setSvUpdated(e.target.value)}
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={svMinimumBalance}
+                  onChange={(e) => setSvMinimumBalance(e.target.value)}
                   className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
                 />
               </div>
+              <div>
+                <label className='block text-sm mb-1'>Monthly Fee (LKR)</label>
+                <input
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={svMonthlyFee}
+                  onChange={(e) => setSvMonthlyFee(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+            </div>
+            <div>
+              <label className='block text-sm mb-1'>Last Updated</label>
+              <input
+                type='date'
+                value={svUpdated}
+                onChange={(e) => setSvUpdated(e.target.value)}
+                className='w-full px-3 py-2 border rounded-lg'
+              />
             </div>
           </div>
         );
@@ -456,6 +598,35 @@ export default function AddAssetModal({
                   className='w-full px-3 py-2 border rounded-lg'
                   placeholder='Optional'
                 />
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>Fund Manager</label>
+                <input
+                  type='text'
+                  value={mfManager}
+                  onChange={(e) => setMfManager(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
+                <label className='block text-sm mb-1'>Category</label>
+                <select
+                  value={mfCategory}
+                  onChange={(e) =>
+                    setMfCategory(e.target.value as typeof mfCategory)
+                  }
+                  className='w-full px-3 py-2 border rounded-lg'
+                >
+                  <option value='equity'>Equity</option>
+                  <option value='debt'>Debt</option>
+                  <option value='balanced'>Balanced</option>
+                  <option value='index'>Index</option>
+                  <option value='sectoral'>Sectoral</option>
+                  <option value='other'>Other</option>
+                </select>
               </div>
               <div>
                 <label className='block text-sm mb-1'>Units</label>
@@ -495,6 +666,20 @@ export default function AddAssetModal({
                 />
               </div>
               <div>
+                <label className='block text-sm mb-1'>Expense Ratio (%)</label>
+                <input
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={mfExpenseRatio}
+                  onChange={(e) => setMfExpenseRatio(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
                 <label className='block text-sm mb-1'>Last NAV Date</label>
                 <input
                   type='date'
@@ -503,6 +688,21 @@ export default function AddAssetModal({
                   className='w-full px-3 py-2 border rounded-lg'
                   placeholder='Optional'
                 />
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>Dividend Frequency</label>
+                <select
+                  value={mfDividendFreq}
+                  onChange={(e) =>
+                    setMfDividendFreq(e.target.value as typeof mfDividendFreq)
+                  }
+                  className='w-full px-3 py-2 border rounded-lg'
+                >
+                  <option value='monthly'>Monthly</option>
+                  <option value='quarterly'>Quarterly</option>
+                  <option value='annual'>Annual</option>
+                  <option value='none'>None</option>
+                </select>
               </div>
             </div>
           </div>
@@ -522,6 +722,22 @@ export default function AddAssetModal({
                 />
               </div>
               <div>
+                <label className='block text-sm mb-1'>Issuer</label>
+                <select
+                  value={tbIssuer}
+                  onChange={(e) =>
+                    setTbIssuer(e.target.value as typeof tbIssuer)
+                  }
+                  className='w-full px-3 py-2 border rounded-lg'
+                >
+                  <option value='government'>Government</option>
+                  <option value='corporate'>Corporate</option>
+                  <option value='municipal'>Municipal</option>
+                </select>
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
                 <label className='block text-sm mb-1'>
                   Face Value (per unit)
                 </label>
@@ -534,8 +750,6 @@ export default function AddAssetModal({
                   className='w-full px-3 py-2 border rounded-lg'
                 />
               </div>
-            </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>Units</label>
                 <input
@@ -547,6 +761,8 @@ export default function AddAssetModal({
                   className='w-full px-3 py-2 border rounded-lg'
                 />
               </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>
                   Coupon Rate (% p.a.)
@@ -561,8 +777,6 @@ export default function AddAssetModal({
                   placeholder='Optional'
                 />
               </div>
-            </div>
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>Coupon Frequency</label>
                 <select
@@ -575,6 +789,8 @@ export default function AddAssetModal({
                   <option value='quarterly'>Quarterly</option>
                 </select>
               </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>
                   Purchase Price (per unit)
@@ -603,8 +819,6 @@ export default function AddAssetModal({
                   placeholder='Optional'
                 />
               </div>
-            </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
               <div>
                 <label className='block text-sm mb-1'>Purchase Date</label>
                 <input
@@ -615,16 +829,16 @@ export default function AddAssetModal({
                   placeholder='Optional'
                 />
               </div>
-              <div>
-                <label className='block text-sm mb-1'>Maturity Date</label>
-                <input
-                  type='date'
-                  value={tbMaturityDate}
-                  onChange={(e) => setTbMaturityDate(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                  placeholder='Optional'
-                />
-              </div>
+            </div>
+            <div>
+              <label className='block text-sm mb-1'>Maturity Date</label>
+              <input
+                type='date'
+                value={tbMaturityDate}
+                onChange={(e) => setTbMaturityDate(e.target.value)}
+                className='w-full px-3 py-2 border rounded-lg'
+                placeholder='Optional'
+              />
             </div>
           </div>
         );
@@ -682,6 +896,30 @@ export default function AddAssetModal({
 
           {/* Type Specific Fields */}
           {renderTypeFields()}
+
+          <div>
+            <label className='block text-sm mb-1'>Description</label>
+            <input
+              type='text'
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className='w-full px-3 py-2 border rounded-lg'
+              placeholder='Optional description'
+            />
+          </div>
+
+          <div>
+            <label className='block text-sm mb-1'>Tags</label>
+            <input
+              type='text'
+              value={tags.join(", ")}
+              onChange={(e) =>
+                setTags(e.target.value.split(",").map((t) => t.trim()))
+              }
+              className='w-full px-3 py-2 border rounded-lg'
+              placeholder='Comma-separated tags (optional)'
+            />
+          </div>
 
           <div>
             <label className='block text-sm mb-1'>Notes</label>
