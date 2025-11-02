@@ -178,6 +178,103 @@ export interface PortfolioHoldingWithMetrics extends PortfolioHolding {
   invested: number;
 }
 
+// ===== Extended Portfolio Assets (Non-stock) =====
+
+export type AssetType =
+  | "fixed-asset" // Land/Gold/Property/Vehicle etc.
+  | "fixed-deposit"
+  | "savings"
+  | "mutual-fund"
+  | "treasury-bond";
+
+export interface BaseAsset {
+  id: string;
+  userId: string;
+  type: AssetType;
+  name: string; // Display name e.g., "Land - Kandy", "FD - HNB", "NDB Savings", "ABC Equity Fund"
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Fixed Asset (Land/Gold/Property/Vehicle)
+export interface FixedAsset extends BaseAsset {
+  type: "fixed-asset";
+  category: "land" | "gold" | "property" | "vehicle" | "other";
+  purchaseDate: string;
+  purchasePrice: number; // LKR
+  currentValue?: number; // Manual appraisal value in LKR
+  appraisalDate?: string; // When currentValue was last appraised
+  locationOrDetails?: string; // address / description
+}
+
+// Fixed Deposit
+export interface FixedDeposit extends BaseAsset {
+  type: "fixed-deposit";
+  bank: string;
+  principal: number; // LKR
+  interestRate: number; // annual % e.g., 12.5 means 12.5%
+  compounding: "simple" | "monthly" | "quarterly" | "annually";
+  startDate: string;
+  maturityDate: string;
+  autoRenewal?: boolean;
+}
+
+// Savings Account
+export interface SavingsAccount extends BaseAsset {
+  type: "savings";
+  bank: string;
+  balance: number; // current balance in LKR (manually updated)
+  interestRate?: number; // annual % (optional informational)
+  lastUpdated?: string;
+}
+
+// Mutual Fund (units * NAV)
+export interface MutualFund extends BaseAsset {
+  type: "mutual-fund";
+  fundCode?: string; // optional code/ISIN
+  units: number;
+  buyNav?: number; // NAV at purchase (optional)
+  lastNav?: number; // latest known NAV (manual for now)
+  lastNavDate?: string;
+}
+
+// Treasury Bond (simplified)
+export interface TreasuryBond extends BaseAsset {
+  type: "treasury-bond";
+  issueCode?: string;
+  faceValue: number; // per unit face value (LKR)
+  units: number; // number of units (face value lots)
+  couponRate?: number; // annual %
+  couponFrequency?: "annual" | "semi-annual" | "quarterly";
+  purchasePrice?: number; // price per unit at purchase (LKR)
+  purchaseDate?: string;
+  maturityDate?: string;
+  currentMarketPrice?: number; // price per unit (if known)
+}
+
+export type PortfolioAsset =
+  | FixedAsset
+  | FixedDeposit
+  | SavingsAccount
+  | MutualFund
+  | TreasuryBond;
+
+export type AssetWithMetrics = PortfolioAsset & {
+  invested?: number; // principal/purchase total
+  currentValue: number; // computed or stored
+  gainLoss?: number;
+  gainLossPercent?: number;
+};
+
+export interface AssetsSummary {
+  totalCurrentValue: number;
+  totalInvested: number;
+  totalGainLoss: number;
+  items: AssetWithMetrics[];
+  byType: { type: AssetType; value: number }[];
+}
+
 export interface PortfolioPerformance {
   daily: number;
   weekly: number;

@@ -82,7 +82,7 @@ export async function fetchLatestStockPrices(): Promise<StockQuote[]> {
                       | "X"
                       | "P"
                       | "Z"
-                      | "V")
+                      )
                   : "N";
               }
               return {

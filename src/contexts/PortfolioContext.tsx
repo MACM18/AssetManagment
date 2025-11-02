@@ -7,17 +7,23 @@ import {
   Transaction,
   PortfolioSummary,
   StockQuote,
+  PortfolioAsset,
+  AssetsSummary,
 } from "@/types";
 import {
   getUserHoldings,
   getUserTransactions,
+  getUserAssets,
   calculatePortfolioSummary,
+  calculateAssetsSummary,
 } from "@/lib/portfolio";
 
 interface PortfolioContextType {
   holdings: PortfolioHolding[];
   transactions: Transaction[];
   summary: PortfolioSummary | null;
+  assets: PortfolioAsset[];
+  assetsSummary: AssetsSummary | null;
   loading: boolean;
   refreshPortfolio: (currentPrices?: StockQuote[]) => Promise<void>;
 }
@@ -26,6 +32,8 @@ const PortfolioContext = createContext<PortfolioContextType>({
   holdings: [],
   transactions: [],
   summary: null,
+  assets: [],
+  assetsSummary: null,
   loading: true,
   refreshPortfolio: async () => {},
 });
@@ -35,6 +43,10 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const [holdings, setHoldings] = useState<PortfolioHolding[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<PortfolioSummary | null>(null);
+  const [assets, setAssets] = useState<PortfolioAsset[]>([]);
+  const [assetsSummary, setAssetsSummary] = useState<AssetsSummary | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   const refreshPortfolio = async (currentPrices: StockQuote[] = []) => {
@@ -42,19 +54,23 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       setHoldings([]);
       setTransactions([]);
       setSummary(null);
+      setAssets([]);
+      setAssetsSummary(null);
       setLoading(false);
       return;
     }
 
     setLoading(true);
     try {
-      const [holdingsData, transactionsData] = await Promise.all([
+      const [holdingsData, transactionsData, assetsData] = await Promise.all([
         getUserHoldings(user.uid),
         getUserTransactions(user.uid),
+        getUserAssets(user.uid),
       ]);
 
       setHoldings(holdingsData);
       setTransactions(transactionsData);
+      setAssets(assetsData);
 
       // Calculate summary if we have current prices
       if (currentPrices.length > 0) {
@@ -63,6 +79,13 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           currentPrices
         );
         setSummary(summaryData);
+      }
+
+      try {
+        const aSummary = await calculateAssetsSummary(user.uid);
+        setAssetsSummary(aSummary);
+      } catch (e) {
+        console.warn("Failed calculating assets summary", e);
       }
     } catch (error) {
       console.error("Error loading portfolio:", error);
@@ -78,6 +101,8 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       setHoldings([]);
       setTransactions([]);
       setSummary(null);
+      setAssets([]);
+      setAssetsSummary(null);
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,6 +114,8 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
         holdings,
         transactions,
         summary,
+        assets,
+        assetsSummary,
         loading,
         refreshPortfolio,
       }}

@@ -22,6 +22,10 @@ import {
   PortfolioSummary,
   PortfolioHoldingWithMetrics,
   StockQuote,
+  PortfolioAsset,
+  AssetWithMetrics,
+  AssetsSummary,
+  AssetType,
 } from "@/types";
 
 /**
@@ -348,4 +352,204 @@ export function aggregateHoldingsBySymbol(
   });
 
   return Array.from(aggregated.values());
+}
+
+// ===== Assets (Non-stock) API =====
+
+/** Add a new portfolio asset (non-stock) */
+export async function addAsset(
+  userId: string,
+  asset: Omit<PortfolioAsset, "id" | "userId" | "createdAt" | "updatedAt">
+): Promise<string> {
+  if (!FIREBASE_AVAILABLE) {
+    throw new Error("Firebase is not initialized");
+  }
+  const assetsCol = collection(db, "portfolios", userId, "assets");
+  const docRef = doc(assetsCol);
+  await writeBatch(db)
+    .set(docRef, {
+      ...asset,
+      userId,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    })
+    .commit();
+  return docRef.id;
+}
+
+/** Update an asset */
+export async function updateAsset(
+  userId: string,
+  assetId: string,
+  updates: Partial<Omit<PortfolioAsset, "id" | "userId" | "createdAt">>
+): Promise<void> {
+  if (!FIREBASE_AVAILABLE) throw new Error("Firebase is not initialized");
+  const ref = doc(db, "portfolios", userId, "assets", assetId);
+  await updateDoc(ref, { ...updates, updatedAt: serverTimestamp() });
+}
+
+/** Delete an asset */
+export async function deleteAsset(
+  userId: string,
+  assetId: string
+): Promise<void> {
+  if (!FIREBASE_AVAILABLE) throw new Error("Firebase is not initialized");
+  const ref = doc(db, "portfolios", userId, "assets", assetId);
+  await deleteDoc(ref);
+}
+
+/** Get all assets for a user */
+export async function getUserAssets(userId: string): Promise<PortfolioAsset[]> {
+  if (!FIREBASE_AVAILABLE) return [];
+  const assetsRef = collection(db, "portfolios", userId, "assets");
+  const q = query(assetsRef, orderBy("createdAt", "desc"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => {
+    const data = d.data();
+    const created = (data as { createdAt?: unknown }).createdAt;
+    const updated = (data as { updatedAt?: unknown }).updatedAt;
+    const toIso = (v: unknown) =>
+      v && typeof (v as { toDate?: () => Date }).toDate === "function"
+        ? (v as { toDate: () => Date }).toDate().toISOString()
+        : (v as string | undefined);
+    return {
+      id: d.id,
+      ...data,
+      createdAt: toIso(created) || new Date().toISOString(),
+      updatedAt: toIso(updated) || new Date().toISOString(),
+    } as unknown as PortfolioAsset;
+  });
+}
+
+// Helpers to compute current value for each asset type
+function yearsBetween(startDateISO: string, endDateISO: string): number {
+  const start = new Date(startDateISO).getTime();
+  const end = new Date(endDateISO).getTime();
+  const msInYear = 365.25 * 24 * 60 * 60 * 1000;
+  return Math.max(0, (end - start) / msInYear);
+}
+
+function periodsPerYear(
+  freq: "simple" | "monthly" | "quarterly" | "annually"
+): number {
+  switch (freq) {
+    case "monthly":
+      return 12;
+    case "quarterly":
+      return 4;
+    case "annually":
+      return 1;
+    default:
+      return 0; // simple interest handled separately
+  }
+}
+
+export function computeAssetMetrics(
+  asset: PortfolioAsset,
+  asOfISO = new Date().toISOString()
+): AssetWithMetrics {
+  switch (asset.type) {
+    case "fixed-asset": {
+      const invested = asset.purchasePrice;
+      const currentValue = asset.currentValue ?? invested;
+      const gainLoss = currentValue - invested;
+      const gainLossPercent = invested > 0 ? (gainLoss / invested) * 100 : 0;
+      return { ...asset, invested, currentValue, gainLoss, gainLossPercent };
+    }
+    case "fixed-deposit": {
+      const p = asset.principal;
+      const r = (asset.interestRate || 0) / 100;
+      const endISO =
+        asset.maturityDate && asset.autoRenewal !== true
+          ? new Date(
+              Math.min(
+                new Date(asOfISO).getTime(),
+                new Date(asset.maturityDate).getTime()
+              )
+            ).toISOString()
+          : asOfISO;
+      const t = yearsBetween(asset.startDate, endISO);
+      let currentValue = p;
+      if (
+        asset.compounding === "simple" ||
+        periodsPerYear(asset.compounding) === 0
+      ) {
+        currentValue = p * (1 + r * t);
+      } else {
+        const m = periodsPerYear(asset.compounding);
+        currentValue = p * Math.pow(1 + r / m, m * t);
+      }
+      const invested = p;
+      const gainLoss = currentValue - invested;
+      const gainLossPercent = invested > 0 ? (gainLoss / invested) * 100 : 0;
+      return { ...asset, invested, currentValue, gainLoss, gainLossPercent };
+    }
+    case "savings": {
+      const currentValue = asset.balance;
+      return { ...asset, currentValue };
+    }
+    case "mutual-fund": {
+      const invested =
+        asset.buyNav && asset.units ? asset.buyNav * asset.units : undefined;
+      const currentValue =
+        asset.lastNav && asset.units
+          ? asset.lastNav * asset.units
+          : invested ?? 0;
+      const gainLoss =
+        invested !== undefined ? currentValue - invested : undefined;
+      const gainLossPercent =
+        invested && invested > 0 && gainLoss !== undefined
+          ? (gainLoss / invested) * 100
+          : undefined;
+      return { ...asset, invested, currentValue, gainLoss, gainLossPercent };
+    }
+    case "treasury-bond": {
+      const price = asset.currentMarketPrice ?? asset.faceValue;
+      const currentValue = (asset.units || 0) * price;
+      const invested = asset.purchasePrice
+        ? asset.purchasePrice * (asset.units || 0)
+        : asset.faceValue * (asset.units || 0);
+      const gainLoss = currentValue - invested;
+      const gainLossPercent = invested > 0 ? (gainLoss / invested) * 100 : 0;
+      return { ...asset, invested, currentValue, gainLoss, gainLossPercent };
+    }
+    default: {
+      const neverType: never = asset as never;
+      return {
+        ...(neverType as unknown as PortfolioAsset),
+        currentValue: 0,
+      } as AssetWithMetrics;
+    }
+  }
+}
+
+export async function calculateAssetsSummary(
+  userId: string
+): Promise<AssetsSummary> {
+  const assets = await getUserAssets(userId);
+  const withMetrics = assets.map((a) => computeAssetMetrics(a));
+  const totalCurrentValue = withMetrics.reduce(
+    (sum, a) => sum + (a.currentValue || 0),
+    0
+  );
+  const totalInvested = withMetrics.reduce(
+    (sum, a) => sum + (a.invested || 0),
+    0
+  );
+  const totalGainLoss = totalCurrentValue - totalInvested;
+  const byMap = new Map<string, number>();
+  withMetrics.forEach((a) => {
+    byMap.set(a.type, (byMap.get(a.type) || 0) + (a.currentValue || 0));
+  });
+  const byType = Array.from(byMap.entries()).map(([type, value]) => ({
+    type: type as AssetType,
+    value,
+  }));
+  return {
+    totalCurrentValue,
+    totalInvested,
+    totalGainLoss,
+    items: withMetrics,
+    byType,
+  };
 }

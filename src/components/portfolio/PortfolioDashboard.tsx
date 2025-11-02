@@ -9,10 +9,13 @@ import PortfolioSummaryCard from "@/components/portfolio/PortfolioSummaryCard";
 import HoldingsList from "@/components/portfolio/HoldingsList";
 import TransactionHistory from "@/components/portfolio/TransactionHistory";
 import AddHoldingModal from "@/components/portfolio/AddHoldingModal";
+import AddAssetModal from "@/components/portfolio/assets/AddAssetModal";
+import AssetsList from "@/components/portfolio/assets/AssetsList";
 import PortfolioAllocationChart from "@/components/portfolio/PortfolioAllocationChart";
 import PerformanceChart from "@/components/portfolio/PerformanceChart";
 import PortfolioInsights from "@/components/portfolio/PortfolioInsights";
 import TopHoldings from "@/components/portfolio/TopHoldings";
+import NetWorthAllocationChart from "@/components/portfolio/NetWorthAllocationChart";
 import Navigation from "@/components/Navigation";
 import { Plus, RefreshCw } from "lucide-react";
 
@@ -22,6 +25,7 @@ export default function PortfolioDashboard() {
   const [stocks, setStocks] = useState<StockQuote[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showAddAssetModal, setShowAddAssetModal] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -112,6 +116,14 @@ export default function PortfolioDashboard() {
               <Plus className='w-4 h-4' />
               <span>Add Holding</span>
             </button>
+
+            <button
+              onClick={() => setShowAddAssetModal(true)}
+              className='flex items-center gap-2 px-3 sm:px-4 py-2 bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border rounded-lg transition-all shadow-sm hover:shadow-lg'
+            >
+              <Plus className='w-4 h-4' />
+              <span>Add Asset</span>
+            </button>
           </div>
         </div>
 
@@ -121,8 +133,9 @@ export default function PortfolioDashboard() {
         </div>
 
         {/* Analytics Section */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8'>
           <PortfolioAllocationChart />
+          <NetWorthAllocationChart />
           <PerformanceChart />
         </div>
 
@@ -144,6 +157,11 @@ export default function PortfolioDashboard() {
             <TransactionHistory />
           </div>
         </div>
+
+        {/* Other Assets */}
+        <div className='mt-6 sm:mt-8'>
+          <AssetsList />
+        </div>
       </div>
 
       {/* Add Holding Modal */}
@@ -151,6 +169,14 @@ export default function PortfolioDashboard() {
         <AddHoldingModal
           stocks={stocks}
           onClose={() => setShowAddModal(false)}
+          onSuccess={handleAddSuccess}
+        />
+      )}
+
+      {/* Add Asset Modal */}
+      {showAddAssetModal && (
+        <AddAssetModal
+          onClose={() => setShowAddAssetModal(false)}
           onSuccess={handleAddSuccess}
         />
       )}

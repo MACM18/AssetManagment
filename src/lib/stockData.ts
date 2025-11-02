@@ -86,7 +86,7 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
         // Extract share type from symbol (e.g., 'JKH.N0000' -> 'N', 'ABC.X0000' -> 'X')
         const shareTypeMatch = String(rawSymbol).match(/\.([NXPZV])\d*$/i);
         const shareType = shareTypeMatch
-          ? (shareTypeMatch[1].toUpperCase() as "N" | "X" | "P" | "Z" | "V")
+          ? (shareTypeMatch[1].toUpperCase() as "N" | "X" | "P" | "Z" )
           : undefined;
 
         // Only process stocks that are in our tracking list (compare normalized symbols)
