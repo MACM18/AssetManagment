@@ -186,3 +186,35 @@
     transform: rotate(360deg);
   }
 }
+
+/* Safari mobile date input width fix */
+/* This targets Safari on iOS devices where date inputs appear wider */
+@supports (-webkit-appearance: none) and (not (-moz-appearance: none)) {
+  input[type="date"] {
+    /* Safari-specific styling to prevent wide date inputs */
+    -webkit-appearance: none;
+    appearance: none;
+    /* Ensure consistent width across browsers */
+    max-width: 100%;
+    /* Prevent Safari from making date inputs wider than their container */
+    box-sizing: border-box;
+  }
+
+  /* Additional Safari-specific fixes for mobile */
+  @media screen and (max-width: 768px) {
+    input[type="date"] {
+      /* Force consistent sizing on mobile Safari */
+      width: 100% !important;
+      min-width: 0;
+      /* Prevent overflow issues */
+      overflow: hidden;
+    }
+  }
+}
+
+/* Alternative approach for all browsers to ensure date inputs don't overflow */
+input[type="date"] {
+  /* Ensure date inputs respect their container width */
+  max-width: 100%;
+  box-sizing: border-box;
+}

@@ -1,7 +1,7 @@
 import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getFirestore, Firestore } from "firebase/firestore";
 import { getStorage, FirebaseStorage } from "firebase/storage";
-import { getAuth, Auth } from "firebase/auth";
+import { getAuth, Auth, setPersistence, browserLocalPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -43,6 +43,11 @@ if (hasValidConfig && typeof window !== "undefined") {
     dbInstance = getFirestore(app);
     storageInstance = getStorage(app);
     authInstance = getAuth(app);
+    
+    // Set persistence to browser local storage to maintain auth state
+    setPersistence(authInstance, browserLocalPersistence).catch((error) => {
+      console.error("Failed to set auth persistence:", error);
+    });
   } else {
     app = getApps()[0];
     dbInstance = getFirestore(app);

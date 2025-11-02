@@ -94,7 +94,8 @@ export default function Home() {
     let cancelled = false;
     const init = async () => {
       // Attempt anonymous auth so Firestore rules that require auth can pass
-      if (FIREBASE_AVAILABLE) {
+      // Only sign in anonymously if not already authenticated
+      if (FIREBASE_AVAILABLE && !auth.currentUser) {
         try {
           const cred = await signInAnonymously(auth);
           console.debug("Anonymous sign-in success:", cred.user?.uid);
