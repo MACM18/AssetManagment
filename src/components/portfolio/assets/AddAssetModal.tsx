@@ -732,146 +732,169 @@ export default function AddAssetModal({
       case "goal-based-fixed-deposit":
         return (
           <div className='space-y-3'>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-              <div>
-                <label className='block text-sm mb-1'>Bank</label>
-                <input
-                  type='text'
-                  value={gfdBank}
-                  onChange={(e) => setGfdBank(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                />
-              </div>
-              <div>
-                <label className='block text-sm mb-1'>Account Number</label>
-                <input
-                  type='text'
-                  value={gfdAccountNumber}
-                  onChange={(e) => setGfdAccountNumber(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                  placeholder='Optional'
-                />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-              <div>
-                <label className='block text-sm mb-1'>Principal (LKR)</label>
-                <input
-                  type='number'
-                  min='0'
-                  step='0.01'
-                  value={gfdPrincipal}
-                  onChange={(e) => setGfdPrincipal(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                />
-              </div>
-              <div>
-                <label className='block text-sm mb-1'>
-                  Interest Rate (% p.a.)
-                </label>
-                <input
-                  type='number'
-                  min='0'
-                  step='0.01'
-                  value={gfdRate}
-                  onChange={(e) => setGfdRate(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                />
+            {/* Bank Details Section */}
+            <div className='border-b pb-3'>
+              <h3 className='text-sm font-semibold mb-2'>Bank Details</h3>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                <div>
+                  <label className='block text-sm mb-1'>Bank *</label>
+                  <input
+                    type='text'
+                    value={gfdBank}
+                    onChange={(e) => setGfdBank(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm mb-1'>Account Number</label>
+                  <input
+                    type='text'
+                    value={gfdAccountNumber}
+                    onChange={(e) => setGfdAccountNumber(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                    placeholder='Optional'
+                  />
+                </div>
               </div>
             </div>
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-              <div>
-                <label className='block text-sm mb-1'>Compounding</label>
-                <select
-                  value={gfdComp}
-                  onChange={(e) => setGfdComp(e.target.value as typeof gfdComp)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                >
-                  <option value='simple'>Simple</option>
-                  <option value='monthly'>Monthly</option>
-                  <option value='quarterly'>Quarterly</option>
-                  <option value='annually'>Annually</option>
-                </select>
+
+            {/* Deposit Details Section */}
+            <div className='border-b pb-3'>
+              <h3 className='text-sm font-semibold mb-2'>Deposit Details</h3>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                <div>
+                  <label className='block text-sm mb-1'>
+                    Principal (LKR) *
+                  </label>
+                  <input
+                    type='number'
+                    min='0'
+                    step='0.01'
+                    value={gfdPrincipal}
+                    onChange={(e) => setGfdPrincipal(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm mb-1'>
+                    Interest Rate (% p.a.) *
+                  </label>
+                  <input
+                    type='number'
+                    min='0'
+                    step='0.01'
+                    value={gfdRate}
+                    onChange={(e) => setGfdRate(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                  />
+                </div>
               </div>
-              <div>
-                <label className='block text-sm mb-1'>Start Date</label>
-                <input
-                  type='date'
-                  value={gfdStart}
-                  onChange={(e) => setGfdStart(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                />
-              </div>
-              <div>
-                <label className='block text-sm mb-1'>Maturity Date</label>
-                <input
-                  type='date'
-                  value={gfdMaturity}
-                  onChange={(e) => setGfdMaturity(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                  placeholder='Optional'
-                />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-              <div>
-                <label className='block text-sm mb-1'>Goal Name</label>
-                <input
-                  type='text'
-                  value={gfdGoalName}
-                  onChange={(e) => setGfdGoalName(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                  placeholder='e.g., Child Education, House Purchase'
-                />
-              </div>
-              <div>
-                <label className='block text-sm mb-1'>Goal Amount (LKR)</label>
-                <input
-                  type='number'
-                  min='0'
-                  step='0.01'
-                  value={gfdGoalAmount}
-                  onChange={(e) => setGfdGoalAmount(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg'
-                />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-              <div>
-                <label className='block text-sm mb-1'>Goal Priority</label>
-                <select
-                  value={gfdGoalPriority}
-                  onChange={(e) =>
-                    setGfdGoalPriority(e.target.value as typeof gfdGoalPriority)
-                  }
-                  className='w-full px-3 py-2 border rounded-lg'
-                >
-                  <option value='low'>Low</option>
-                  <option value='medium'>Medium</option>
-                  <option value='high'>High</option>
-                </select>
-              </div>
-              <div className='flex items-center gap-2'>
-                <input
-                  id='gfd-auto'
-                  type='checkbox'
-                  checked={gfdAuto}
-                  onChange={(e) => setGfdAuto(e.target.checked)}
-                />
-                <label htmlFor='gfd-auto' className='text-sm'>
-                  Auto Renew
-                </label>
+              <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3'>
+                <div>
+                  <label className='block text-sm mb-1'>Compounding</label>
+                  <select
+                    value={gfdComp}
+                    onChange={(e) =>
+                      setGfdComp(e.target.value as typeof gfdComp)
+                    }
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                  >
+                    <option value='simple'>Simple</option>
+                    <option value='monthly'>Monthly</option>
+                    <option value='quarterly'>Quarterly</option>
+                    <option value='annually'>Annually</option>
+                  </select>
+                </div>
+                <div>
+                  <label className='block text-sm mb-1'>Start Date *</label>
+                  <input
+                    type='date'
+                    value={gfdStart}
+                    onChange={(e) => setGfdStart(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm mb-1'>Maturity Date</label>
+                  <input
+                    type='date'
+                    value={gfdMaturity}
+                    onChange={(e) => setGfdMaturity(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                    placeholder='Optional'
+                  />
+                </div>
               </div>
             </div>
-            <div>
-              <label className='block text-sm mb-1'>Goal Description</label>
-              <textarea
-                value={gfdGoalDescription}
-                onChange={(e) => setGfdGoalDescription(e.target.value)}
-                rows={2}
-                className='w-full px-3 py-2 border rounded-lg'
-                placeholder='Additional details about your goal (optional)'
-              />
+
+            {/* Goal Details Section */}
+            <div className='border-b pb-3'>
+              <h3 className='text-sm font-semibold mb-2'>Goal Details</h3>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                <div>
+                  <label className='block text-sm mb-1'>Goal Name *</label>
+                  <input
+                    type='text'
+                    value={gfdGoalName}
+                    onChange={(e) => setGfdGoalName(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                    placeholder='e.g., Child Education, House'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm mb-1'>
+                    Goal Amount (LKR) *
+                  </label>
+                  <input
+                    type='number'
+                    min='0'
+                    step='0.01'
+                    value={gfdGoalAmount}
+                    onChange={(e) => setGfdGoalAmount(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                  />
+                </div>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3'>
+                <div>
+                  <label className='block text-sm mb-1'>Goal Priority</label>
+                  <select
+                    value={gfdGoalPriority}
+                    onChange={(e) =>
+                      setGfdGoalPriority(
+                        e.target.value as typeof gfdGoalPriority
+                      )
+                    }
+                    className='w-full px-3 py-2 border rounded-lg text-sm'
+                  >
+                    <option value='low'>Low</option>
+                    <option value='medium'>Medium</option>
+                    <option value='high'>High</option>
+                  </select>
+                </div>
+                <div className='flex items-end pb-2'>
+                  <label className='flex items-center gap-2 cursor-pointer'>
+                    <input
+                      id='gfd-auto'
+                      type='checkbox'
+                      checked={gfdAuto}
+                      onChange={(e) => setGfdAuto(e.target.checked)}
+                      className='w-4 h-4'
+                    />
+                    <span className='text-sm'>Auto Renew</span>
+                  </label>
+                </div>
+              </div>
+              <div className='mt-3'>
+                <label className='block text-sm mb-1'>Goal Description</label>
+                <textarea
+                  value={gfdGoalDescription}
+                  onChange={(e) => setGfdGoalDescription(e.target.value)}
+                  rows={2}
+                  className='w-full px-3 py-2 border rounded-lg text-sm'
+                  placeholder='Additional details about your goal (optional)'
+                />
+              </div>
             </div>
           </div>
         );
@@ -1243,115 +1266,119 @@ export default function AddAssetModal({
 
   return (
     <div
-      className='fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto'
+      className='fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4'
       role='dialog'
       aria-modal='true'
       aria-labelledby='add-asset-title'
     >
-      <div className='relative w-full max-w-2xl mx-auto my-8 rounded-2xl shadow-2xl border backdrop-blur-lg'>
-        <div className='sticky top-0 backdrop-blur-lg border-b px-6 py-4 flex justify-between items-center rounded-t-2xl'>
-          <h2 id='add-asset-title' className='text-2xl font-bold'>
+      <div className='relative w-full max-w-2xl mx-auto my-4 sm:my-8 rounded-2xl shadow-2xl border backdrop-blur-lg max-h-[95vh] sm:max-h-[90vh] flex flex-col'>
+        <div className='sticky top-0 backdrop-blur-lg border-b px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-2xl z-10'>
+          <h2 id='add-asset-title' className='text-lg sm:text-2xl font-bold'>
             {asset ? "Edit Portfolio Asset" : "Add Portfolio Asset"}
           </h2>
-          <button onClick={onClose} className='transition-colors'>
-            <X className='w-6 h-6' />
+          <button onClick={onClose} className='transition-colors p-1'>
+            <X className='w-5 h-5 sm:w-6 sm:h-6' />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className='p-6 space-y-4'>
-          {error && (
-            <div className='p-3 border rounded-lg text-sm'>{error}</div>
-          )}
+        <form onSubmit={handleSubmit} className='flex-1 overflow-y-auto'>
+          <div className='p-4 sm:p-6 space-y-4'>
+            {error && (
+              <div className='p-3 border rounded-lg text-sm'>{error}</div>
+            )}
 
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-            <div>
-              <label className='block text-sm mb-1'>Asset Type</label>
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value as AssetType)}
-                className='w-full px-3 py-2 border rounded-lg'
-              >
-                <option value='fixed-asset'>Fixed Asset (Land/Gold)</option>
-                <option value='fixed-deposit'>Fixed Deposit</option>
-                <option value='goal-based-fixed-deposit'>
-                  Goal Based Fixed Deposit
-                </option>
-                <option value='savings'>Savings</option>
-                <option value='mutual-fund'>Mutual Fund</option>
-                <option value='treasury-bond'>Treasury Bond</option>
-              </select>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
+                <label className='block text-sm mb-1'>Asset Type</label>
+                <select
+                  value={type}
+                  onChange={(e) => setType(e.target.value as AssetType)}
+                  className='w-full px-3 py-2 border rounded-lg text-sm sm:text-base'
+                >
+                  <option value='fixed-asset'>Fixed Asset (Land/Gold)</option>
+                  <option value='fixed-deposit'>Fixed Deposit</option>
+                  <option value='goal-based-fixed-deposit'>
+                    Goal Based Fixed Deposit
+                  </option>
+                  <option value='savings'>Savings</option>
+                  <option value='mutual-fund'>Mutual Fund</option>
+                  <option value='treasury-bond'>Treasury Bond</option>
+                </select>
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>Name</label>
+                <input
+                  type='text'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg text-sm sm:text-base'
+                  placeholder='e.g., Land - Kandy / FD - HNB'
+                />
+              </div>
             </div>
+
+            {/* Type Specific Fields */}
+            {renderTypeFields()}
+
             <div>
-              <label className='block text-sm mb-1'>Name</label>
+              <label className='block text-sm mb-1'>Description</label>
               <input
                 type='text'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 className='w-full px-3 py-2 border rounded-lg'
-                placeholder='e.g., Land - Kandy / FD - HNB'
+                placeholder='Optional description'
+              />
+            </div>
+
+            <div>
+              <label className='block text-sm mb-1'>Tags</label>
+              <input
+                type='text'
+                value={tags.join(", ")}
+                onChange={(e) =>
+                  setTags(e.target.value.split(",").map((t) => t.trim()))
+                }
+                className='w-full px-3 py-2 border rounded-lg'
+                placeholder='Comma-separated tags (optional)'
+              />
+            </div>
+
+            <div>
+              <label className='block text-sm mb-1'>Notes</label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+                className='w-full px-3 py-2 border rounded-lg'
+                placeholder='Optional notes'
               />
             </div>
           </div>
 
-          {/* Type Specific Fields */}
-          {renderTypeFields()}
-
-          <div>
-            <label className='block text-sm mb-1'>Description</label>
-            <input
-              type='text'
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className='w-full px-3 py-2 border rounded-lg'
-              placeholder='Optional description'
-            />
-          </div>
-
-          <div>
-            <label className='block text-sm mb-1'>Tags</label>
-            <input
-              type='text'
-              value={tags.join(", ")}
-              onChange={(e) =>
-                setTags(e.target.value.split(",").map((t) => t.trim()))
-              }
-              className='w-full px-3 py-2 border rounded-lg'
-              placeholder='Comma-separated tags (optional)'
-            />
-          </div>
-
-          <div>
-            <label className='block text-sm mb-1'>Notes</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              className='w-full px-3 py-2 border rounded-lg'
-              placeholder='Optional notes'
-            />
-          </div>
-
-          <div className='flex gap-3 pt-4'>
-            <button
-              type='button'
-              onClick={onClose}
-              className='flex-1 px-4 py-2 border rounded-lg font-medium'
-            >
-              Cancel
-            </button>
-            <button
-              type='submit'
-              disabled={loading}
-              className='flex-1 px-4 py-2 border rounded-lg font-semibold disabled:opacity-50'
-            >
-              {loading
-                ? asset
-                  ? "Updating..."
-                  : "Adding..."
-                : asset
-                ? "Update Asset"
-                : "Add Asset"}
-            </button>
+          <div className='sticky bottom-0 backdrop-blur-lg border-t px-4 sm:px-6 py-3 sm:py-4 rounded-b-2xl'>
+            <div className='flex gap-3'>
+              <button
+                type='button'
+                onClick={onClose}
+                className='flex-1 px-4 py-2 border rounded-lg font-medium'
+              >
+                Cancel
+              </button>
+              <button
+                type='submit'
+                disabled={loading}
+                className='flex-1 px-4 py-2 border rounded-lg font-semibold disabled:opacity-50'
+              >
+                {loading
+                  ? asset
+                    ? "Updating..."
+                    : "Adding..."
+                  : asset
+                  ? "Update Asset"
+                  : "Add Asset"}
+              </button>
+            </div>
           </div>
         </form>
       </div>
