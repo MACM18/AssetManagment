@@ -1272,87 +1272,89 @@ export default function AddAssetModal({
       aria-labelledby='add-asset-title'
     >
       <div className='relative w-full max-w-2xl mx-auto my-4 sm:my-8 rounded-2xl shadow-2xl border backdrop-blur-lg max-h-[95vh] sm:max-h-[90vh] flex flex-col'>
-        <div className='sticky top-0 backdrop-blur-lg border-b px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-2xl z-10'>
-          <h2 id='add-asset-title' className='text-lg sm:text-2xl font-bold'>
-            {asset ? "Edit Portfolio Asset" : "Add Portfolio Asset"}
-          </h2>
-          <button onClick={onClose} className='transition-colors p-1'>
-            <X className='w-5 h-5 sm:w-6 sm:h-6' />
-          </button>
-        </div>
-
         <form onSubmit={handleSubmit} className='flex-1 overflow-y-auto'>
-          <div className='p-4 sm:p-6 space-y-4'>
-            {error && (
-              <div className='p-3 border rounded-lg text-sm'>{error}</div>
-            )}
+          <div className='sticky top-0 backdrop-blur-lg border-b px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-2xl z-10'>
+            <h2 id='add-asset-title' className='text-lg sm:text-2xl font-bold'>
+              {asset ? "Edit Portfolio Asset" : "Add Portfolio Asset"}
+            </h2>
+            <button onClick={onClose} className='transition-colors p-1'>
+              <X className='w-5 h-5 sm:w-6 sm:h-6' />
+            </button>
+          </div>
 
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-              <div>
-                <label className='block text-sm mb-1'>Asset Type</label>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value as AssetType)}
-                  className='w-full px-3 py-2 border rounded-lg text-sm sm:text-base'
-                >
-                  <option value='fixed-asset'>Fixed Asset (Land/Gold)</option>
-                  <option value='fixed-deposit'>Fixed Deposit</option>
-                  <option value='goal-based-fixed-deposit'>
-                    Goal Based Fixed Deposit
-                  </option>
-                  <option value='savings'>Savings</option>
-                  <option value='mutual-fund'>Mutual Fund</option>
-                  <option value='treasury-bond'>Treasury Bond</option>
-                </select>
+          <div className='flex-1 overflow-y-auto'>
+            <div className='p-4 sm:p-6 space-y-4'>
+              {error && (
+                <div className='p-3 border rounded-lg text-sm'>{error}</div>
+              )}
+
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                <div>
+                  <label className='block text-sm mb-1'>Asset Type</label>
+                  <select
+                    value={type}
+                    onChange={(e) => setType(e.target.value as AssetType)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm sm:text-base'
+                  >
+                    <option value='fixed-asset'>Fixed Asset (Land/Gold)</option>
+                    <option value='fixed-deposit'>Fixed Deposit</option>
+                    <option value='goal-based-fixed-deposit'>
+                      Goal Based Fixed Deposit
+                    </option>
+                    <option value='savings'>Savings</option>
+                    <option value='mutual-fund'>Mutual Fund</option>
+                    <option value='treasury-bond'>Treasury Bond</option>
+                  </select>
+                </div>
+                <div>
+                  <label className='block text-sm mb-1'>Name</label>
+                  <input
+                    type='text'
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className='w-full px-3 py-2 border rounded-lg text-sm sm:text-base'
+                    placeholder='e.g., Land - Kandy / FD - HNB'
+                  />
+                </div>
               </div>
+
+              {/* Type Specific Fields */}
+              {renderTypeFields()}
+
               <div>
-                <label className='block text-sm mb-1'>Name</label>
+                <label className='block text-sm mb-1'>Description</label>
                 <input
                   type='text'
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className='w-full px-3 py-2 border rounded-lg text-sm sm:text-base'
-                  placeholder='e.g., Land - Kandy / FD - HNB'
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional description'
                 />
               </div>
-            </div>
 
-            {/* Type Specific Fields */}
-            {renderTypeFields()}
+              <div>
+                <label className='block text-sm mb-1'>Tags</label>
+                <input
+                  type='text'
+                  value={tags.join(", ")}
+                  onChange={(e) =>
+                    setTags(e.target.value.split(",").map((t) => t.trim()))
+                  }
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Comma-separated tags (optional)'
+                />
+              </div>
 
-            <div>
-              <label className='block text-sm mb-1'>Description</label>
-              <input
-                type='text'
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className='w-full px-3 py-2 border rounded-lg'
-                placeholder='Optional description'
-              />
-            </div>
-
-            <div>
-              <label className='block text-sm mb-1'>Tags</label>
-              <input
-                type='text'
-                value={tags.join(", ")}
-                onChange={(e) =>
-                  setTags(e.target.value.split(",").map((t) => t.trim()))
-                }
-                className='w-full px-3 py-2 border rounded-lg'
-                placeholder='Comma-separated tags (optional)'
-              />
-            </div>
-
-            <div>
-              <label className='block text-sm mb-1'>Notes</label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                className='w-full px-3 py-2 border rounded-lg'
-                placeholder='Optional notes'
-              />
+              <div>
+                <label className='block text-sm mb-1'>Notes</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional notes'
+                />
+              </div>
             </div>
           </div>
 

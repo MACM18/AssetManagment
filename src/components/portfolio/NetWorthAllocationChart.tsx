@@ -3,10 +3,11 @@
 import { useMemo, useEffect, useState } from "react";
 import { usePortfolio } from "@/contexts/PortfolioContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Wallet } from "lucide-react";
 import { PieChart, Pie, ResponsiveContainer, Tooltip, Cell } from "recharts";
 
-// Predefined color palette for pie chart
-const COLORS = [
+// Predefined color palette for pie chart - theme-aware
+const COLORS_LIGHT = [
   "#3b82f6", // blue
   "#10b981", // green
   "#f59e0b", // amber
@@ -21,9 +22,27 @@ const COLORS = [
   "#06b6d4", // cyan
 ];
 
+const COLORS_DARK = [
+  "#60a5fa", // lighter blue
+  "#34d399", // lighter green
+  "#fbbf24", // lighter amber
+  "#f87171", // lighter red
+  "#a78bfa", // lighter violet
+  "#f472b6", // lighter pink
+  "#2dd4bf", // lighter teal
+  "#fb923c", // lighter orange
+  "#818cf8", // lighter indigo
+  "#a3e635", // lighter lime
+  "#fb7185", // lighter rose
+  "#22d3ee", // lighter cyan
+];
+
 export default function NetWorthAllocationChart() {
   const { summary, assetsSummary } = usePortfolio();
   const { actualTheme } = useTheme();
+
+  // Select color palette based on theme
+  const COLORS = actualTheme === "dark" ? COLORS_DARK : COLORS_LIGHT;
 
   // Get computed colors from CSS variables
   const [chartColors, setChartColors] = useState({
@@ -31,6 +50,7 @@ export default function NetWorthAllocationChart() {
     grid: "#e5e7eb",
     text: "#000000",
     background: "#ffffff",
+    card: "#ffffff",
   });
 
   useEffect(() => {
@@ -46,7 +66,9 @@ export default function NetWorthAllocationChart() {
         computedStyle.getPropertyValue("--color-foreground").trim() ||
         "#000000",
       background:
-        computedStyle.getPropertyValue("--color-card").trim() || "#ffffff",
+        computedStyle.getPropertyValue("--color-background").trim() ||
+        "#ffffff",
+      card: computedStyle.getPropertyValue("--color-card").trim() || "#ffffff",
     });
   }, [actualTheme]);
 
@@ -109,13 +131,18 @@ export default function NetWorthAllocationChart() {
 
   if (chartData.length === 0) {
     return (
-      <div className='bg-card rounded-lg shadow-lg p-6 border border-border'>
+      <div className='bg-card rounded-xl shadow-lg p-6 border border-border'>
         <h3 className='text-lg font-bold mb-4 text-foreground'>
           Net Worth Allocation
         </h3>
-        <div className='text-center py-8'>
-          <p className='text-muted-foreground'>No data to display</p>
-          <p className='text-sm mt-1 text-muted-foreground'>
+        <div className='text-center py-12'>
+          <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-muted/30 flex items-center justify-center'>
+            <Wallet className='w-8 h-8 text-muted-foreground' />
+          </div>
+          <p className='text-muted-foreground font-medium'>
+            No data to display
+          </p>
+          <p className='text-sm mt-2 text-muted-foreground'>
             Add holdings or assets to see allocation
           </p>
         </div>
@@ -124,26 +151,29 @@ export default function NetWorthAllocationChart() {
   }
 
   return (
-    <div className='bg-card rounded-lg shadow-lg p-6 border border-border'>
-      <h3 className='text-lg font-bold mb-4 text-foreground'>
+    <div className='bg-card rounded-xl shadow-lg p-6 border border-border hover:shadow-xl transition-shadow'>
+      <h3 className='text-lg font-bold mb-6 text-foreground'>
         Net Worth Allocation
       </h3>
 
-      <ResponsiveContainer width='100%' height={300}>
+      <ResponsiveContainer width='100%' height={280}>
         <PieChart>
           <Pie
             data={chartData}
             cx='50%'
             cy='50%'
             labelLine={false}
-            outerRadius={100}
+            outerRadius={95}
+            innerRadius={60}
             dataKey='value'
+            strokeWidth={2}
+            stroke={chartColors.card}
           >
             {chartData.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
-                opacity={0.85}
+                opacity={0.9}
               />
             ))}
           </Pie>
@@ -155,10 +185,15 @@ export default function NetWorthAllocationChart() {
               })}`
             }
             contentStyle={{
-              backgroundColor: chartColors.background,
+              backgroundColor: chartColors.card,
               border: `1px solid ${chartColors.grid}`,
               borderRadius: "8px",
               color: chartColors.text,
+              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+            }}
+            labelStyle={{
+              color: chartColors.text,
+              fontWeight: 600,
             }}
           />
         </PieChart>
@@ -166,37 +201,39 @@ export default function NetWorthAllocationChart() {
 
       {/* Allocation Table */}
       <div className='mt-6 border-t border-border pt-4'>
-        <div className='space-y-2'>
+        <div className='space-y-3'>
           {chartData.map((item, index) => (
             <div
               key={item.name}
-              className='flex items-center justify-between text-sm'
+              className='flex items-center justify-between text-sm hover:bg-secondary/30 p-2 rounded-lg transition-colors'
             >
               <div className='flex items-center gap-2'>
                 <div
-                  className='w-3 h-3 rounded-full'
+                  className='w-3 h-3 rounded-full shadow-sm'
                   style={{ backgroundColor: COLORS[index % COLORS.length] }}
                 />
-                <span className='font-medium text-foreground'>{item.name}</span>
+                <span className='font-semibold text-foreground'>
+                  {item.name}
+                </span>
                 <span
-                  className={`text-xs px-1.5 py-0.5 rounded ${
+                  className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                     item.type === "stock"
-                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                      : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "bg-success/10 text-success border border-success/20"
                   }`}
                 >
                   {item.type}
                 </span>
               </div>
               <div className='flex items-center gap-4'>
-                <span className='text-muted-foreground'>
+                <span className='text-muted-foreground text-xs'>
                   LKR{" "}
                   {item.value.toLocaleString("en-LK", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </span>
-                <span className='font-semibold min-w-[60px] text-right text-foreground'>
+                <span className='font-bold min-w-[60px] text-right text-foreground'>
                   {item.percentage.toFixed(2)}%
                 </span>
               </div>
@@ -204,9 +241,9 @@ export default function NetWorthAllocationChart() {
           ))}
         </div>
         <div className='mt-4 pt-3 border-t border-border'>
-          <div className='flex justify-between text-sm font-semibold'>
-            <span>Total Net Worth</span>
-            <span>
+          <div className='flex justify-between text-sm font-bold'>
+            <span className='text-foreground'>Total Net Worth</span>
+            <span className='text-primary'>
               LKR{" "}
               {totalValue.toLocaleString("en-LK", {
                 minimumFractionDigits: 2,

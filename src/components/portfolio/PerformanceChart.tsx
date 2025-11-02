@@ -3,6 +3,7 @@
 import { useMemo, useEffect, useState } from "react";
 import { usePortfolio } from "@/contexts/PortfolioContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -26,6 +27,7 @@ export default function PerformanceChart() {
     grid: "#e5e7eb",
     text: "#000000",
     background: "#ffffff",
+    card: "#ffffff",
   });
 
   useEffect(() => {
@@ -46,7 +48,9 @@ export default function PerformanceChart() {
         computedStyle.getPropertyValue("--color-foreground").trim() ||
         "#000000",
       background:
-        computedStyle.getPropertyValue("--color-card").trim() || "#ffffff",
+        computedStyle.getPropertyValue("--color-background").trim() ||
+        "#ffffff",
+      card: computedStyle.getPropertyValue("--color-card").trim() || "#ffffff",
     });
   }, [actualTheme]);
 
@@ -64,13 +68,18 @@ export default function PerformanceChart() {
 
   if (!summary || summary.holdings.length === 0) {
     return (
-      <div className='bg-card rounded-lg shadow-lg p-6 border border-border'>
+      <div className='bg-card rounded-xl shadow-lg p-6 border border-border'>
         <h3 className='text-lg font-bold mb-4 text-foreground'>
           Performance by Stock
         </h3>
-        <div className='text-center py-8'>
-          <p className='text-muted-foreground'>No data to display</p>
-          <p className='text-sm mt-1 text-muted-foreground'>
+        <div className='text-center py-12'>
+          <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-muted/30 flex items-center justify-center'>
+            <BarChart3 className='w-8 h-8 text-muted-foreground' />
+          </div>
+          <p className='text-muted-foreground font-medium'>
+            No data to display
+          </p>
+          <p className='text-sm mt-2 text-muted-foreground'>
             Add holdings to see performance
           </p>
         </div>
@@ -79,29 +88,36 @@ export default function PerformanceChart() {
   }
 
   return (
-    <div className='bg-card rounded-lg shadow-lg p-6 border border-border'>
-      <h3 className='text-lg font-bold mb-4 text-foreground'>
+    <div className='bg-card rounded-xl shadow-lg p-6 border border-border hover:shadow-xl transition-shadow'>
+      <h3 className='text-lg font-bold mb-6 text-foreground'>
         Performance by Stock
       </h3>
 
-      <ResponsiveContainer width='100%' height={300}>
-        <BarChart data={chartData}>
+      <ResponsiveContainer width='100%' height={280}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+        >
           <CartesianGrid
             strokeDasharray='3 3'
             stroke={chartColors.grid}
-            opacity={0.5}
+            opacity={0.3}
+            vertical={false}
           />
           <XAxis
             dataKey='symbol'
             stroke={chartColors.muted}
-            style={{ fontSize: "12px" }}
+            tick={{ fill: chartColors.text, fontSize: 11 }}
+            tickLine={{ stroke: chartColors.grid }}
           />
           <YAxis
             tickFormatter={(value) => `${value >= 0 ? "+" : ""}${value}`}
             stroke={chartColors.muted}
-            style={{ fontSize: "12px" }}
+            tick={{ fill: chartColors.text, fontSize: 11 }}
+            tickLine={{ stroke: chartColors.grid }}
           />
           <Tooltip
+            cursor={{ fill: chartColors.grid, opacity: 0.1 }}
             formatter={(value: number) =>
               `LKR ${value.toLocaleString("en-LK", {
                 minimumFractionDigits: 2,
@@ -109,13 +125,18 @@ export default function PerformanceChart() {
               })}`
             }
             contentStyle={{
-              backgroundColor: chartColors.background,
+              backgroundColor: chartColors.card,
               border: `1px solid ${chartColors.grid}`,
               borderRadius: "8px",
               color: chartColors.text,
+              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+            }}
+            labelStyle={{
+              color: chartColors.text,
+              fontWeight: 600,
             }}
           />
-          <Bar dataKey='gainLoss' radius={[8, 8, 0, 0]}>
+          <Bar dataKey='gainLoss' radius={[6, 6, 0, 0]} maxBarSize={60}>
             {chartData.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
@@ -124,7 +145,7 @@ export default function PerformanceChart() {
                     ? chartColors.success
                     : chartColors.destructive
                 }
-                opacity={0.8}
+                opacity={0.85}
               />
             ))}
           </Bar>
@@ -133,30 +154,39 @@ export default function PerformanceChart() {
 
       {/* Performance Summary */}
       <div className='mt-6 border-t border-border pt-4'>
-        <div className='grid grid-cols-2 gap-4 text-sm'>
-          <div>
-            <p className='mb-1 text-muted-foreground'>Biggest Gain</p>
-            <p className='font-bold text-foreground'>
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='bg-success/10 border border-success/30 rounded-lg p-3 hover:bg-success/15 transition-colors'>
+            <div className='flex items-center gap-2 mb-2'>
+              <TrendingUp className='w-4 h-4 text-success' />
+              <p className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                Biggest Gain
+              </p>
+            </div>
+            <p className='font-bold text-foreground text-lg'>
               {chartData[0]?.symbol || "N/A"}
-              {chartData[0] && (
-                <span className='ml-2 text-xs text-success'>
-                  +{chartData[0].gainLossPercent.toFixed(2)}%
+            </p>
+            {chartData[0] && (
+              <span className='text-sm font-semibold text-success'>
+                +{chartData[0].gainLossPercent.toFixed(2)}%
+              </span>
+            )}
+          </div>
+          <div className='bg-destructive/10 border border-destructive/30 rounded-lg p-3 hover:bg-destructive/15 transition-colors'>
+            <div className='flex items-center gap-2 mb-2'>
+              <TrendingDown className='w-4 h-4 text-destructive' />
+              <p className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                Biggest Loss
+              </p>
+            </div>
+            <p className='font-bold text-foreground text-lg'>
+              {chartData[chartData.length - 1]?.symbol || "N/A"}
+            </p>
+            {chartData[chartData.length - 1] &&
+              chartData[chartData.length - 1].gainLoss < 0 && (
+                <span className='text-sm font-semibold text-destructive'>
+                  {chartData[chartData.length - 1].gainLossPercent.toFixed(2)}%
                 </span>
               )}
-            </p>
-          </div>
-          <div>
-            <p className='mb-1 text-muted-foreground'>Biggest Loss</p>
-            <p className='font-bold text-foreground'>
-              {chartData[chartData.length - 1]?.symbol || "N/A"}
-              {chartData[chartData.length - 1] &&
-                chartData[chartData.length - 1].gainLoss < 0 && (
-                  <span className='ml-2 text-xs text-destructive'>
-                    {chartData[chartData.length - 1].gainLossPercent.toFixed(2)}
-                    %
-                  </span>
-                )}
-            </p>
           </div>
         </div>
       </div>

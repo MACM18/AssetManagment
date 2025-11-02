@@ -6,6 +6,7 @@ import type { AxiosRequestConfig } from "axios";
 // Add or remove stock symbols here as needed
 export const CSE_SYMBOLS = [
   "JKH",
+  "JKL",
   "COMB",
   "DIAL",
   "SAMP",
