@@ -1357,7 +1357,7 @@ export default function AddAssetModal({
           </div>
 
           <div className='sticky bottom-0 backdrop-blur-lg border-t px-4 sm:px-6 py-3 sm:py-4 rounded-b-2xl'>
-            <div className='flex gap-3'>
+            <div className='flex gap-3 backdrop-blur-lg'>
               <button
                 type='button'
                 onClick={onClose}
