@@ -202,6 +202,7 @@ export interface PortfolioHoldingWithMetrics extends PortfolioHolding {
 export type AssetType =
   | "fixed-asset" // Land/Gold/Property/Vehicle etc.
   | "fixed-deposit"
+  | "goal-based-fixed-deposit"
   | "savings"
   | "mutual-fund"
   | "treasury-bond";
@@ -254,6 +255,26 @@ export interface FixedDeposit extends BaseAsset {
   interestEarned?: number; // Accumulated interest
 }
 
+// Goal Based Fixed Deposit
+export interface GoalBasedFixedDeposit extends BaseAsset {
+  type: "goal-based-fixed-deposit";
+  bank: string;
+  accountNumber?: string; // Masked for security
+  principal: number; // LKR
+  interestRate: number; // annual % e.g., 12.5 means 12.5%
+  compounding: "simple" | "monthly" | "quarterly" | "annually";
+  startDate: string;
+  maturityDate: string;
+  goalName: string; // e.g., "Child Education", "House Purchase", "Retirement"
+  goalAmount: number; // Target amount needed for the goal (LKR)
+  goalPriority: "low" | "medium" | "high"; // Priority level
+  goalDescription?: string; // Additional details about the goal
+  autoRenewal?: boolean;
+  maturityAmount?: number; // Calculated maturity value
+  interestEarned?: number; // Accumulated interest
+  progressPercent?: number; // Current progress towards goal (calculated)
+}
+
 // Savings Account
 export interface SavingsAccount extends BaseAsset {
   type: "savings";
@@ -300,6 +321,7 @@ export interface TreasuryBond extends BaseAsset {
 export type PortfolioAsset =
   | FixedAsset
   | FixedDeposit
+  | GoalBasedFixedDeposit
   | SavingsAccount
   | MutualFund
   | TreasuryBond;
@@ -375,6 +397,10 @@ export interface AssetFormData {
   compounding?: string;
   startDate?: string;
   maturityDate?: string;
+  goalName?: string;
+  goalAmount?: number;
+  goalPriority?: string;
+  goalDescription?: string;
   autoRenewal?: boolean;
   balance?: number;
   lastUpdated?: string;

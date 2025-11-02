@@ -599,6 +599,66 @@ export function computeAssetMetrics(
         daysToMaturity,
       };
     }
+    case "goal-based-fixed-deposit": {
+      const p = asset.principal;
+      const r = (asset.interestRate || 0) / 100;
+      const endISO =
+        asset.maturityDate && asset.autoRenewal !== true
+          ? new Date(
+              Math.min(
+                new Date(asOfISO).getTime(),
+                new Date(asset.maturityDate).getTime()
+              )
+            ).toISOString()
+          : asOfISO;
+      const t = yearsBetween(asset.startDate, endISO);
+      let currentValue = p;
+      if (
+        asset.compounding === "simple" ||
+        periodsPerYear(asset.compounding) === 0
+      ) {
+        currentValue = p * (1 + r * t);
+      } else {
+        const m = periodsPerYear(asset.compounding);
+        currentValue = p * Math.pow(1 + r / m, m * t);
+      }
+      const invested = p;
+      const gainLoss = currentValue - invested;
+      const gainLossPercent = invested > 0 ? (gainLoss / invested) * 100 : 0;
+
+      // Calculate progress towards goal
+      const progressPercent =
+        asset.goalAmount > 0 ? (currentValue / asset.goalAmount) * 100 : 0;
+
+      // Calculate days to maturity
+      const daysToMaturity = asset.maturityDate
+        ? Math.max(
+            0,
+            Math.ceil(
+              (new Date(asset.maturityDate).getTime() -
+                new Date(asOfISO).getTime()) /
+                (1000 * 60 * 60 * 24)
+            )
+          )
+        : undefined;
+
+      const isMatured = daysToMaturity === 0;
+
+      return {
+        ...asset,
+        invested,
+        currentValue,
+        gainLoss,
+        gainLossPercent,
+        isPositive: gainLoss >= 0,
+        formattedGainLoss: formatCurrency(Math.abs(gainLoss)),
+        formattedCurrentValue: formatCurrency(currentValue),
+        formattedInvested: formatCurrency(invested),
+        progressPercent,
+        status: isMatured ? "matured" : "active",
+        daysToMaturity,
+      };
+    }
     case "savings": {
       const currentValue = asset.balance;
       return {

@@ -10,6 +10,7 @@ import type {
   PortfolioAsset,
   FixedAsset,
   FixedDeposit,
+  GoalBasedFixedDeposit,
   SavingsAccount,
   MutualFund,
   TreasuryBond,
@@ -63,6 +64,23 @@ export default function AddAssetModal({
   const [fdStart, setFdStart] = useState(today);
   const [fdMaturity, setFdMaturity] = useState("");
   const [fdAuto, setFdAuto] = useState(true);
+
+  const [gfdBank, setGfdBank] = useState("");
+  const [gfdAccountNumber, setGfdAccountNumber] = useState("");
+  const [gfdPrincipal, setGfdPrincipal] = useState("");
+  const [gfdRate, setGfdRate] = useState("");
+  const [gfdComp, setGfdComp] = useState<
+    "simple" | "monthly" | "quarterly" | "annually"
+  >("monthly");
+  const [gfdStart, setGfdStart] = useState(today);
+  const [gfdMaturity, setGfdMaturity] = useState("");
+  const [gfdGoalName, setGfdGoalName] = useState("");
+  const [gfdGoalAmount, setGfdGoalAmount] = useState("");
+  const [gfdGoalPriority, setGfdGoalPriority] = useState<
+    "low" | "medium" | "high"
+  >("medium");
+  const [gfdGoalDescription, setGfdGoalDescription] = useState("");
+  const [gfdAuto, setGfdAuto] = useState(true);
 
   const [svBank, setSvBank] = useState("");
   const [svAccountNumber, setSvAccountNumber] = useState("");
@@ -159,6 +177,38 @@ export default function AddAssetModal({
       setFdStart((asset as FixedDeposit).startDate || today);
       setFdMaturity((asset as FixedDeposit).maturityDate || "");
       setFdAuto((asset as FixedDeposit).autoRenewal || false);
+    }
+
+    // goal based fixed deposit
+    if (asset.type === "goal-based-fixed-deposit") {
+      setGfdBank((asset as GoalBasedFixedDeposit).bank || "");
+      setGfdAccountNumber((asset as GoalBasedFixedDeposit).accountNumber || "");
+      setGfdPrincipal(
+        (asset as GoalBasedFixedDeposit).principal !== undefined
+          ? String((asset as GoalBasedFixedDeposit).principal)
+          : ""
+      );
+      setGfdRate(
+        (asset as GoalBasedFixedDeposit).interestRate !== undefined
+          ? String((asset as GoalBasedFixedDeposit).interestRate)
+          : ""
+      );
+      setGfdComp((asset as GoalBasedFixedDeposit).compounding || "monthly");
+      setGfdStart((asset as GoalBasedFixedDeposit).startDate || today);
+      setGfdMaturity((asset as GoalBasedFixedDeposit).maturityDate || "");
+      setGfdGoalName((asset as GoalBasedFixedDeposit).goalName || "");
+      setGfdGoalAmount(
+        (asset as GoalBasedFixedDeposit).goalAmount !== undefined
+          ? String((asset as GoalBasedFixedDeposit).goalAmount)
+          : ""
+      );
+      setGfdGoalPriority(
+        (asset as GoalBasedFixedDeposit).goalPriority || "medium"
+      );
+      setGfdGoalDescription(
+        (asset as GoalBasedFixedDeposit).goalDescription || ""
+      );
+      setGfdAuto((asset as GoalBasedFixedDeposit).autoRenewal || false);
     }
 
     // savings
@@ -323,6 +373,44 @@ export default function AddAssetModal({
           startDate: fdStart,
           maturityDate: fdMaturity || "",
           autoRenewal: fdAuto,
+        };
+        payload = obj;
+      } else if (type === "goal-based-fixed-deposit") {
+        if (
+          !gfdBank ||
+          !gfdPrincipal ||
+          !gfdRate ||
+          !gfdStart ||
+          !gfdGoalName ||
+          !gfdGoalAmount
+        ) {
+          setError(
+            "Fill bank, principal, rate, start date, goal name and goal amount"
+          );
+          setLoading(false);
+          return;
+        }
+        const obj: Omit<
+          GoalBasedFixedDeposit,
+          "id" | "userId" | "createdAt" | "updatedAt"
+        > = {
+          type,
+          name: name.trim(),
+          description: description.trim() || undefined,
+          notes: notes.trim() || undefined,
+          tags: tags.filter((t) => t.trim()),
+          bank: gfdBank,
+          accountNumber: gfdAccountNumber || undefined,
+          principal: num(gfdPrincipal),
+          interestRate: num(gfdRate),
+          compounding: gfdComp,
+          startDate: gfdStart,
+          maturityDate: gfdMaturity || "",
+          goalName: gfdGoalName,
+          goalAmount: num(gfdGoalAmount),
+          goalPriority: gfdGoalPriority,
+          goalDescription: gfdGoalDescription || undefined,
+          autoRenewal: gfdAuto,
         };
         payload = obj;
       } else if (type === "savings") {
@@ -638,6 +726,152 @@ export default function AddAssetModal({
               <label htmlFor='fd-auto' className='text-sm'>
                 Auto Renew
               </label>
+            </div>
+          </div>
+        );
+      case "goal-based-fixed-deposit":
+        return (
+          <div className='space-y-3'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
+                <label className='block text-sm mb-1'>Bank</label>
+                <input
+                  type='text'
+                  value={gfdBank}
+                  onChange={(e) => setGfdBank(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                />
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>Account Number</label>
+                <input
+                  type='text'
+                  value={gfdAccountNumber}
+                  onChange={(e) => setGfdAccountNumber(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
+                <label className='block text-sm mb-1'>Principal (LKR)</label>
+                <input
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={gfdPrincipal}
+                  onChange={(e) => setGfdPrincipal(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                />
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>
+                  Interest Rate (% p.a.)
+                </label>
+                <input
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={gfdRate}
+                  onChange={(e) => setGfdRate(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+              <div>
+                <label className='block text-sm mb-1'>Compounding</label>
+                <select
+                  value={gfdComp}
+                  onChange={(e) => setGfdComp(e.target.value as typeof gfdComp)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                >
+                  <option value='simple'>Simple</option>
+                  <option value='monthly'>Monthly</option>
+                  <option value='quarterly'>Quarterly</option>
+                  <option value='annually'>Annually</option>
+                </select>
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>Start Date</label>
+                <input
+                  type='date'
+                  value={gfdStart}
+                  onChange={(e) => setGfdStart(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                />
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>Maturity Date</label>
+                <input
+                  type='date'
+                  value={gfdMaturity}
+                  onChange={(e) => setGfdMaturity(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='Optional'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
+                <label className='block text-sm mb-1'>Goal Name</label>
+                <input
+                  type='text'
+                  value={gfdGoalName}
+                  onChange={(e) => setGfdGoalName(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                  placeholder='e.g., Child Education, House Purchase'
+                />
+              </div>
+              <div>
+                <label className='block text-sm mb-1'>Goal Amount (LKR)</label>
+                <input
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={gfdGoalAmount}
+                  onChange={(e) => setGfdGoalAmount(e.target.value)}
+                  className='w-full px-3 py-2 border rounded-lg'
+                />
+              </div>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <div>
+                <label className='block text-sm mb-1'>Goal Priority</label>
+                <select
+                  value={gfdGoalPriority}
+                  onChange={(e) =>
+                    setGfdGoalPriority(e.target.value as typeof gfdGoalPriority)
+                  }
+                  className='w-full px-3 py-2 border rounded-lg'
+                >
+                  <option value='low'>Low</option>
+                  <option value='medium'>Medium</option>
+                  <option value='high'>High</option>
+                </select>
+              </div>
+              <div className='flex items-center gap-2'>
+                <input
+                  id='gfd-auto'
+                  type='checkbox'
+                  checked={gfdAuto}
+                  onChange={(e) => setGfdAuto(e.target.checked)}
+                />
+                <label htmlFor='gfd-auto' className='text-sm'>
+                  Auto Renew
+                </label>
+              </div>
+            </div>
+            <div>
+              <label className='block text-sm mb-1'>Goal Description</label>
+              <textarea
+                value={gfdGoalDescription}
+                onChange={(e) => setGfdGoalDescription(e.target.value)}
+                rows={2}
+                className='w-full px-3 py-2 border rounded-lg'
+                placeholder='Additional details about your goal (optional)'
+              />
             </div>
           </div>
         );
@@ -1017,7 +1251,7 @@ export default function AddAssetModal({
       <div className='relative w-full max-w-2xl mx-auto my-8 rounded-2xl shadow-2xl border backdrop-blur-lg'>
         <div className='sticky top-0 backdrop-blur-lg border-b px-6 py-4 flex justify-between items-center rounded-t-2xl'>
           <h2 id='add-asset-title' className='text-2xl font-bold'>
-            Add Portfolio Asset
+            {asset ? "Edit Portfolio Asset" : "Add Portfolio Asset"}
           </h2>
           <button onClick={onClose} className='transition-colors'>
             <X className='w-6 h-6' />
@@ -1039,6 +1273,9 @@ export default function AddAssetModal({
               >
                 <option value='fixed-asset'>Fixed Asset (Land/Gold)</option>
                 <option value='fixed-deposit'>Fixed Deposit</option>
+                <option value='goal-based-fixed-deposit'>
+                  Goal Based Fixed Deposit
+                </option>
                 <option value='savings'>Savings</option>
                 <option value='mutual-fund'>Mutual Fund</option>
                 <option value='treasury-bond'>Treasury Bond</option>
@@ -1107,7 +1344,13 @@ export default function AddAssetModal({
               disabled={loading}
               className='flex-1 px-4 py-2 border rounded-lg font-semibold disabled:opacity-50'
             >
-              {loading ? "Adding..." : "Add Asset"}
+              {loading
+                ? asset
+                  ? "Updating..."
+                  : "Adding..."
+                : asset
+                ? "Update Asset"
+                : "Add Asset"}
             </button>
           </div>
         </form>

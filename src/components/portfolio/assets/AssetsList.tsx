@@ -120,6 +120,27 @@ export default function AssetsList() {
                     />
                   </>
                 )}
+                {a.type === "goal-based-fixed-deposit" && (
+                  <>
+                    <Detail label='Bank' value={a.bank} />
+                    <Detail
+                      label='Principal'
+                      value={`LKR ${a.principal.toLocaleString("en-LK", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`}
+                    />
+                    <Detail label='Rate' value={`${a.interestRate}% p.a.`} />
+                    <Detail label='Goal' value={a.goalName} />
+                    <Detail
+                      label='Target'
+                      value={`LKR ${a.goalAmount.toLocaleString("en-LK", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`}
+                    />
+                  </>
+                )}
                 {a.type === "savings" && (
                   <>
                     <Detail label='Bank' value={a.bank} />
