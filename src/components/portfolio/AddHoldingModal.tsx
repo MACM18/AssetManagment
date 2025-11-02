@@ -1,23 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import type { FirebaseError } from "firebase/app";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePortfolio } from "@/contexts/PortfolioContext";
-import { addHolding } from "@/lib/portfolio";
-import { StockQuote } from "@/types";
+import { addHolding, updateHolding } from "@/lib/portfolio";
+import { StockQuote, PortfolioHolding } from "@/types";
 import { X } from "lucide-react";
 
 interface AddHoldingModalProps {
   stocks: StockQuote[];
   onClose: () => void;
   onSuccess: () => void;
+  holding?: PortfolioHolding | null;
 }
 
 export default function AddHoldingModal({
   stocks,
   onClose,
   onSuccess,
+  holding,
 }: AddHoldingModalProps) {
   const { user } = useAuth();
   const { refreshPortfolio } = usePortfolio();
@@ -32,6 +33,17 @@ export default function AddHoldingModal({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Prefill form when editing
+  useEffect(() => {
+    if (holding) {
+      setSymbol(holding.symbol);
+      setQuantity(String(holding.quantity));
+      setPurchasePrice(String(holding.purchasePrice));
+      setPurchaseDate(holding.purchaseDate);
+      setNotes(holding.notes || "");
+    }
+  }, [holding]);
+
   const selectedStock = stocks.find((s) => s.symbol === symbol);
 
   const sanitizeNumber = (val: string) =>
@@ -42,7 +54,7 @@ export default function AddHoldingModal({
     setError("");
 
     if (!user) {
-      setError("You must be logged in to add holdings");
+      setError("User not authenticated");
       return;
     }
 
@@ -51,55 +63,48 @@ export default function AddHoldingModal({
       return;
     }
 
-    // Ensure the symbol exists in provided stock list
-    if (!stocks.some((s) => s.symbol === symbol)) {
-      setError("Please select a valid stock symbol from the list");
+    const quantityNum = parseFloat(quantity);
+    const purchasePriceNum = parseFloat(purchasePrice);
+
+    if (isNaN(quantityNum) || quantityNum <= 0) {
+      setError("Please enter a valid quantity");
       return;
     }
 
-    const quantityNum = sanitizeNumber(quantity);
-    const priceNum = sanitizeNumber(purchasePrice);
-
-    if (!Number.isFinite(quantityNum) || !Number.isFinite(priceNum)) {
-      setError("Quantity and price must be valid numbers");
-      return;
-    }
-
-    if (quantityNum <= 0 || priceNum <= 0) {
-      setError("Quantity and price must be positive numbers");
+    if (isNaN(purchasePriceNum) || purchasePriceNum <= 0) {
+      setError("Please enter a valid purchase price");
       return;
     }
 
     setLoading(true);
-
     try {
-      await addHolding(user.uid, {
-        symbol,
-        companyName: selectedStock?.companyName || symbol,
-        quantity: quantityNum,
-        purchasePrice: priceNum,
-        purchaseDate,
-        notes: notes.trim() || undefined,
-      });
+      if (holding) {
+        // Update existing holding
+        await updateHolding(user.uid, holding.id, {
+          symbol,
+          quantity: quantityNum,
+          purchasePrice: purchasePriceNum,
+          purchaseDate,
+          notes: notes || undefined,
+        });
+      } else {
+        // Add new holding
+        await addHolding(user.uid, {
+          symbol,
+          companyName: selectedStock?.companyName || symbol,
+          quantity: quantityNum,
+          purchasePrice: purchasePriceNum,
+          purchaseDate,
+          notes: notes || undefined,
+        });
+      }
 
-      await refreshPortfolio(stocks);
+      await refreshPortfolio();
       onSuccess();
       onClose();
-    } catch (err: unknown) {
-      const code = (err as FirebaseError)?.code;
-      if (code === "permission-denied") {
-        setError(
-          "Permission denied when writing to your portfolio. Please ensure your account has access."
-        );
-      } else if (code === "unavailable") {
-        setError(
-          "Service temporarily unavailable. Please check your connection and try again."
-        );
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Failed to add holding. Please try again.");
-      }
+    } catch (err) {
+      console.error("Error saving holding:", err);
+      setError("Failed to save holding. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -115,7 +120,7 @@ export default function AddHoldingModal({
       <div className='relative w-full max-w-lg mx-auto my-8 rounded-2xl shadow-2xl border backdrop-blur-lg'>
         <div className='sticky top-0 backdrop-blur-lg border-b px-6 py-4 flex justify-between items-center rounded-t-2xl'>
           <h2 id='add-holding-title' className='text-2xl font-bold'>
-            Add Stock Holding
+            {holding ? "Edit Stock Holding" : "Add Stock Holding"}
           </h2>
           <button onClick={onClose} className='transition-colors'>
             <X className='w-6 h-6' />
@@ -276,7 +281,13 @@ export default function AddHoldingModal({
               {loading && (
                 <span className='inline-block h-4 w-4 border-2 border-t-transparent rounded-full animate-spin' />
               )}
-              {loading ? "Adding..." : "Add Holding"}
+              {loading
+                ? holding
+                  ? "Updating..."
+                  : "Adding..."
+                : holding
+                ? "Update Holding"
+                : "Add Holding"}
             </button>
           </div>
         </form>

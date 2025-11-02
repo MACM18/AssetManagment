@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePortfolio } from "@/contexts/PortfolioContext";
-import { addAsset } from "@/lib/portfolio";
+import { addAsset, updateAsset as libUpdateAsset } from "@/lib/portfolio";
 import type {
   AssetType,
   PortfolioAsset,
@@ -18,11 +18,13 @@ import type {
 interface AddAssetModalProps {
   onClose: () => void;
   onSuccess: () => void;
+  asset?: PortfolioAsset | null;
 }
 
 export default function AddAssetModal({
   onClose,
   onSuccess,
+  asset,
 }: AddAssetModalProps) {
   const { user } = useAuth();
   const { refreshPortfolio } = usePortfolio();
@@ -101,6 +103,155 @@ export default function AddAssetModal({
   const [tbPurchaseDate, setTbPurchaseDate] = useState("");
   const [tbMaturityDate, setTbMaturityDate] = useState("");
   const [tbMarketPrice, setTbMarketPrice] = useState("");
+
+  // Populate state when editing an existing asset
+  useEffect(() => {
+    if (!asset) return;
+    setType(asset.type as AssetType);
+    setName(asset.name || "");
+    setDescription((asset as PortfolioAsset).description || "");
+    setNotes((asset as PortfolioAsset).notes || "");
+    setTags(((asset as PortfolioAsset).tags as string[]) || []);
+
+    // fixed asset
+    if (asset.type === "fixed-asset") {
+      setFaCategory((asset as FixedAsset).category || "land");
+      setFaPurchaseDate((asset as FixedAsset).purchaseDate || "");
+      setFaPurchasePrice(
+        (asset as FixedAsset).purchasePrice !== undefined
+          ? String((asset as FixedAsset).purchasePrice)
+          : ""
+      );
+      setFaCurrentValue(
+        (asset as FixedAsset).currentValue !== undefined
+          ? String((asset as FixedAsset).currentValue)
+          : ""
+      );
+      setFaAppraisalDate((asset as FixedAsset).appraisalDate || "");
+      setFaDetails((asset as FixedAsset).locationOrDetails || "");
+      setFaInsuranceValue(
+        (asset as FixedAsset).insuranceValue !== undefined
+          ? String((asset as FixedAsset).insuranceValue)
+          : ""
+      );
+      setFaDepreciationRate(
+        (asset as FixedAsset).depreciationRate !== undefined
+          ? String((asset as FixedAsset).depreciationRate)
+          : ""
+      );
+    }
+
+    // fixed deposit
+    if (asset.type === "fixed-deposit") {
+      setFdBank((asset as FixedDeposit).bank || "");
+      setFdAccountNumber((asset as FixedDeposit).accountNumber || "");
+      setFdPrincipal(
+        (asset as FixedDeposit).principal !== undefined
+          ? String((asset as FixedDeposit).principal)
+          : ""
+      );
+      setFdRate(
+        (asset as FixedDeposit).interestRate !== undefined
+          ? String((asset as FixedDeposit).interestRate)
+          : ""
+      );
+      setFdComp((asset as FixedDeposit).compounding || "monthly");
+      setFdStart((asset as FixedDeposit).startDate || today);
+      setFdMaturity((asset as FixedDeposit).maturityDate || "");
+      setFdAuto((asset as FixedDeposit).autoRenewal || false);
+    }
+
+    // savings
+    if (asset.type === "savings") {
+      setSvBank((asset as SavingsAccount).bank || "");
+      setSvAccountNumber((asset as SavingsAccount).accountNumber || "");
+      setSvAccountType((asset as SavingsAccount).accountType || "regular");
+      setSvBalance(
+        (asset as SavingsAccount).balance !== undefined
+          ? String((asset as SavingsAccount).balance)
+          : ""
+      );
+      setSvRate(
+        (asset as SavingsAccount).interestRate !== undefined
+          ? String((asset as SavingsAccount).interestRate)
+          : ""
+      );
+      setSvUpdated((asset as SavingsAccount).lastUpdated || today);
+      setSvMinimumBalance(
+        (asset as SavingsAccount).minimumBalance !== undefined
+          ? String((asset as SavingsAccount).minimumBalance)
+          : ""
+      );
+      setSvMonthlyFee(
+        (asset as SavingsAccount).monthlyFee !== undefined
+          ? String((asset as SavingsAccount).monthlyFee)
+          : ""
+      );
+    }
+
+    // mutual fund
+    if (asset.type === "mutual-fund") {
+      setMfCode((asset as MutualFund).fundCode || "");
+      setMfManager((asset as MutualFund).fundManager || "");
+      setMfCategory((asset as MutualFund).category || "equity");
+      setMfUnits(
+        (asset as MutualFund).units !== undefined
+          ? String((asset as MutualFund).units)
+          : ""
+      );
+      setMfBuyNav(
+        (asset as MutualFund).buyNav !== undefined
+          ? String((asset as MutualFund).buyNav)
+          : ""
+      );
+      setMfLastNav(
+        (asset as MutualFund).lastNav !== undefined
+          ? String((asset as MutualFund).lastNav)
+          : ""
+      );
+      setMfLastNavDate((asset as MutualFund).lastNavDate || "");
+      setMfExpenseRatio(
+        (asset as MutualFund).expenseRatio !== undefined
+          ? String((asset as MutualFund).expenseRatio)
+          : ""
+      );
+      setMfDividendFreq((asset as MutualFund).dividendFrequency || "annual");
+    }
+
+    // treasury bond
+    if (asset.type === "treasury-bond") {
+      setTbIssue((asset as TreasuryBond).issueCode || "");
+      setTbIssuer((asset as TreasuryBond).issuer || "government");
+      setTbFace(
+        (asset as TreasuryBond).faceValue !== undefined
+          ? String((asset as TreasuryBond).faceValue)
+          : ""
+      );
+      setTbUnits(
+        (asset as TreasuryBond).units !== undefined
+          ? String((asset as TreasuryBond).units)
+          : ""
+      );
+      setTbCoupon(
+        (asset as TreasuryBond).couponRate !== undefined
+          ? String((asset as TreasuryBond).couponRate)
+          : ""
+      );
+      setTbFreq((asset as TreasuryBond).couponFrequency || "semi-annual");
+      setTbPurchasePrice(
+        (asset as TreasuryBond).purchasePrice !== undefined
+          ? String((asset as TreasuryBond).purchasePrice)
+          : ""
+      );
+      setTbPurchaseDate((asset as TreasuryBond).purchaseDate || "");
+      setTbMaturityDate((asset as TreasuryBond).maturityDate || "");
+      setTbMarketPrice(
+        (asset as TreasuryBond).currentMarketPrice !== undefined
+          ? String((asset as TreasuryBond).currentMarketPrice)
+          : ""
+      );
+    }
+  }, [asset, today]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -255,7 +406,18 @@ export default function AddAssetModal({
       }
 
       if (!payload) throw new Error("Invalid asset data");
-      await addAsset(user.uid, payload);
+      if (asset && asset.id) {
+        // Update existing
+        await libUpdateAsset(
+          user.uid,
+          asset.id,
+          payload as Partial<
+            Omit<PortfolioAsset, "id" | "userId" | "createdAt">
+          >
+        );
+      } else {
+        await addAsset(user.uid, payload);
+      }
       await refreshPortfolio();
       onSuccess();
       onClose();

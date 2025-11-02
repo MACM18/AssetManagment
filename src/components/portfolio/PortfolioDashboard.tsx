@@ -149,7 +149,7 @@ export default function PortfolioDashboard() {
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8'>
           {/* Holdings List */}
           <div className='lg:col-span-2'>
-            <HoldingsList currentPrices={stocks} />
+            <HoldingsList currentPrices={stocks} stocks={stocks} />
           </div>
 
           {/* Transaction History */}

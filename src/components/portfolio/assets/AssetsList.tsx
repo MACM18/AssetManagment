@@ -1,15 +1,19 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import type { PortfolioAsset } from "@/types";
 import { usePortfolio } from "@/contexts/PortfolioContext";
 import { deleteAsset, computeAssetMetrics } from "@/lib/portfolio";
 import { useAuth } from "@/contexts/AuthContext";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit3 } from "lucide-react";
+import AddAssetModal from "@/components/portfolio/assets/AddAssetModal";
 
 export default function AssetsList() {
   const { assets, assetsSummary, refreshPortfolio } = usePortfolio();
   const { user } = useAuth();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingAsset, setEditingAsset] = useState<PortfolioAsset | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const rows = useMemo(
     () => assets.map((a) => computeAssetMetrics(a)),
@@ -174,17 +178,43 @@ export default function AssetsList() {
               </div>
 
               <div className='flex justify-end pt-3'>
-                <button
-                  onClick={() => handleDelete(a.id)}
-                  disabled={deletingId === a.id}
-                  className='p-2 underline disabled:opacity-50'
-                >
-                  <Trash2 className='w-5 h-5' />
-                </button>
+                <div className='flex items-center gap-2'>
+                  <button
+                    onClick={() => {
+                      // find original asset by id
+                      const orig = assets.find((x) => x.id === a.id) || null;
+                      setEditingAsset(orig);
+                      setShowEditModal(true);
+                    }}
+                    className='p-2 underline'
+                  >
+                    <Edit3 className='w-5 h-5' />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(a.id)}
+                    disabled={deletingId === a.id}
+                    className='p-2 underline disabled:opacity-50'
+                  >
+                    <Trash2 className='w-5 h-5' />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
+      )}
+      {showEditModal && editingAsset && (
+        <AddAssetModal
+          asset={editingAsset}
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingAsset(null);
+          }}
+          onSuccess={() => {
+            setShowEditModal(false);
+            setEditingAsset(null);
+          }}
+        />
       )}
     </div>
   );

@@ -12,20 +12,33 @@ import {
   Calendar,
   Hash,
   Eye,
+  Edit3,
 } from "lucide-react";
-import { StockQuote, PortfolioHoldingWithMetrics } from "@/types";
+import {
+  StockQuote,
+  PortfolioHoldingWithMetrics,
+  PortfolioHolding,
+} from "@/types";
 import StockDetailModal from "./StockDetailModal";
+import AddHoldingModal from "./AddHoldingModal";
 
 interface HoldingsListProps {
   currentPrices: StockQuote[];
+  stocks: StockQuote[];
 }
 
-export default function HoldingsList({ currentPrices }: HoldingsListProps) {
+export default function HoldingsList({
+  currentPrices,
+  stocks,
+}: HoldingsListProps) {
   const { summary, refreshPortfolio, loading } = usePortfolio();
   const { user, isAuthenticated } = useAuth();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedHolding, setSelectedHolding] =
     useState<PortfolioHoldingWithMetrics | null>(null);
+  const [editingHolding, setEditingHolding] = useState<PortfolioHolding | null>(
+    null
+  );
 
   if (!isAuthenticated) {
     return null;
@@ -121,14 +134,24 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
                   </button>
 
                   {originalHolding && (
-                    <button
-                      onClick={() => handleDelete(originalHolding.id)}
-                      disabled={deletingId === originalHolding.id}
-                      className='disabled:opacity-50 disabled:cursor-not-allowed p-2 underline'
-                      title='Delete holding'
-                    >
-                      <Trash2 className='w-5 h-5' />
-                    </button>
+                    <>
+                      <button
+                        onClick={() => setEditingHolding(originalHolding)}
+                        className='p-2 underline'
+                        title='Edit holding'
+                      >
+                        <Edit3 className='w-5 h-5' />
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(originalHolding.id)}
+                        disabled={deletingId === originalHolding.id}
+                        className='disabled:opacity-50 disabled:cursor-not-allowed p-2 underline'
+                        title='Delete holding'
+                      >
+                        <Trash2 className='w-5 h-5' />
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -230,6 +253,19 @@ export default function HoldingsList({ currentPrices }: HoldingsListProps) {
             (s) => s.symbol === selectedHolding.symbol
           )}
           onClose={() => setSelectedHolding(null)}
+        />
+      )}
+
+      {/* Edit Holding Modal */}
+      {editingHolding && (
+        <AddHoldingModal
+          stocks={stocks}
+          holding={editingHolding}
+          onClose={() => setEditingHolding(null)}
+          onSuccess={() => {
+            setEditingHolding(null);
+            refreshPortfolio(currentPrices);
+          }}
         />
       )}
     </div>

@@ -16,6 +16,10 @@ import {
   getUserAssets,
   calculatePortfolioSummary,
   calculateAssetsSummary,
+  updateAsset as libUpdateAsset,
+  updateHolding as libUpdateHolding,
+  deleteAsset as libDeleteAsset,
+  deleteHolding as libDeleteHolding,
 } from "@/lib/portfolio";
 
 interface PortfolioContextType {
@@ -26,6 +30,16 @@ interface PortfolioContextType {
   assetsSummary: AssetsSummary | null;
   loading: boolean;
   refreshPortfolio: (currentPrices?: StockQuote[]) => Promise<void>;
+  updateAsset: (
+    assetId: string,
+    updates: Partial<Omit<PortfolioAsset, "id" | "userId" | "createdAt">>
+  ) => Promise<void>;
+  updateHolding: (
+    holdingId: string,
+    updates: Partial<Omit<PortfolioHolding, "id" | "userId" | "createdAt">>
+  ) => Promise<void>;
+  deleteAsset: (assetId: string) => Promise<void>;
+  deleteHolding: (holdingId: string) => Promise<void>;
 }
 
 const PortfolioContext = createContext<PortfolioContextType>({
@@ -36,6 +50,10 @@ const PortfolioContext = createContext<PortfolioContextType>({
   assetsSummary: null,
   loading: true,
   refreshPortfolio: async () => {},
+  updateAsset: async () => {},
+  updateHolding: async () => {},
+  deleteAsset: async () => {},
+  deleteHolding: async () => {},
 });
 
 export function PortfolioProvider({ children }: { children: React.ReactNode }) {
@@ -94,6 +112,56 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateAsset = async (
+    assetId: string,
+    updates: Partial<Omit<PortfolioAsset, "id" | "userId" | "createdAt">>
+  ) => {
+    if (!isAuthenticated || !user) return;
+    try {
+      await libUpdateAsset(user.uid, assetId, updates);
+      await refreshPortfolio();
+    } catch (e) {
+      console.error("Failed to update asset", e);
+      throw e;
+    }
+  };
+
+  const updateHolding = async (
+    holdingId: string,
+    updates: Partial<Omit<PortfolioHolding, "id" | "userId" | "createdAt">>
+  ) => {
+    if (!isAuthenticated || !user) return;
+    try {
+      await libUpdateHolding(user.uid, holdingId, updates);
+      await refreshPortfolio();
+    } catch (e) {
+      console.error("Failed to update holding", e);
+      throw e;
+    }
+  };
+
+  const deleteAsset = async (assetId: string) => {
+    if (!isAuthenticated || !user) return;
+    try {
+      await libDeleteAsset(user.uid, assetId);
+      await refreshPortfolio();
+    } catch (e) {
+      console.error("Failed to delete asset", e);
+      throw e;
+    }
+  };
+
+  const deleteHolding = async (holdingId: string) => {
+    if (!isAuthenticated || !user) return;
+    try {
+      await libDeleteHolding(user.uid, holdingId);
+      await refreshPortfolio();
+    } catch (e) {
+      console.error("Failed to delete holding", e);
+      throw e;
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated && user) {
       refreshPortfolio();
@@ -118,6 +186,10 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
         assetsSummary,
         loading,
         refreshPortfolio,
+        updateAsset,
+        updateHolding,
+        deleteAsset,
+        deleteHolding,
       }}
     >
       {children}
