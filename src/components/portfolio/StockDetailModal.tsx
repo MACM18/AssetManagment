@@ -50,13 +50,20 @@ export default function StockDetailModal({
   }, [holding]);
 
   return (
-    <div className='fixed inset-0 flex items-center justify-center z-50 p-4'>
-      <div className='rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border'>
+    <div
+      className='fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto'
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='stock-detail-title'
+    >
+      <div className='relative w-full max-w-3xl mx-auto my-8 rounded-2xl shadow-2xl border backdrop-blur-lg'>
         {/* Header */}
-        <div className='sticky top-0 border-b px-6 py-4 flex justify-between items-start'>
+        <div className='sticky top-0 backdrop-blur-lg border-b px-6 py-4 flex justify-between items-start rounded-t-2xl'>
           <div>
             <div className='flex items-center gap-3'>
-              <h2 className='text-2xl font-bold'>{holding.symbol}</h2>
+              <h2 id='stock-detail-title' className='text-2xl font-bold'>
+                {holding.symbol}
+              </h2>
               <span className='px-3 py-1 rounded-full text-sm font-medium border'>
                 {isGain ? "+" : ""}
                 {holding.gainLossPercent.toFixed(2)}%
