@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { StockQuote, SelectedStockKey, ShareTypeCode } from "@/types";
 import {
-  Star,
   TrendingUp,
   TrendingDown,
   Search,
@@ -47,15 +46,6 @@ export default function WatchList({
   const isMockData = dataSource === "mock" || stocks.length === 0;
 
   // Load user's watchlist from Firestore
-  useEffect(() => {
-    if (isAuthenticated && user && FIREBASE_AVAILABLE) {
-      loadUserWatchlist();
-    } else {
-      // For non-authenticated users, show empty watchlist
-      setWatchlist([]);
-    }
-  }, [isAuthenticated, user]);
-
   const loadUserWatchlist = async () => {
     if (!user || !FIREBASE_AVAILABLE) return;
 
@@ -75,6 +65,14 @@ export default function WatchList({
       setWatchlist([]);
     }
   };
+  useEffect(() => {
+    if (isAuthenticated && user && FIREBASE_AVAILABLE) {
+      loadUserWatchlist();
+    } else {
+      // For non-authenticated users, show empty watchlist
+      setWatchlist([]);
+    }
+  }, [isAuthenticated, user, loadUserWatchlist]);
 
   const saveUserWatchlist = async (newWatchlist: string[]) => {
     if (!user || !FIREBASE_AVAILABLE) return;

@@ -140,7 +140,7 @@ export default function AddAssetModal({
           compounding: fdComp,
           startDate: fdStart,
           autoRenewal: fdAuto,
-          maturityDate: fdMaturity || undefined,
+          maturityDate: fdMaturity || "",
         };
         payload = obj;
       } else if (type === "savings") {
