@@ -4,6 +4,8 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { S3Client, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as dns from 'dns';
+import * as net from 'net';
 
 async function main() {
   console.log('Starting monthly export...');
@@ -38,15 +40,44 @@ async function main() {
     },
   };
   
+  // Resolve endpoint from a single env name
+  const endpointEnv = process.env.AWS_ENDPOINT_URL;
+
   // Add endpoint if using MinIO or S3-compatible service
-  if (process.env.AWS_ENDPOINT_URL) {
-    const rawEndpoint = process.env.AWS_ENDPOINT_URL;
-    // Normalize endpoint and enable path-style for MinIO/S3-compatible services
+  if (endpointEnv) {
+    const rawEndpoint = endpointEnv;
     const hasProtocol = /^https?:\/\//i.test(rawEndpoint);
     const normalizedEndpoint = hasProtocol ? rawEndpoint : `http://${rawEndpoint}`;
     s3Config.endpoint = normalizedEndpoint;
-    s3Config.forcePathStyle = true; // required for MinIO unless using wildcard DNS
+    s3Config.forcePathStyle = (process.env.AWS_S3_FORCE_PATH_STYLE || 'true').toLowerCase() !== 'false';
     console.log(`Using custom S3 endpoint: ${normalizedEndpoint}`);
+
+    // Preflight: DNS + TCP connectivity check for clearer failures
+    if ((process.env.AWS_S3_SKIP_PREFLIGHT || 'false').toLowerCase() !== 'true') {
+      try {
+        const u = new URL(normalizedEndpoint);
+        const hostname = u.hostname;
+        const port = Number(u.port || (u.protocol === 'https:' ? 443 : 80));
+        console.log(`S3 endpoint parsed -> protocol: ${u.protocol}, hostname: ${hostname}, port: ${port}`);
+        const addrs = await dns.promises.lookup(hostname, { all: true });
+        console.log(`DNS resolved ${hostname} -> ${addrs.map(a => a.address).join(', ')}`);
+        await new Promise<void>((resolve, reject) => {
+          const socket = net.createConnection({ host: hostname, port, timeout: 4000 }, () => {
+            socket.end();
+            resolve();
+          });
+          socket.on('error', reject);
+          socket.on('timeout', () => {
+            socket.destroy(new Error('TCP connection timed out'));
+          });
+        });
+        console.log('Preflight: TCP connectivity to S3 endpoint OK');
+      } catch (pfErr) {
+        console.error('Preflight S3 endpoint check failed:', pfErr);
+        console.error('Tips: verify endpoint DNS/port reachability, protocol (http/https), and runner network access. Set AWS_S3_SKIP_PREFLIGHT=true to skip this check.');
+        process.exit(1);
+      }
+    }
   }
   
   const s3Client = new S3Client(s3Config);
@@ -73,10 +104,18 @@ async function main() {
     const listCommand = new ListObjectsV2Command({
       Bucket: bucketName,
       Prefix: 'monthly-exports/',
+      MaxKeys: 1,
     });
-    
-    const listResponse = await s3Client.send(listCommand);
-    const hasExistingExports = listResponse.Contents && listResponse.Contents.length > 0;
+
+    let hasExistingExports = false;
+    try {
+      const listResponse = await s3Client.send(listCommand);
+      hasExistingExports = !!(listResponse.Contents && listResponse.Contents.length > 0);
+    } catch (listErr) {
+      console.warn('S3 list check failed; defaulting to monthly export only.', listErr);
+      // Treat as if previous exports exist so we do a monthly-only export
+      hasExistingExports = true;
+    }
     
     let startDate: string;
     let nextMonthStr: string;
