@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { initializeApp, cert } from 'firebase-admin/app';
-import { getStorage } from 'firebase-admin/storage';
 import { getFirestore } from 'firebase-admin/firestore';
+import { S3Client, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -17,7 +17,6 @@ async function main() {
     try {
       initializeApp({
         projectId: process.env.FIREBASE_PROJECT_ID,
-        storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
       });
     } catch (error) {
       console.error('Failed to initialize Firebase:', error);
@@ -27,11 +26,32 @@ async function main() {
     const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
     initializeApp({
       credential: cert(serviceAccount),
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
     });
   }
   
-  const storage = getStorage();
+  // Initialize S3 Client
+  const s3Config: any = {
+    region: process.env.AWS_REGION || 'us-east-1',
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+    },
+  };
+  
+  // Add endpoint if using MinIO or S3-compatible service
+  if (process.env.AWS_ENDPOINT_URL) {
+    s3Config.endpoint = process.env.AWS_ENDPOINT_URL;
+  }
+  
+  const s3Client = new S3Client(s3Config);
+  
+  const bucketName = process.env.AWS_S3_BUCKET;
+  
+  if (!bucketName) {
+    console.error('AWS_S3_BUCKET environment variable is required');
+    process.exit(1);
+  }
+  
   const db = getFirestore();
   
   const now = new Date();
@@ -42,10 +62,32 @@ async function main() {
   console.log(`Exporting data for ${monthStr}...`);
 
   try {
-    // Query Firestore for date-wise documents in stock_prices_by_date for this month
-    const startDate = `${monthStr}-01`;
-    const nextMonth = new Date(year, month); // month is 1-based above; this gives first day of next month
-    const nextMonthStr = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
+    // Check for existing exports in S3
+    console.log('Checking S3 bucket for previous exports...');
+    const listCommand = new ListObjectsV2Command({
+      Bucket: bucketName,
+      Prefix: 'monthly-exports/',
+    });
+    
+    const listResponse = await s3Client.send(listCommand);
+    const hasExistingExports = listResponse.Contents && listResponse.Contents.length > 0;
+    
+    let startDate: string;
+    let nextMonthStr: string;
+    
+    if (!hasExistingExports) {
+      console.log('No previous exports found. Exporting all historical data...');
+      // Export all data - start from earliest possible date
+      startDate = '2020-01-01'; // Adjust this to your earliest data date
+      const nextMonth = new Date(year, month);
+      nextMonthStr = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
+    } else {
+      console.log('Previous exports found. Exporting current month only...');
+      // Export only current month
+      startDate = `${monthStr}-01`;
+      const nextMonth = new Date(year, month);
+      nextMonthStr = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
+    }
 
     console.log(`Querying stock_prices_by_date for dates >= ${startDate} and < ${nextMonthStr}`);
 
@@ -56,7 +98,7 @@ async function main() {
       .orderBy('date')
       .get();
 
-    console.log(`Found ${snapshot.size} date documents for ${monthStr}`);
+    console.log(`Found ${snapshot.size} date documents for the selected range`);
 
     const rows: string[] = [];
     // CSV header — choose fields useful for ML: date,symbol,normalizedSymbol,price,open,high,low,close,change,changePercent,volume
@@ -95,17 +137,26 @@ async function main() {
     const exportDir = path.join(process.cwd(), 'data', 'exports', monthStr);
     if (!fs.existsSync(exportDir)) fs.mkdirSync(exportDir, { recursive: true });
 
-    const csvFilename = `stock_prices_${monthStr}.csv`;
+    const csvFilename = hasExistingExports 
+      ? `stock_prices_${monthStr}.csv` 
+      : `stock_prices_all_${monthStr}.csv`;
     const csvPath = path.join(exportDir, csvFilename);
     fs.writeFileSync(csvPath, rows.join('\n'));
     console.log(`Wrote CSV to ${csvPath}`);
 
-    // Upload to Firebase Storage under folder monthly-exports/<month>/
-    const bucket = storage.bucket();
+    // Upload to S3 under folder monthly-exports/<month>/
     const remotePath = `monthly-exports/${monthStr}/${csvFilename}`;
-    const file = bucket.file(remotePath);
-    await file.save(fs.readFileSync(csvPath), { contentType: 'text/csv' });
-    console.log(`Uploaded CSV to Firebase Storage: ${remotePath}`);
+    const fileContent = fs.readFileSync(csvPath);
+    
+    const uploadCommand = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: remotePath,
+      Body: fileContent,
+      ContentType: 'text/csv',
+    });
+    
+    await s3Client.send(uploadCommand);
+    console.log(`Uploaded CSV to S3: ${remotePath}`);
 
     // Save metadata to Firestore monthly-reports collection
     await db.collection('monthly-reports').doc(monthStr).set({
@@ -113,6 +164,9 @@ async function main() {
       year,
       dataPoints: totalCount,
       storagePath: remotePath,
+      storageType: 's3',
+      bucketName: bucketName,
+      isFullExport: !hasExistingExports,
       createdAt: new Date().toISOString(),
     });
 
