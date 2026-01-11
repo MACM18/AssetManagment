@@ -305,10 +305,6 @@ See [TRADING_PLATFORM.md](./TRADING_PLATFORM.md) for detailed documentation.
 4. Test thoroughly
 5. Submit a pull request
 
-## License
-
-ISC
-
 ## Support
 
 For issues and questions, please open an issue on GitHub.
