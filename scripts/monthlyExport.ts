@@ -40,7 +40,13 @@ async function main() {
   
   // Add endpoint if using MinIO or S3-compatible service
   if (process.env.AWS_ENDPOINT_URL) {
-    s3Config.endpoint = process.env.AWS_ENDPOINT_URL;
+    const rawEndpoint = process.env.AWS_ENDPOINT_URL;
+    // Normalize endpoint and enable path-style for MinIO/S3-compatible services
+    const hasProtocol = /^https?:\/\//i.test(rawEndpoint);
+    const normalizedEndpoint = hasProtocol ? rawEndpoint : `http://${rawEndpoint}`;
+    s3Config.endpoint = normalizedEndpoint;
+    s3Config.forcePathStyle = true; // required for MinIO unless using wildcard DNS
+    console.log(`Using custom S3 endpoint: ${normalizedEndpoint}`);
   }
   
   const s3Client = new S3Client(s3Config);
