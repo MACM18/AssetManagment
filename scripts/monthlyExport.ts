@@ -112,9 +112,9 @@ async function main() {
       const listResponse = await s3Client.send(listCommand);
       hasExistingExports = !!(listResponse.Contents && listResponse.Contents.length > 0);
     } catch (listErr) {
-      console.warn('S3 list check failed; defaulting to monthly export only.', listErr);
-      // Treat as if previous exports exist so we do a monthly-only export
-      hasExistingExports = true;
+      console.warn('S3 list check failed; assuming no previous exports and running full export.', listErr);
+      // Be generous: if we cannot determine, export everything once
+      hasExistingExports = false;
     }
     
     let startDate: string;
@@ -123,7 +123,7 @@ async function main() {
     if (!hasExistingExports) {
       console.log('No previous exports found. Exporting all historical data...');
       // Export all data - start from earliest possible date
-      startDate = '2020-01-01'; // Adjust this to your earliest data date
+      startDate = '2025-10-18'; // Adjust this to your earliest data date
       const nextMonth = new Date(year, month);
       nextMonthStr = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
     } else {
