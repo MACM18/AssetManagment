@@ -1,5 +1,8 @@
 name: Monthly Data Export
 
+permissions:
+  contents: read
+
 on:
   schedule:
     # Run on the first day of each month at 00:00 UTC
