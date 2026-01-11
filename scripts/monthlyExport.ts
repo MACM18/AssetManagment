@@ -108,13 +108,30 @@ async function main() {
     });
 
     let hasExistingExports = false;
+    let listErr: unknown = null;
     try {
       const listResponse = await s3Client.send(listCommand);
       hasExistingExports = !!(listResponse.Contents && listResponse.Contents.length > 0);
-    } catch (listErr) {
-      console.warn('S3 list check failed; assuming no previous exports and running full export.', listErr);
-      // Be generous: if we cannot determine, export everything once
-      hasExistingExports = false;
+    } catch (err) {
+      listErr = err;
+      // Retry once with virtual-host style if path-style may be rejected by the endpoint
+      if (s3Config.forcePathStyle) {
+        console.warn('S3 list with path-style failed; retrying with virtual-host style...');
+        try {
+          const vhClient = new S3Client({ ...s3Config, forcePathStyle: false });
+          const listResponse = await vhClient.send(listCommand);
+          hasExistingExports = !!(listResponse.Contents && listResponse.Contents.length > 0);
+          listErr = null;
+        } catch (vhErr) {
+          listErr = vhErr;
+        }
+      }
+
+      if (listErr) {
+        console.warn('S3 list check failed; assuming no previous exports and running full export.', listErr);
+        // Be generous: if we cannot determine, export everything once
+        hasExistingExports = false;
+      }
     }
     
     let startDate: string;
