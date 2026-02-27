@@ -6,7 +6,7 @@ import { usePortfolio } from "@/contexts/PortfolioContext";
 import { StockQuote } from "@/types";
 import { fetchLatestStockPrices } from "@/lib/tradingData";
 import PortfolioSummaryCard from "@/components/portfolio/PortfolioSummaryCard";
-import HoldingsList from "@/components/portfolio/HoldingsList";
+
 import TransactionHistory from "@/components/portfolio/TransactionHistory";
 import AddHoldingModal from "@/components/portfolio/AddHoldingModal";
 import AddAssetModal from "@/components/portfolio/assets/AddAssetModal";
@@ -142,7 +142,6 @@ export default function PortfolioDashboard() {
                 />
               </div>
             )}
-            <HoldingsList currentPrices={stocks} stocks={stocks} />
           </div>
         );
       case "assets":
