@@ -2,7 +2,7 @@
 
 import { aggregateHoldingsBySymbol } from "@/lib/portfolio";
 import { PortfolioHoldingWithMetrics, StockQuote } from "@/types";
-import { useStockModal } from "@/contexts/StockModalContext";
+import { useRouter } from "next/navigation";
 
 interface HoldingsGridProps {
   holdings: PortfolioHoldingWithMetrics[];
@@ -10,7 +10,7 @@ interface HoldingsGridProps {
 }
 
 export default function HoldingsGrid({ holdings, currentPrices }: HoldingsGridProps) {
-  const { openModal } = useStockModal();
+  const router = useRouter();
 
   if (!holdings || holdings.length === 0) {
     return null;
@@ -28,8 +28,7 @@ export default function HoldingsGrid({ holdings, currentPrices }: HoldingsGridPr
           <button
             key={h.symbol}
             onClick={() => {
-              const stock = currentPrices.find((s) => s.symbol === h.symbol);
-              openModal({ open: true, stock: stock || undefined, holdings: [h] });
+              router.push(`/stock?symbol=${h.symbol}`);
             }}
             className="block text-left p-4 rounded-lg border border-border bg-card hover:shadow-lg transition-shadow h-full flex flex-col justify-between"
           >

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useStockModal } from "@/contexts/StockModalContext";
+import { useRouter } from "next/navigation";
 import { usePortfolio } from "@/contexts/PortfolioContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { deleteHolding } from "@/lib/portfolio";
@@ -34,7 +34,7 @@ export default function HoldingsList({
 }: HoldingsListProps) {
   const { summary, refreshPortfolio, loading } = usePortfolio();
   const { user, isAuthenticated } = useAuth();
-  const { openModal } = useStockModal();
+  const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedHolding, setSelectedHolding] =
     useState<PortfolioHoldingWithMetrics | null>(null);
@@ -134,9 +134,7 @@ export default function HoldingsList({
                     <h3 className='text-lg font-bold text-foreground'>
                           <button
                             onClick={() => {
-                              const stock = currentPrices.find((s) => s.symbol === holding.symbol);
-                              // open modal with holding info
-                              openModal({ open: true, stock: stock || undefined, holdings: [holding] });
+                              router.push(`/stock?symbol=${holding.symbol}`);
                             }}
                             className='hover:underline'
                           >

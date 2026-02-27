@@ -3,8 +3,6 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PortfolioProvider } from "@/contexts/PortfolioContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { StockModalProvider } from "@/contexts/StockModalContext";
-import StockViewerModal from "@/components/StockViewerModal";
 
 export const metadata: Metadata = {
   title: "stock.macm.dev - CSE Stock Market Tracker",
@@ -41,12 +39,9 @@ export default function RootLayout({
       <body className='font-sans bg-background text-foreground antialiased min-h-screen'>
         <ThemeProvider>
           <AuthProvider>
-            <StockModalProvider>
-              <PortfolioProvider>
-                {children}
-                <StockViewerModal />
-              </PortfolioProvider>
-            </StockModalProvider>
+            <PortfolioProvider>
+              {children}
+            </PortfolioProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

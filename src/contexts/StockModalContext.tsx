@@ -24,9 +24,7 @@ export function StockModalProvider({ children }: { children: React.ReactNode }) 
   const [state, setState] = useState<StockModalState>({ open: false });
 
   const openModal = (payload: StockModalState) => {
-    // Ensure `open` from payload doesn't conflict with the explicit true flag
-    const { open: _open, ...rest } = payload as StockModalState;
-    setState({ open: true, ...rest });
+    setState({ ...payload, open: true });
   };
 
   const closeModal = () => setState({ open: false });

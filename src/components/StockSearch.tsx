@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { StockQuote } from "@/types";
-import { useStockModal } from "@/contexts/StockModalContext";
+import { useRouter } from "next/navigation";
 
 interface StockSearchProps {
   stocks: StockQuote[];
@@ -10,7 +10,7 @@ interface StockSearchProps {
 
 export default function StockSearch({ stocks }: StockSearchProps) {
   const [query, setQuery] = useState("");
-  const { openModal } = useStockModal();
+  const router = useRouter();
 
   const filtered = useMemo(() => {
     if (!query) return [];
@@ -24,8 +24,7 @@ export default function StockSearch({ stocks }: StockSearchProps) {
 
   const handleSelect = (symbol: string) => {
     setQuery("");
-    const s = stocks.find((x) => x.symbol === symbol);
-    if (s) openModal({ open: true, stock: s });
+    router.push(`/stock?symbol=${symbol}`);
   };
 
   return (
