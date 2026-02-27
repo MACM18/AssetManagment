@@ -7,6 +7,7 @@ import { useEffect, useState, Suspense } from "react";
 import { StockQuote } from "@/types";
 import Navigation from "@/components/Navigation";
 import StockDetailView from "@/components/StockDetailView";
+import TransactionHistory from "@/components/portfolio/TransactionHistory";
 import { fetchLatestStockPrices } from "@/lib/tradingData";
 import { usePortfolio } from "@/contexts/PortfolioContext";
 import { ChevronLeft } from "lucide-react";
@@ -118,14 +119,104 @@ function StockPageContent() {
   return (
     <main className="min-h-screen bg-background">
       <Navigation />
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <Link href="/" className="flex items-center gap-2 text-primary hover:underline mb-6">
-          <ChevronLeft className="w-4 h-4" />
-          Back to Market
-        </Link>
+      <div className="w-full">
+        {/* Header Section */}
+        <div className="border-b border-border bg-card/50">
+          <div className="max-w-7xl mx-auto px-6 py-8">
+            <Link href="/" className="flex items-center gap-2 text-primary hover:underline mb-6 text-sm">
+              <ChevronLeft className="w-4 h-4" />
+              Back to Market
+            </Link>
 
-        <div className="bg-card rounded-xl border border-border p-8">
-          <StockDetailView stock={stock} holdings={enrichedHoldings} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold">{symbol}</h1>
+                {stock && stock.companyName && (
+                  <p className="text-lg text-muted-foreground mt-2">{stock.companyName}</p>
+                )}
+              </div>
+
+              {stock && (
+                <div className="md:col-span-2 flex items-end justify-between">
+                  <div>
+                    <div className="text-5xl font-bold">LKR {stock.price.toFixed(2)}</div>
+                    <div className={`text-xl mt-2 ${(stock.changePercent ?? 0) >= 0 ? 'text-success' : 'text-destructive'}`}>
+                      {(stock.change ?? 0) >= 0 ? '+' : ''}{(stock.change ?? 0).toFixed(2)} ({(stock.changePercent ?? 0).toFixed(2)}%)
+                    </div>
+                  </div>
+                  {enrichedHoldings.length > 0 && (
+                    <div className="text-right pb-2">
+                      <div className="text-sm text-muted-foreground">Portfolio Value</div>
+                      <div className="text-2xl font-semibold text-success">
+                        LKR {enrichedHoldings.reduce((sum, h) => sum + h.currentValue, 0).toFixed(2)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {stock && (
+            <div className="space-y-8">
+              {/* Chart */}
+              <section>
+                <h2 className="text-2xl font-bold mb-4">Price Chart</h2>
+                <div className="bg-card rounded-lg border border-border p-6">
+                  <StockDetailView stock={stock} holdings={enrichedHoldings} />
+                </div>
+              </section>
+
+              {/* Holdings and Transactions Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Holdings Section */}
+                {enrichedHoldings.length > 0 && (
+                  <section className="lg:col-span-1">
+                    <h2 className="text-2xl font-bold mb-4">Your Holdings</h2>
+                    <div className="bg-card rounded-lg border border-border p-6 space-y-4">
+                      {enrichedHoldings.map((h) => (
+                        <div key={h.id} className="pb-4 border-b last:border-b-0 last:pb-0">
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Quantity</span>
+                            <span className="font-semibold">{h.quantity.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Avg. Cost</span>
+                            <span className="font-semibold">LKR {h.purchasePrice.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Cost Basis</span>
+                            <span className="font-semibold">LKR {h.formattedInvested}</span>
+                          </div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Current Value</span>
+                            <span className="font-semibold text-success">LKR {h.formattedCurrentValue}</span>
+                          </div>
+                          <div className="flex justify-between pt-2 border-t">
+                            <span className="text-sm text-muted-foreground">Gain/Loss</span>
+                            <span className={`font-bold ${h.isPositive ? 'text-success' : 'text-destructive'}`}>
+                              {h.isPositive ? '+' : ''}LKR {h.formattedGainLoss} ({h.gainLossPercent.toFixed(2)}%)
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Transactions Section */}
+                <section className={enrichedHoldings.length > 0 ? 'lg:col-span-2' : ''}>
+                  <h2 className="text-2xl font-bold mb-4">Transaction History</h2>
+                  <div className="bg-card rounded-lg border border-border p-6">
+                    <TransactionHistory symbolFilter={stock.symbol} />
+                  </div>
+                </section>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </main>
