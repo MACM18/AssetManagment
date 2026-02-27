@@ -227,10 +227,10 @@ npm run monthly-export
 Runs every day at 9:00 AM UTC (3:00 PM Sri Lanka Time) to fetch CSE stock data.
 
 - **Workflow**: `.github/workflows/daily-data-collection.yml`
-- **Script**: `scripts/collectStockData.ts`
+- **Script**: `scripts/collectStockData.ts` (now requests every stock returned by the API)
 - **Features**:
   - Fetches data for all CSE stocks in a single bulk request
-  - Filters to include only tracked symbols
+  - By default stores every symbol; tracked-symbol filtering is applied only when a list is supplied to the fetch functions
   - Much faster: completes in ~5 seconds (vs. 110+ seconds with old approach)
   - Saves data to `data/` directory
   - Commits data back to repository

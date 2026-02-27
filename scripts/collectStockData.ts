@@ -1,15 +1,17 @@
 #!/usr/bin/env node
-import { fetchMultipleStocks, saveStockDataLocally, CSE_SYMBOLS } from '../src/lib/stockData';
+import { fetchAllCSEStockData, saveStockDataLocally } from '../src/lib/stockData';
 import { saveStockDataToFirestore } from './saveStockDataToFirestore';
 
 async function main() {
   console.log('Starting daily stock data collection...');
-  console.log(`Collecting data for ${CSE_SYMBOLS.length} symbols using bulk endpoint...`);
+  console.log(`Collecting data for all available stocks using bulk endpoint...`);
 
   const date = new Date().toISOString().split('T')[0];
 
   try {
-    const stockData = await fetchMultipleStocks(CSE_SYMBOLS);
+    // fetchAllCSEStockData without arguments returns every symbol from the
+    // tradeSummary payload; this satisfies the request to save all stock types
+    const stockData = await fetchAllCSEStockData();
     console.log(`Successfully collected data for ${stockData.length} stocks`);
 
     // Save to local file
