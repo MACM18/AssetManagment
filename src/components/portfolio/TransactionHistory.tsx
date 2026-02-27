@@ -4,7 +4,12 @@ import { usePortfolio } from "@/contexts/PortfolioContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { ArrowUpRight, ArrowDownRight, Calendar, Receipt } from "lucide-react";
 
-export default function TransactionHistory() {
+interface TransactionHistoryProps {
+  /** optional symbol to filter transactions by */
+  symbolFilter?: string;
+}
+
+export default function TransactionHistory({ symbolFilter }: TransactionHistoryProps = {}) {
   const { transactions, loading } = usePortfolio();
   const { isAuthenticated } = useAuth();
 
@@ -27,7 +32,11 @@ export default function TransactionHistory() {
     );
   }
 
-  if (transactions.length === 0) {
+  const filtered = symbolFilter
+    ? transactions.filter((t) => t.symbol === symbolFilter)
+    : transactions;
+
+  if (filtered.length === 0) {
     return (
       <div className='rounded-xl shadow-lg p-6 border border-border bg-card'>
         <h2 className='text-xl font-bold mb-4 text-foreground'>
@@ -38,10 +47,14 @@ export default function TransactionHistory() {
             <Receipt className='w-8 h-8 text-muted-foreground' />
           </div>
           <p className='text-muted-foreground font-medium'>
-            No transactions yet
+            {symbolFilter
+              ? `No transactions for ${symbolFilter}`
+              : "No transactions yet"}
           </p>
           <p className='text-sm mt-2 text-muted-foreground'>
-            Your buy and sell history will appear here
+            {symbolFilter
+              ? "You have no purchase or sale history for this stock."
+              : "Your buy and sell history will appear here"}
           </p>
         </div>
       </div>
@@ -55,8 +68,8 @@ export default function TransactionHistory() {
           Transaction History
         </h2>
         <p className='text-sm text-muted-foreground mt-1'>
-          {transactions.length} transaction
-          {transactions.length !== 1 ? "s" : ""}
+          {filtered.length} transaction{filtered.length !== 1 ? "s" : ""}
+          {symbolFilter && ` for ${symbolFilter}`}
         </p>
       </div>
 

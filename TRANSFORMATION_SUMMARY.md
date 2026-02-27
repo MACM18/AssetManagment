@@ -130,6 +130,8 @@ Created comprehensive documentation:
 - Switch between chart types
 - Change timeframes dynamically
 - Search and filter stocks
+- Added stock search bar to main page with instant results
+- New dynamic route `/stocks/[symbol]` for full stock details/history (includes portfolio-specific data)
 - Add/remove from watchlist
 
 ## Technical Implementation

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { usePortfolio } from "@/contexts/PortfolioContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { deleteHolding } from "@/lib/portfolio";
@@ -130,7 +131,9 @@ export default function HoldingsList({
                 <div className='flex-1'>
                   <div className='flex items-center gap-2 mb-1'>
                     <h3 className='text-lg font-bold text-foreground'>
-                      {holding.symbol}
+                      <Link href={`/stocks/${holding.symbol}`} className='hover:underline'>
+                        {holding.symbol}
+                      </Link>
                     </h3>
                     <span
                       className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${

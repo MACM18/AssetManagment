@@ -15,6 +15,7 @@ import PortfolioAllocationChart from "@/components/portfolio/PortfolioAllocation
 import PerformanceChart from "@/components/portfolio/PerformanceChart";
 import PortfolioInsights from "@/components/portfolio/PortfolioInsights";
 import TopHoldings from "@/components/portfolio/TopHoldings";
+import HoldingsGrid from "@/components/portfolio/HoldingsGrid";
 import NetWorthAllocationChart from "@/components/portfolio/NetWorthAllocationChart";
 import Navigation from "@/components/Navigation";
 import {
@@ -38,7 +39,7 @@ type TabView =
 
 export default function PortfolioDashboard() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { refreshPortfolio } = usePortfolio();
+  const { refreshPortfolio, summary } = usePortfolio();
   const [stocks, setStocks] = useState<StockQuote[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -129,6 +130,18 @@ export default function PortfolioDashboard() {
       case "holdings":
         return (
           <div className='space-y-6'>
+            {/* compact grid view for quick navigation */}
+            {summary?.holdings && summary.holdings.length > 0 && (
+              <div>
+                <h2 className='text-xl font-bold text-foreground mb-2'>
+                  My Stocks
+                </h2>
+                <HoldingsGrid
+                  holdings={summary.holdings}
+                  currentPrices={stocks}
+                />
+              </div>
+            )}
             <HoldingsList currentPrices={stocks} stocks={stocks} />
           </div>
         );

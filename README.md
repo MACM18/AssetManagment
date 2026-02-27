@@ -207,6 +207,29 @@ Stores metadata about the last data collection run:
 
 ### Data Collection Workflow
 
+<h3 id="search-and-stock-pages">🔍 Search & Stock Detail Pages</h3>
+
+The home screen now includes a **search bar** – start typing a symbol or company
+name and results will appear instantly. Selecting an item navigates you to a
+stock‑specific page (see below).
+
+A new dynamic route has been added at `/stocks/[symbol]`. Each stock page
+contains:
+
+- Current price, change, and company name
+- Interactive history chart (up to 90 days)
+- If you're signed in, any holdings you own for that symbol plus a filtered
+  transaction history.
+
+This same page can be reached from the portfolio dashboard – the holdings
+section now includes a compact grid of your stocks and clicking any card takes
+you there.
+
+These enhancements make it easy to jump from market overview to detailed
+information without modals or manual lookup.
+
+### Data Collection Workflow
+
 1. **Collect Data**: Fetch from CSE API
 
 ```bash
