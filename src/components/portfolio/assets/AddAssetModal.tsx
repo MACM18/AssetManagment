@@ -1294,7 +1294,7 @@ export default function AddAssetModal({
           </div>
 
           <div className='flex-1 overflow-y-auto'>
-            <div className='p-4 sm:p-6 space-y-4'>
+            <div className='p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4'>
               {error && (
                 <div className='p-3 border rounded-lg text-sm'>{error}</div>
               )}

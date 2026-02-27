@@ -138,7 +138,7 @@ export default function AddHoldingModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className='p-6 space-y-4'>
+        <form onSubmit={handleSubmit} className='p-6 space-y-4 lg:grid lg:grid-cols-2 lg:gap-6'>
           {error && (
             <div className='p-3 border rounded-lg text-sm'>{error}</div>
           )}
