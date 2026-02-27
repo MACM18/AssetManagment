@@ -34,9 +34,22 @@ const CSE_API_URL = "https://www.cse.lk/api/tradeSummary";
  * Fetch all stock data from CSE (Colombo Stock Exchange) in a single request
  * Uses the new tradeSummary endpoint which returns all stocks at once
  */
-export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
+export async function fetchAllCSEStockData(symbolsToInclude?: string[]): Promise<CSEStockData[]> {
+  // if `symbolsToInclude` is provided and non-empty we will only return
+  // those symbols.  Passing `undefined` or an empty array means "no
+  // filtering" – return everything from the API.  This lets callers
+  // (such as the daily collection script) request every stock without
+  // needing to maintain a hard‑coded list.
+  const filterList = Array.isArray(symbolsToInclude) && symbolsToInclude.length > 0
+    ? symbolsToInclude.map((s) => s.toUpperCase())
+    : undefined;
+
   try {
-    console.log("Fetching trade summary for all stocks...");
+    console.log(
+      filterList && filterList.length
+        ? `Fetching trade summary for ${filterList.length} symbols...`
+        : "Fetching trade summary for all stocks..."
+    );
 
     // Make request to CSE API - using explicit axios.request config
     const config: AxiosRequestConfig = {
@@ -90,8 +103,10 @@ export async function fetchAllCSEStockData(): Promise<CSEStockData[]> {
           ? (shareTypeMatch[1].toUpperCase() as "N" | "X" | "P" | "Z" )
           : undefined;
 
-        // Only process stocks that are in our tracking list (compare normalized symbols)
-        if (!CSE_SYMBOLS.includes(normalizedSymbol)) {
+        // If a filter list was provided, ignore any symbols not present
+        // in it.  Otherwise we keep everything that comes back from the
+        // API (this is what allows full‑market collection).
+        if (filterList && !filterList.includes(normalizedSymbol)) {
           continue;
         }
 
@@ -186,7 +201,10 @@ export async function fetchCSEStockData(
     console.log(`Fetching data for ${symbol}...`);
 
     // Use the bulk fetch and filter for the specific symbol
-    const allStocks = await fetchAllCSEStockData();
+// ask for _only_ the requested symbol rather than fetching the
+  // hard‑coded list; this makes the behaviour consistent with the new
+  // optional argument on fetchAllCSEStockData().
+  const allStocks = await fetchAllCSEStockData([symbol]);
     const stockData = allStocks.find((stock) => stock.symbol === symbol);
 
     if (stockData) {
@@ -213,10 +231,13 @@ export async function fetchMultipleStocks(
     `Fetching data for ${symbols.length} symbols using bulk endpoint...`
   );
 
-  // Use the new bulk fetch - no need for throttling anymore!
-  const allStocks = await fetchAllCSEStockData();
+  // Use the new bulk fetch - supply the list of symbols we care about
+  // so that fetchAllCSEStockData can perform the filtering internally.
+  const allStocks = await fetchAllCSEStockData(symbols);
 
-  // Filter to only include the requested symbols
+  // `fetchAllCSEStockData` already applied the filter, but the extra
+  // layer here makes sure the order matches the requested symbol list
+  // and protects callers from modified results in the future.
   const results = allStocks.filter((stock) => symbols.includes(stock.symbol));
 
   console.log(

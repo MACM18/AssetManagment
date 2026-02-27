@@ -131,7 +131,7 @@ Updated test script to verify the new bulk fetch implementation:
 
 Updated sections:
 - **API Integration**: Documents the new tradeSummary endpoint and bulk fetch approach
-- **Daily Data Collection**: Updated to reflect performance improvements
+- **Daily Data Collection**: Updated to reflect performance improvements and switch to collecting all stocks (filtering is now optional)
 - **Performance Metrics**: Added comparison showing 20x speed improvement
 
 ## Performance Improvement

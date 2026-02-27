@@ -10,6 +10,7 @@ import {
 import MarketOverview from "@/components/MarketOverview";
 import StockChart from "@/components/StockChart";
 import WatchList from "@/components/WatchList";
+import StockSearch from "@/components/StockSearch";
 import MarketDepth from "@/components/MarketDepth";
 import Navigation from "@/components/Navigation";
 import {
@@ -176,6 +177,12 @@ export default function Home() {
               Colombo Stock Exchange - Real-time Market Data
             </p>
           </div>
+
+          {/* search bar between title and controls on wider screens */}
+          <div className='flex-1 flex justify-center md:justify-end'>
+            <StockSearch stocks={stocks} />
+          </div>
+
           <div className='flex flex-wrap items-center gap-2 sm:gap-4'>
             <div className='text-left sm:text-right'>
               <p className='text-xs sm:text-sm text-muted-foreground'>

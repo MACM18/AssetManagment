@@ -7,7 +7,7 @@ import { fetchCSEStockData, fetchMultipleStocks, fetchAllCSEStockData, CSE_SYMBO
 
 async function testBulkFetch() {
   console.log('=== Testing Bulk Trade Summary Fetch ===');
-  console.log('Attempting to fetch all trade summary data in a single request...\n');
+  console.log('Attempting to fetch all trade summary data in a single request (no filter)...\n');
   
   const startTime = Date.now();
   const results = await fetchAllCSEStockData();
@@ -16,7 +16,15 @@ async function testBulkFetch() {
   const duration = (endTime - startTime) / 1000;
   
   console.log(`\n✓ Fetch completed in ${duration.toFixed(2)} seconds`);
-  console.log(`✓ Successfully fetched ${results.length} stocks`);
+  console.log(`✓ Successfully fetched ${results.length} stocks (unfiltered)`);
+
+  // demonstrate that filtering still works when a symbol list is supplied
+  console.log('\nNow verifying that symbol filtering behaves as expected...');
+  const subsetStart = Date.now();
+  const subset = await fetchAllCSEStockData(CSE_SYMBOLS.slice(0, 3));
+  const subsetEnd = Date.now();
+  console.log(`  fetched ${subset.length} symbols using explicit filter in ${(subsetEnd-
+    subsetStart)/1000}s`);
   
   if (results.length > 0) {
     console.log('\nSample data (first stock):');
@@ -77,7 +85,8 @@ async function main() {
   console.log('Stock Data Fetching Test - Updated Implementation\n');
   console.log('API Endpoint: https://www.cse.lk/api/tradeSummary');
   console.log('Request Format: POST {} (empty body)');
-  console.log('Returns: Array of all trade summary data\n');
+  console.log('Returns: Array of all trade summary data');
+  console.log('Optional argument: pass symbol list to filter results\n');
   console.log('='.repeat(60));
   console.log('\n');
   
