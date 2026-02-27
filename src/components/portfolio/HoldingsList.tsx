@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useStockModal } from "@/contexts/StockModalContext";
 import { usePortfolio } from "@/contexts/PortfolioContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { deleteHolding } from "@/lib/portfolio";
@@ -34,6 +34,7 @@ export default function HoldingsList({
 }: HoldingsListProps) {
   const { summary, refreshPortfolio, loading } = usePortfolio();
   const { user, isAuthenticated } = useAuth();
+  const { openModal } = useStockModal();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedHolding, setSelectedHolding] =
     useState<PortfolioHoldingWithMetrics | null>(null);
@@ -131,9 +132,16 @@ export default function HoldingsList({
                 <div className='flex-1'>
                   <div className='flex items-center gap-2 mb-1'>
                     <h3 className='text-lg font-bold text-foreground'>
-                      <Link href={`/stocks/${holding.symbol}`} className='hover:underline'>
-                        {holding.symbol}
-                      </Link>
+                          <button
+                            onClick={() => {
+                              const stock = currentPrices.find((s) => s.symbol === holding.symbol);
+                              // open modal with holding info
+                              openModal({ open: true, stock: stock || undefined, holdings: [holding] });
+                            }}
+                            className='hover:underline'
+                          >
+                            {holding.symbol}
+                          </button>
                     </h3>
                     <span
                       className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${

@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { aggregateHoldingsBySymbol } from "@/lib/portfolio";
 import { PortfolioHoldingWithMetrics, StockQuote } from "@/types";
+import { useStockModal } from "@/contexts/StockModalContext";
 
 interface HoldingsGridProps {
   holdings: PortfolioHoldingWithMetrics[];
@@ -10,6 +10,8 @@ interface HoldingsGridProps {
 }
 
 export default function HoldingsGrid({ holdings, currentPrices }: HoldingsGridProps) {
+  const { openModal } = useStockModal();
+
   if (!holdings || holdings.length === 0) {
     return null;
   }
@@ -23,10 +25,13 @@ export default function HoldingsGrid({ holdings, currentPrices }: HoldingsGridPr
         const currentPrice = priceObj ? priceObj.price : h.currentPrice || 0;
 
         return (
-          <Link
+          <button
             key={h.symbol}
-            href={`/stocks/${h.symbol}`}
-            className="block p-4 rounded-lg border border-border bg-card hover:shadow-lg transition-shadow h-full flex flex-col justify-between"
+            onClick={() => {
+              const stock = currentPrices.find((s) => s.symbol === h.symbol);
+              openModal({ open: true, stock: stock || undefined, holdings: [h] });
+            }}
+            className="block text-left p-4 rounded-lg border border-border bg-card hover:shadow-lg transition-shadow h-full flex flex-col justify-between"
           >
             <div>
               <h3 className="text-lg font-bold text-foreground">{h.symbol}</h3>
@@ -37,7 +42,7 @@ export default function HoldingsGrid({ holdings, currentPrices }: HoldingsGridPr
               <p>Avg. Buy: LKR {h.purchasePrice.toFixed(2)}</p>
               <p>Current: LKR {currentPrice.toFixed(2)}</p>
             </div>
-          </Link>
+          </button>
         );
       })}
     </div>
