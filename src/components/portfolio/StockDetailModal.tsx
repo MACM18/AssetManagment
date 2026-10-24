@@ -132,7 +132,7 @@ export default function StockDetailModal({
                 <XAxis dataKey='day' />
                 <YAxis domain={["auto", "auto"]} />
                 <Tooltip
-                  formatter={(value: number) => `LKR ${value.toFixed(2)}`}
+                  formatter={(value) => `LKR ${Number(value ?? 0).toFixed(2)}`}
                 />
                 <Line
                   type='monotone'

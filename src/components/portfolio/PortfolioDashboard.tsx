@@ -18,6 +18,7 @@ import TopHoldings from "@/components/portfolio/TopHoldings";
 import HoldingsGrid from "@/components/portfolio/HoldingsGrid";
 import NetWorthAllocationChart from "@/components/portfolio/NetWorthAllocationChart";
 import Navigation from "@/components/Navigation";
+import AuthButton from "@/components/auth/AuthButton";
 import {
   Plus,
   RefreshCw,
@@ -88,15 +89,18 @@ export default function PortfolioDashboard() {
 
   if (!isAuthenticated) {
     return (
-      <div className='min-h-screen flex items-center justify-center p-4 bg-background'>
+      <div className='min-h-screen bg-background'>
+        <Navigation />
+        <div className='min-h-[calc(100vh-4rem)] flex items-center justify-center p-4'>
         <div className='bg-card rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full text-center border border-border'>
           <h1 className='text-xl sm:text-2xl font-bold text-foreground mb-4'>
             Portfolio Dashboard
           </h1>
           <p className='text-muted-foreground mb-6'>
-            Sign in to access your portfolio and track your CSE stock
-            investments.
+            Sign in to view your holdings, performance, and transaction history.
           </p>
+          <div className='flex justify-center'><AuthButton /></div>
+        </div>
         </div>
       </div>
     );
@@ -184,7 +188,9 @@ export default function PortfolioDashboard() {
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className='lg:hidden fixed bottom-6 right-6 z-40 p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:opacity-90 transition-all'
-          aria-label='Toggle sidebar'
+          aria-label={sidebarOpen ? 'Close portfolio menu' : 'Open portfolio menu'}
+          aria-expanded={sidebarOpen}
+          aria-controls='portfolio-sidebar'
         >
           {sidebarOpen ? (
             <X className='w-6 h-6' />
@@ -195,16 +201,20 @@ export default function PortfolioDashboard() {
 
         {/* Sidebar Overlay for Mobile */}
         {sidebarOpen && (
-          <div
-            className='lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30'
+          <button
+            type='button'
+            aria-label='Close portfolio menu'
+            className='lg:hidden fixed inset-x-0 top-16 bottom-0 bg-black/50 backdrop-blur-sm z-30'
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
         {/* Sidebar */}
         <aside
+          id='portfolio-sidebar'
+          aria-label='Portfolio sections'
           className={`
-            fixed lg:sticky top-0 left-0 h-screen bg-card border-r border-border z-40
+            fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)] bg-card border-r border-border z-40
             transition-transform duration-300 ease-in-out
             ${
               sidebarOpen
@@ -229,6 +239,8 @@ export default function PortfolioDashboard() {
               return (
                 <button
                   key={tab.id}
+                  type='button'
+                  aria-current={activeTab === tab.id ? 'page' : undefined}
                   onClick={() => {
                     setActiveTab(tab.id);
                     setSidebarOpen(false);
@@ -301,7 +313,7 @@ export default function PortfolioDashboard() {
           </div>
 
           {/* Content Area */}
-          <div className='p-6'>{renderContent()}</div>
+          <div className='p-4 sm:p-6 xl:p-8 max-w-[1600px] mx-auto'>{renderContent()}</div>
         </main>
       </div>
 

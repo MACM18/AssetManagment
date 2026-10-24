@@ -166,15 +166,18 @@ export default function Home() {
     <main className='min-h-screen bg-background'>
       <Navigation />
 
-      <div className='max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6'>
+      <div className='max-w-[1680px] mx-auto px-4 sm:px-6 xl:px-8 py-5 sm:py-7'>
         {/* Header */}
         <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6'>
           <div>
-            <h1 className='text-2xl sm:text-3xl font-bold text-foreground'>
-              Market Overview
+            <p className='text-xs font-semibold uppercase tracking-[0.16em] text-primary mb-1'>
+              Colombo Stock Exchange
+            </p>
+            <h1 className='text-2xl sm:text-3xl font-bold tracking-tight text-foreground'>
+              Market overview
             </h1>
             <p className='text-sm sm:text-base text-muted-foreground mt-1'>
-              Colombo Stock Exchange - Real-time Market Data
+              Prices, market activity, and stock performance
             </p>
           </div>
 
@@ -186,7 +189,7 @@ export default function Home() {
           <div className='flex flex-wrap items-center gap-2 sm:gap-4'>
             <div className='text-left sm:text-right'>
               <p className='text-xs sm:text-sm text-muted-foreground'>
-                Last Updated
+                Last updated
               </p>
               <p className='text-sm font-semibold text-foreground'>
                 {lastUpdate.toLocaleTimeString()}
@@ -206,7 +209,7 @@ export default function Home() {
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className='flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md'
+              aria-label={loading ? 'Refreshing market data' : 'Refresh market data'} className='min-h-11 flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm'
             >
               <RefreshCw
                 className={`w-4 h-4 sm:w-5 sm:h-5 ${

@@ -230,9 +230,11 @@ export default function StockChart({
         </div>
 
         {/* Chart Type Selector */}
-        <div className='flex gap-2'>
+        <div className='flex flex-wrap gap-2' role='group' aria-label='Chart style'>
           {chartTypes.map((ct) => (
             <button
+              type='button'
+              aria-pressed={chartType === ct.type}
               key={ct.type}
               onClick={() => setChartType(ct.type)}
               className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
@@ -248,7 +250,7 @@ export default function StockChart({
       </div>
 
       {/* Chart */}
-      <div className='h-[400px] mb-4'>
+      <div className='h-[280px] sm:h-[360px] lg:h-[400px] mb-4' role='img' aria-label={symbol + ' historical price chart'}>
         <ResponsiveContainer width='100%' height='100%'>
           {chartType === "line" ? (
             <LineChart data={filteredData}>
@@ -368,9 +370,11 @@ export default function StockChart({
       </div>
 
       {/* Time Frame Selector */}
-      <div className='flex justify-center flex-wrap gap-2'>
+      <div className='flex justify-center flex-wrap gap-2' role='group' aria-label='Chart time range'>
         {timeFrames.map((tf) => (
           <button
+            type='button'
+            aria-pressed={timeFrame === tf}
             key={tf}
             onClick={() => setTimeFrame(tf)}
             className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${

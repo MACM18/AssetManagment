@@ -16,14 +16,14 @@ export default function Navigation() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav className='sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border shadow-sm'>
+    <nav aria-label='Primary navigation' className='sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center h-16'>
           {/* Logo and Brand */}
           <div className='flex items-center gap-6 md:gap-8'>
             <Link
               href='/'
-              className='flex items-center gap-2 group transition-transform hover:scale-105'
+              className='flex items-center gap-2 group rounded-md'
             >
               <div className='p-1.5 rounded-lg bg-primary text-primary-foreground shadow-md group-hover:shadow-lg transition-shadow'>
                 <TrendingUp className='w-5 h-5' />
@@ -37,6 +37,7 @@ export default function Navigation() {
             <div className='hidden md:flex items-center gap-1'>
               <Link
                 href='/'
+                aria-current={isActive('/') ? 'page' : undefined}
                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive("/")
                     ? "bg-primary text-primary-foreground shadow-sm"
@@ -49,6 +50,7 @@ export default function Navigation() {
               {isAuthenticated && (
                 <Link
                   href='/portfolio'
+                  aria-current={isActive('/portfolio') ? 'page' : undefined}
                   className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
                     isActive("/portfolio")
                       ? "bg-primary text-primary-foreground shadow-sm"
@@ -74,7 +76,9 @@ export default function Navigation() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className='p-2 rounded-lg hover:bg-muted transition-colors'
-              aria-label='Toggle menu'
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls='mobile-primary-menu'
             >
               {mobileMenuOpen ? (
                 <X className='w-6 h-6' />
@@ -87,11 +91,12 @@ export default function Navigation() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className='md:hidden py-4 border-t border-border animate-slide-up'>
+          <div id='mobile-primary-menu' className='md:hidden py-4 border-t border-border animate-slide-up'>
             <div className='flex flex-col gap-2'>
               <Link
                 href='/'
                 onClick={() => setMobileMenuOpen(false)}
+                aria-current={isActive('/') ? 'page' : undefined}
                 className={`px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                   isActive("/")
                     ? "bg-primary text-primary-foreground shadow-sm"
@@ -105,6 +110,7 @@ export default function Navigation() {
                 <Link
                   href='/portfolio'
                   onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/portfolio') ? 'page' : undefined}
                   className={`px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
                     isActive("/portfolio")
                       ? "bg-primary text-primary-foreground shadow-sm"

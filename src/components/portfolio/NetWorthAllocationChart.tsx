@@ -178,8 +178,8 @@ export default function NetWorthAllocationChart() {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number) =>
-              `LKR ${value.toLocaleString("en-LK", {
+            formatter={(value) =>
+              `LKR ${Number(value ?? 0).toLocaleString("en-LK", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}`

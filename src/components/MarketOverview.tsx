@@ -60,8 +60,8 @@ export default function MarketOverview({
       )}
 
       {/* Market Summary Cards */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-        <div className='bg-card rounded-xl p-6 shadow-md border border-border transform transition-all hover:shadow-lg hover:scale-105'>
+      <div className='grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4'>
+        <div className='bg-card rounded-xl p-4 sm:p-5 border border-border transition-shadow hover:shadow-md'>
           <div className='flex items-center justify-between'>
             <div>
               <p className='text-sm font-medium text-muted-foreground mb-1'>
