@@ -214,7 +214,7 @@ export default function PortfolioDashboard() {
           id='portfolio-sidebar'
           aria-label='Portfolio sections'
           className={`
-            fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)] bg-card border-r border-border z-40
+            fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)] bg-card/95 backdrop-blur-xl border-r border-border shadow-xl shadow-slate-950/5 z-40
             transition-transform duration-300 ease-in-out
             ${
               sidebarOpen
@@ -246,10 +246,10 @@ export default function PortfolioDashboard() {
                     setSidebarOpen(false);
                   }}
                   className={`
-                    w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all
+                    w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all
                     ${
                       activeTab === tab.id
-                        ? "bg-primary text-primary-foreground shadow-md"
+                        ? "bg-primary/10 text-primary ring-1 ring-inset ring-primary/15"
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                     }
                   `}
@@ -265,14 +265,14 @@ export default function PortfolioDashboard() {
           <div className='p-4 border-t border-border space-y-2'>
             <button
               onClick={() => setShowAddModal(true)}
-              className='w-full flex items-center gap-3 px-4 py-3 bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all shadow-md'
+              className='w-full flex items-center gap-3 px-4 py-3 bg-primary text-primary-foreground hover:opacity-90 rounded-xl transition-all shadow-sm'
             >
               <Plus className='w-5 h-5' />
               <span className='font-medium'>Add Holding</span>
             </button>
             <button
               onClick={() => setShowAddAssetModal(true)}
-              className='w-full flex items-center gap-3 px-4 py-3 bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border rounded-lg transition-all'
+              className='w-full flex items-center gap-3 px-4 py-3 bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border rounded-xl transition-all'
             >
               <Plus className='w-5 h-5' />
               <span className='font-medium'>Add Asset</span>
@@ -283,7 +283,7 @@ export default function PortfolioDashboard() {
         {/* Main Content */}
         <main className='flex-1 min-h-screen'>
           {/* Header */}
-          <div className='sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border'>
+          <div className='sticky top-0 z-20 bg-background/90 backdrop-blur-xl border-b border-border'>
             <div className='px-6 py-4 flex justify-between items-center'>
               <div>
                 <h1 className='text-2xl font-bold text-foreground'>
@@ -302,7 +302,7 @@ export default function PortfolioDashboard() {
               <button
                 onClick={handleRefresh}
                 disabled={loading}
-                className='flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm hover:shadow-md'
+                className='flex items-center gap-2 px-4 py-2 bg-card text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm hover:shadow-md'
               >
                 <RefreshCw
                   className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}

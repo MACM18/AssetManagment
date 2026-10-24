@@ -16,7 +16,7 @@ export default function Navigation() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav aria-label='Primary navigation' className='sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border'>
+    <nav aria-label='Primary navigation' className='sticky top-0 z-50 bg-card/85 backdrop-blur-xl border-b border-border shadow-[0_1px_0_rgb(15_23_42/0.03)]'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center h-16'>
           {/* Logo and Brand */}
@@ -25,10 +25,10 @@ export default function Navigation() {
               href='/'
               className='flex items-center gap-2 group rounded-md'
             >
-              <div className='p-1.5 rounded-lg bg-primary text-primary-foreground shadow-md group-hover:shadow-lg transition-shadow'>
+              <div className='p-2 rounded-xl bg-primary text-primary-foreground shadow-sm group-hover:shadow-md transition-shadow'>
                 <TrendingUp className='w-5 h-5' />
               </div>
-              <span className='text-lg sm:text-xl font-bold text-foreground'>
+              <span className='text-base sm:text-lg font-bold tracking-tight text-foreground'>
                 stock.macm.dev
               </span>
             </Link>

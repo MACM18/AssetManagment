@@ -51,13 +51,22 @@ export default function Home() {
         setMarketSummary(summary);
         setLastUpdate(new Date());
 
-        // Set default selected symbol if not set
-        if (!selected && stockData.length > 0) {
-          setSelected({
+        // Keep the current selection when it still exists; otherwise select
+        // the first available stock so its chart loads with the market data.
+        setSelected((current) => {
+          const currentStillAvailable = current && stockData.some(
+            (stock) =>
+              stock.symbol === current.symbol &&
+              (stock.shareType ?? "N") === (current.shareType ?? "N")
+          );
+
+          if (currentStillAvailable) return current;
+
+          return {
             symbol: stockData[0].symbol,
             shareType: stockData[0].shareType ?? "N",
-          });
-        }
+          };
+        });
       } else {
         console.warn("No stock data available");
       }
@@ -68,30 +77,6 @@ export default function Home() {
     }
   };
 
-  const loadStockChart = async (
-    symbol: string,
-    shareType?: "N" | "X" | "P" | "Z" | "V"
-  ) => {
-    try {
-      const history = await fetchStockHistory(symbol, 90, shareType);
-
-      if (history.length > 0) {
-        setChartData(history);
-      } else {
-        // Fallback to mock data if no historical data
-        const stKey = (shareType ?? "N").toUpperCase();
-        const selectedStock = stocks.find(
-          (s) => s.symbol === symbol && (s.shareType ?? "N") === stKey
-        );
-        if (selectedStock) {
-          const mockData = generateMockChartData(selectedStock.price, 90);
-          setChartData(mockData);
-        }
-      }
-    } catch (error) {
-      console.error(`Error loading chart data for ${symbol}:`, error);
-    }
-  };
 
   useEffect(() => {
     let cancelled = false;
@@ -130,11 +115,45 @@ export default function Home() {
   }, [authLoading, user]);
 
   useEffect(() => {
-    if (selected?.symbol) {
-      loadStockChart(selected.symbol, selected.shareType ?? "N");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected?.symbol, selected?.shareType]);
+    if (!selected?.symbol) return;
+
+    let cancelled = false;
+    const loadChart = async () => {
+      const selectedStock = stocks.find(
+        (stock) =>
+          stock.symbol === selected.symbol &&
+          (stock.shareType ?? "N") === (selected.shareType ?? "N")
+      );
+
+      if (!selectedStock) return;
+
+      try {
+        const history = await fetchStockHistory(
+          selected.symbol,
+          90,
+          selected.shareType ?? "N"
+        );
+
+        if (!cancelled) {
+          setChartData(
+            history.length > 0
+              ? history
+              : generateMockChartData(selectedStock.price, 90)
+          );
+        }
+      } catch (error) {
+        console.error(`Error loading chart data for ${selected.symbol}:`, error);
+        if (!cancelled) {
+          setChartData(generateMockChartData(selectedStock.price, 90));
+        }
+      }
+    };
+
+    void loadChart();
+    return () => {
+      cancelled = true;
+    };
+  }, [selected?.symbol, selected?.shareType, stocks]);
 
   const handleRefresh = () => {
     setLoading(true);

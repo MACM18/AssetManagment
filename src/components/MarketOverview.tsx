@@ -79,7 +79,7 @@ export default function MarketOverview({
           </div>
         </div>
 
-        <div className='bg-card rounded-xl p-6 shadow-md border border-border transform transition-all hover:shadow-lg hover:scale-105'>
+        <div className='bg-card rounded-xl p-6 shadow-md border border-border transition-shadow hover:shadow-md'>
           <div className='flex items-center justify-between'>
             <div>
               <p className='text-sm font-medium text-muted-foreground mb-1'>
@@ -100,7 +100,7 @@ export default function MarketOverview({
           </div>
         </div>
 
-        <div className='bg-card rounded-xl p-6 shadow-md border border-border transform transition-all hover:shadow-lg hover:scale-105'>
+        <div className='bg-card rounded-xl p-6 shadow-md border border-border transition-shadow hover:shadow-md'>
           <div className='flex items-center justify-between'>
             <div>
               <p className='text-sm font-medium text-muted-foreground mb-1'>
@@ -121,7 +121,7 @@ export default function MarketOverview({
           </div>
         </div>
 
-        <div className='bg-card rounded-xl p-6 shadow-md border border-border transform transition-all hover:shadow-lg hover:scale-105'>
+        <div className='bg-card rounded-xl p-6 shadow-md border border-border transition-shadow hover:shadow-md'>
           <div className='flex items-center justify-between'>
             <div>
               <p className='text-sm font-medium text-muted-foreground mb-1'>

@@ -121,7 +121,7 @@ function StockPageContent() {
       <Navigation />
       <div className="w-full">
         {/* Header Section */}
-        <div className="border-b border-border bg-card/50">
+        <div className="border-b border-border bg-card/80 backdrop-blur-sm">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <Link href="/" className="flex items-center gap-2 text-primary hover:underline mb-6 text-sm">
               <ChevronLeft className="w-4 h-4" />
@@ -137,17 +137,17 @@ function StockPageContent() {
               </div>
 
               {stock && (
-                <div className="md:col-span-2 flex items-end justify-between">
+                <div className="md:col-span-2 flex flex-col sm:flex-row sm:items-end justify-between gap-4 rounded-2xl border border-border bg-background/70 p-5 sm:p-6 shadow-sm">
                   <div>
-                    <div className="text-3xl sm:text-4xl font-bold tracking-tight tabular-nums">LKR {stock.price.toFixed(2)}</div>
-                    <div className={`text-xl mt-2 ${(stock.changePercent ?? 0) >= 0 ? 'text-success' : 'text-destructive'}`}>
+                    <div className="text-3xl sm:text-4xl font-bold tracking-tight tabular-nums text-foreground">LKR {stock.price.toFixed(2)}</div>
+                    <div className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold mt-3 ${(stock.changePercent ?? 0) >= 0 ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
                       {(stock.change ?? 0) >= 0 ? '+' : ''}{(stock.change ?? 0).toFixed(2)} ({(stock.changePercent ?? 0).toFixed(2)}%)
                     </div>
                   </div>
                   {enrichedHoldings.length > 0 && (
                     <div className="text-right pb-2">
                       <div className="text-sm text-muted-foreground">Portfolio Value</div>
-                      <div className="text-2xl font-semibold text-success">
+                      <div className="text-2xl font-semibold text-foreground tabular-nums">
                         LKR {enrichedHoldings.reduce((sum, h) => sum + h.currentValue, 0).toFixed(2)}
                       </div>
                     </div>
@@ -174,7 +174,7 @@ function StockPageContent() {
                 {enrichedHoldings.length > 0 && (
                   <section className="lg:col-span-1">
                     <h2 className="text-xl sm:text-2xl font-bold mb-4">Your holdings</h2>
-                    <div className="bg-card rounded-xl border border-border p-4 sm:p-5 space-y-4">
+                    <div className="bg-card rounded-2xl border border-border p-4 sm:p-5 space-y-4 shadow-sm">
                       {enrichedHoldings.map((h) => (
                         <div key={h.id} className="pb-4 border-b last:border-b-0 last:pb-0">
                           <div className="flex justify-between mb-2">
@@ -208,7 +208,7 @@ function StockPageContent() {
                 {/* Transactions Section */}
                 <section className={enrichedHoldings.length > 0 ? 'lg:col-span-2' : ''}>
                   <h2 className="text-xl sm:text-2xl font-bold mb-4">Transaction history</h2>
-                  <div className="bg-card rounded-xl border border-border p-4 sm:p-5">
+                  <div className="bg-card rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
                     <TransactionHistory symbolFilter={stock.symbol} />
                   </div>
                 </section>
