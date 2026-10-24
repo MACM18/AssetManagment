@@ -19,6 +19,7 @@ import {
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { format, subDays, subMonths, subYears } from "date-fns";
 import { useTheme } from "@/contexts/ThemeContext";
+import { generateMockChartData } from "@/lib/tradingData";
 
 interface StockChartProps {
   data: ChartDataPoint[];
@@ -50,6 +51,22 @@ export default function StockChart({
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("1M");
   const [chartType, setChartType] = useState<ChartType>("line");
   const { actualTheme } = useTheme();
+  const safeCurrentPrice = Number.isFinite(currentPrice) && currentPrice > 0 ? currentPrice : 1;
+  const usableData = useMemo(
+    () => (data ?? []).filter(
+      (point) =>
+        Number.isFinite(new Date(point.date).getTime()) &&
+        Number.isFinite(point.close) &&
+        point.close > 0
+    ),
+    [data]
+  );
+  const sampleData = useMemo(
+    () => generateMockChartData(safeCurrentPrice, 90),
+    [safeCurrentPrice, symbol]
+  );
+  const isSampleHistory = usableData.length < 2;
+  const chartData = isSampleHistory ? sampleData : usableData;
 
   // Get computed colors from CSS variables
   const [chartColors, setChartColors] = useState({
@@ -89,7 +106,7 @@ export default function StockChart({
 
   // Filter data based on timeframe
   const filteredData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    if (chartData.length === 0) return [];
 
     const now = new Date();
     let cutoffDate: Date;
@@ -114,13 +131,14 @@ export default function StockChart({
         cutoffDate = subYears(now, 1);
         break;
       case "ALL":
-        return data;
+        return chartData;
       default:
         cutoffDate = subMonths(now, 1);
     }
 
-    return data.filter((point) => new Date(point.date) >= cutoffDate);
-  }, [data, timeFrame]);
+    const inRange = chartData.filter((point) => new Date(point.date) >= cutoffDate);
+    return inRange.length > 0 ? inRange : chartData;
+  }, [chartData, timeFrame]);
 
   const timeFrames: TimeFrame[] = ["1D", "1W", "1M", "3M", "6M", "1Y", "ALL"];
   const chartTypes: { type: ChartType; label: string }[] = [
@@ -197,9 +215,16 @@ export default function StockChart({
       {/* Header */}
       <div className='flex flex-col sm:flex-row justify-between items-start gap-4 mb-6'>
         <div>
-          <h2 className='text-xl sm:text-2xl font-bold text-foreground'>
-            {symbol}
-          </h2>
+          <div className='flex items-center gap-2'>
+            <h2 className='text-xl sm:text-2xl font-bold text-foreground'>
+              {symbol}
+            </h2>
+            {isSampleHistory && (
+              <span className='rounded-full border border-warning/25 bg-warning/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-warning'>
+                Sample history
+              </span>
+            )}
+          </div>
           <div className='flex flex-wrap items-center mt-2 gap-2 sm:gap-4'>
             <p className='text-2xl sm:text-3xl font-bold text-foreground'>
               Rs.{" "}

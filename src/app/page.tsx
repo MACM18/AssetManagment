@@ -127,25 +127,29 @@ export default function Home() {
 
       if (!selectedStock) return;
 
+      // Draw a chart immediately while Firestore history is loading.
+      const sampleHistory = generateMockChartData(selectedStock.price, 90);
+      setChartData(sampleHistory);
+
       try {
         const history = await fetchStockHistory(
           selected.symbol,
-          90,
+          35,
           selected.shareType ?? "N"
         );
+        const validHistory = history.filter(
+          (point) =>
+            Number.isFinite(new Date(point.date).getTime()) &&
+            Number.isFinite(point.close) &&
+            point.close > 0
+        );
 
-        if (!cancelled) {
-          setChartData(
-            history.length > 0
-              ? history
-              : generateMockChartData(selectedStock.price, 90)
-          );
+        if (!cancelled && validHistory.length > 1) {
+          setChartData(validHistory);
         }
       } catch (error) {
         console.error(`Error loading chart data for ${selected.symbol}:`, error);
-        if (!cancelled) {
-          setChartData(generateMockChartData(selectedStock.price, 90));
-        }
+        // Keep the already-rendered sample chart visible if history fails.
       }
     };
 

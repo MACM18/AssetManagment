@@ -175,7 +175,8 @@ export async function fetchStockHistory(
     const dateQuery = query(
       byDateRef,
       where("date", ">=", cutoffDate),
-      orderBy("date", "asc")
+      orderBy("date", "desc"),
+      limit(Math.max(1, daysBack))
     );
 
     const querySnapshot = await getDocs(dateQuery);
@@ -184,7 +185,10 @@ export async function fetchStockHistory(
     const chartData: ChartDataPoint[] = [];
 
     // Iterate through each date document and find the specific stock (matching symbol and shareType when provided)
-    querySnapshot.docs.forEach((doc) => {
+    querySnapshot.docs
+      .slice()
+      .reverse()
+      .forEach((doc) => {
       const data = doc.data() as FirestoreStockPricesByDate;
       const stocksArray = data.stocks || [];
       console.debug(
