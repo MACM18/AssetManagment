@@ -6,6 +6,18 @@ const nextConfig = {
     unoptimized: true,
   },
   allowedDevOrigins: ['http://localhost:3000'],
+  // Turbopack is the default in Next.js 16. Keep browser bundles free of
+  // Node-only modules, matching the legacy webpack fallbacks below.
+  turbopack: {
+    resolveAlias: {
+      'node:events': { browser: 'events' },
+      fs: { browser: false },
+      net: { browser: false },
+      tls: { browser: false },
+      child_process: { browser: false },
+      http2: { browser: false },
+    },
+  },
   webpack: (config, { isServer }) => {
     // Prevent bundling Node core modules into client-side builds.
     // Some firebase compat packages reference 'net'/'tls' which are Node-only.
